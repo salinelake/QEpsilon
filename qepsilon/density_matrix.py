@@ -4,19 +4,20 @@ This module deals with density matrices.
 
 import torch as th
 from qepsilon.tls import Pauli
-from qepsilon.utility import compose
+from qepsilon.utility import compose, ABAd, bin2idx
 
 class DensityMatrix(th.nn.Module):
     """
-    This class deals with instantaneous quantum operations on n-qubit systems. The operation is not necessarily unitary. A quantum operation is also called a quantum channel. 
+    This class deals with density matrices of an ensemble of n-qubit systems. Basic quantum operations on the ensemble of density matrices are implemented.
+    Quantum operations are not necessarily unitary. A quantum operation is also called a quantum channel. 
     """
-    def __init__(self, n_qubits: int):
+    def __init__(self, n_qubits: int, batchsize: int = 1):
         super().__init__()
         self.nq = n_qubits
         self.ns = 2**n_qubits
+        self.nb = batchsize
         self.pauli = Pauli(n_qubits)
-        self.register_buffer("_rho", None) ## initialize later
-    
+        self.register_buffer("_rho", None) ## initialize later. Shape will be (self.nb, self.ns, self.ns)
 
     ############################################################
     # Getters and setters for the density matrix
@@ -28,16 +29,24 @@ class DensityMatrix(th.nn.Module):
         """
         This function sets the density matrix.
         Args:
-            rho: a 2^n x 2^n complex tensor.
+            rho: a complex tensor. Shape: (self.nb, self.ns, self.ns).
         """
-        if rho.shape != (self.ns, self.ns):
-            raise ValueError("Density matrix must have shape (2^n, 2^n).")
         if rho.dtype != th.cfloat:
             raise ValueError("Density matrix must be a complex tensor (th.cfloat).")
-        if self._rho is None:
-            self._rho = rho
+        if rho.shape == (self.ns, self.ns):
+            rho = rho.unsqueeze(0)
+            if self._rho is None:
+                self._rho = rho.repeat(self.nb, 1, 1)
+            else:
+                self._rho = self._rho * 0 + rho.to(self._rho.device)
+        elif rho.shape == (self.nb, self.ns, self.ns):
+            if self._rho is None:
+                self._rho = rho
+            else:
+                self._rho = rho.to(self._rho.device)
         else:
-            self._rho = rho.to(self._rho.device)
+            raise ValueError("Density matrix must have shape (2^n, 2^n) or (batchsize, 2^n, 2^n).")
+
     
     def set_rho_by_config(self, config: th.Tensor):
         """
@@ -68,7 +77,8 @@ class DensityMatrix(th.nn.Module):
         Args:
             rho: the density matrix to be traced out.
         """
-        return th.trace(rho)
+        # return th.trace(rho)
+        return th.einsum('ijj', rho)
     
     def normalize(self, rho: th.Tensor):
         """
@@ -76,7 +86,7 @@ class DensityMatrix(th.nn.Module):
         Args:
             rho: the density matrix to be normalized.
         """
-        return rho / th.trace(rho)
+        return rho / self.trace(rho)[:, None, None]
     
     def partial_trace(self, rho: th.Tensor, config: th.Tensor):
         """
@@ -95,21 +105,22 @@ class DensityMatrix(th.nn.Module):
         trace_indices = [i for i, keep in enumerate(config) if not keep]
         
         # Reshape the density matrix to separate the qubits
-        reshaped_rho = rho.reshape([2] * (2 * self.nq))
+        reshaped_rho = rho.reshape([self.nb] + ([2] * (2 * self.nq)) )
         
         # Perform the partial trace by summing over the specified axes
-        if self.nq > 26:
+        if self.nq > 25:
             ## it is unlikely to have more than 26 qubits because we store the density matrix plainly.
-            raise NotImplementedError("Partial trace for a system with more than 26 qubits is not implemented.")
+            raise NotImplementedError("Partial trace for a system with more than 25 qubits is not implemented.")
         else:
             ## einstein summation
             ein_equation = [chr(ord('a') + i) for i in range(self.nq)] + [chr(ord('A') + i) for i in range(self.nq)]
             for idx in trace_indices:
                 ein_equation[idx] = ein_equation[idx + self.nq]
+            ein_equation = 'z' + ''.join(ein_equation)
             traced_rho = th.einsum(ein_equation, reshaped_rho)
         
         # Reshape the result back to a matrix
-        new_shape = (2**len(keep_indices), 2**len(keep_indices))
+        new_shape = (self.nb, 2**len(keep_indices), 2**len(keep_indices))
         return traced_rho.reshape(new_shape)
 
     def apply_unitary_rotation(self, rho: th.Tensor, u: th.Tensor, theta: float, config=None):
@@ -120,7 +131,6 @@ class DensityMatrix(th.nn.Module):
             direction: the direction of the rotation. Shape: (3)  
             angle: the angle of the rotation. 
             config: a boolean tensor that specifies the qubits to be rotated. config[i]==True means the i-th qubit is included in the rotation. Shape: (#qubits). If not specified, all qubits are included in the rotation.  
-            set_state: a boolean flag to set the density matrix to the new state.
         """
         ## sanity check
         if config is None:
@@ -136,8 +146,8 @@ class DensityMatrix(th.nn.Module):
         theta = th.tensor(theta).to(u.device)
         M = self.pauli.SU2_rotation(u, theta)
         one_body_ops = [M if config[i] else self.pauli.I for i in range(self.nq)]
-        ops = compose(one_body_ops)
-        rho_new = ops @ rho @ ops.conj().T  
+        ops = compose(one_body_ops).unsqueeze(0)
+        rho_new = ABAd(A=ops, B=rho)
         return rho_new
     
     def apply_kraus_operation(self, rho: th.Tensor, kraus_operators: list[th.Tensor], config=None):
@@ -147,7 +157,6 @@ class DensityMatrix(th.nn.Module):
             rho: the density matrix to be acted on.
             kraus_operators: a list of Kraus operators.
             config: a boolean tensor that specifies the qubits to be acted on. config[i]==True means the i-th qubit is included in the operation. Shape: (#qubits). If not specified, all qubits are included in the operation.
-            set_state: a boolean flag to set the density matrix to the new state.
         """
         if config is None:
             config = th.ones(self.nq, dtype=th.bool)
@@ -158,16 +167,15 @@ class DensityMatrix(th.nn.Module):
             raise ValueError("Config must be a boolean tensor (th.bool).")
         for idx, s in enumerate(config):
             if s:
-                composite_kraus = []
+                ## apply the Kraus operation to the idx-th qubit
+                new_rho = 0
                 for K in kraus_operators:
                     one_body_ops = [self.pauli.I] * self.nq
                     one_body_ops[idx] = K
-                    ops = compose(one_body_ops)
-                    composite_kraus.append(ops)
-                new_rho = 0
-                for K in composite_kraus:
-                    new_rho += K @ rho @ K.conj().T
-        return new_rho
+                    ops = compose(one_body_ops).unsqueeze(0)
+                    new_rho += ABAd(A=ops, B=rho)
+                rho = new_rho
+        return rho
 
     ############################################################
     # Observing the density matrix
@@ -186,9 +194,8 @@ class DensityMatrix(th.nn.Module):
             raise ValueError("One-qubit observable must be a complex tensor (th.cfloat).")
         one_body_ops = [self.pauli.I] * self.nq
         one_body_ops[idx] = observable
-        ops = compose(one_body_ops)
-        th.trace(ops @ rho)
-        return
+        ops = compose(one_body_ops).unsqueeze(0)
+        return self.trace(th.matmul(ops, rho))
     
     def observe_paulix_one_qubit(self, rho: th.Tensor, idx: int):
         return self.observe_one_qubit(rho, self.pauli.X, idx)
@@ -210,9 +217,8 @@ class DensityMatrix(th.nn.Module):
             raise ValueError("Config must have shape (#qubits).")
         if config.dtype != th.int64:
             raise ValueError("Config must be an integer tensor (th.int64).")
-        rho_diag = rho.diag().reshape([2] * self.nq)
-        indices = tuple(config.numpy())
-        return rho_diag[indices]
+        idx = bin2idx(config)
+        return rho[:, idx, idx]
     
     def observe_prob_by_config(self, rho: th.Tensor, config: th.Tensor):
         """
@@ -225,11 +231,7 @@ class DensityMatrix(th.nn.Module):
             raise ValueError("Config must have shape (#qubits).")
         if config.dtype != th.int64:
             raise ValueError("Config must be an integer tensor (th.int64).")
-        rho_diag = rho.diag()
-        rho_trace = rho_diag.sum()
-        rho_diag = rho_diag.reshape([2] * self.nq)
-        indices = tuple(config.numpy())
-        prob = rho_diag[indices] / rho_trace
-        return prob.real
-
-
+        idx = bin2idx(config)
+        prob = rho[:, idx, idx].real / self.trace(rho).real
+        return prob
+ 

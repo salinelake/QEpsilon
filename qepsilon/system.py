@@ -5,7 +5,7 @@ This file contains the system class for the QEpsilon project.
 import torch as th
 from qepsilon.density_matrix import DensityMatrix
 from qepsilon.operator_group import *
-
+from qepsilon.utility import ABAd
 
 class LindbladSystem:
     """
@@ -24,10 +24,11 @@ class LindbladSystem:
     This corresponds to the case where the qubits are coupled to noisy environments such as inhomogeneous, fluctuating magnetic fields. 
     """
 
-    def __init__(self, n_qubits: int):
+    def __init__(self, n_qubits: int, batchsize: int = 1):
         self.nq = n_qubits
         self.ns = 2**n_qubits
-        self.density_matrix = DensityMatrix(n_qubits)
+        self.nb = batchsize 
+        self.density_matrix = DensityMatrix(n_qubits, batchsize)
         self._hamiltonian_operator_group_dict = {}
         self._jumping_group_dict = {}
         self._ham = None
@@ -100,6 +101,8 @@ class LindbladSystem:
         """
         if operator_group.id in self._hamiltonian_operator_group_dict:
             raise ValueError(f"The ID {operator_group.id} already exists.")
+        if operator_group.nb != self.nb:
+            raise ValueError(f"The batchsize of the operator group {operator_group.id} does not match the batchsize of the system.")
         self._hamiltonian_operator_group_dict[operator_group.id] = operator_group
 
     def add_operator_group_to_jumping(self, operator_group: OperatorGroup):
@@ -110,6 +113,8 @@ class LindbladSystem:
         """
         if operator_group.id in self._jumping_group_dict:
             raise ValueError(f"The ID {operator_group.id} already exists.")
+        if operator_group.nb != self.nb:
+            raise ValueError(f"The batchsize of the operator group {operator_group.id} does not match the batchsize of the system.")
         self._jumping_group_dict[operator_group.id] = operator_group
 
     ############################################################
@@ -121,11 +126,13 @@ class LindbladSystem:
         Args:
             dt: a float, the time step.
         Returns:
-            hamiltonian: a tensor, the Hamiltonian operator at time t.
+            hamiltonian: a (self.nb, self.ns, self.ns) tensor, the Hamiltonian operator at time t.
         """
         hamiltonian = 0
         for operator_group in self._hamiltonian_operator_group_dict.values():
-            hamiltonian += operator_group.sample(dt)
+            ops, coefs = operator_group.sample(dt)
+            hamiltonian += ops[None, :, :] * coefs[:, None, None]
+            # hamiltonian += operator_group.sample(dt)
         if set_buffer:
             self._ham = hamiltonian
         return hamiltonian
@@ -136,11 +143,13 @@ class LindbladSystem:
         Args:
             dt: a float, the time step.
         Returns:
-            jump_operator_list: a list of tensors, the jump operators at time t.
+            jump_operator_list: a list of (self.nb, self.ns, self.ns) tensors, the jump operators at time t.
         """
         jump_operator_list = []
         for operator_group in self._jumping_group_dict.values():
-            jump_operator_list.append(operator_group.sample(dt))
+            ops, coefs = operator_group.sample(dt)
+            jump_operator_list.append(ops[None, :, :] * coefs[:, None, None])
+            # jump_operator_list.append(operator_group.sample(dt))
         if set_buffer:
             self._jump = jump_operator_list
         return jump_operator_list
@@ -150,16 +159,16 @@ class LindbladSystem:
         This function steps the density matrix for a time step dt.
         Args:
             dt: a float, the time step.
-            hamiltonian: a tensor, the Hamiltonian operator at time t.
-            jump_operators: a list of tensors, the jump operators at time t.
+            hamiltonian: a (self.nb, self.ns, self.ns) tensor, the Hamiltonian operator at time t.
+            jump_operators: a list of (self.nb, self.ns, self.ns) tensors, the jump operators at time t.
         Returns:
-            rho_new: a tensor, the density matrix at time t+dt.
+            rho_new: a (self.nb, self.ns, self.ns) tensor, the density matrix at time t+dt.
         """
         rho = self.rho
-        identity = th.eye(self.ns, dtype=th.cfloat).to(rho.device)
-        rho_new = (identity - 1j * dt * hamiltonian) @ rho @ (identity + 1j * dt * hamiltonian)
+        identity = th.eye(self.ns, dtype=th.cfloat).to(rho.device).unsqueeze(0)
+        rho_new = ABAd(identity - 1j * dt * hamiltonian, rho)
         for jump_operator in jump_operators:
-            rho_new += dt * jump_operator @ rho @ jump_operator.T.conj()
+            rho_new += ABAd(jump_operator, rho) * dt
         return rho_new
 
     def step(self, dt: float, set_buffer: bool = False):
@@ -167,10 +176,12 @@ class LindbladSystem:
         This function steps the system for a time step dt.
         """
         hamiltonian = self.step_hamiltonian(dt, set_buffer)
-        jump_operator_list = self.step_jumping(dt, set_buffer)
-        rho_new = self.step_rho(dt, hamiltonian, jump_operator_list)
-        self.rho = rho_new
-        return rho_new
+        if self._jumping_group_dict:
+            jump_operator_list = self.step_jumping(dt, set_buffer)
+        else:
+            jump_operator_list = []
+        self.rho = self.step_rho(dt, hamiltonian, jump_operator_list)
+        return self.rho
 
     def rotate(self, direction: th.Tensor, angle: float, config=None):
         """
@@ -178,12 +189,14 @@ class LindbladSystem:
         """
         rho_new = self.density_matrix.apply_unitary_rotation(self.rho, direction, angle, config)
         self.rho = rho_new
-        return rho_new
-    
+        return self.rho
+
     def kraus_operate(self, kraus_operators: list[th.Tensor], config=None):
-        rho_new = self.density_matrix.apply_kraus_operation(self.rho, kraus_operators, config)
-        self.rho = rho_new
-        return rho_new
+        """
+        Apply a Kraus operation.
+        """
+        self.rho = self.density_matrix.apply_kraus_operation(self.rho, kraus_operators, config)
+        return self.rho
  
 class MolecularLindbladSystem(LindbladSystem):
     """

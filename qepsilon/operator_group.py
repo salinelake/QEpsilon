@@ -7,11 +7,12 @@ class OperatorGroup(th.nn.Module):
     """
     This is a base class for operator groups.
     """
-    def __init__(self, n_qubits: int, id: str):
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1):
         super().__init__()
         self.nq = n_qubits
         self.ns = 2**n_qubits
         self.id = id
+        self.nb = batchsize
         self._ops = []
     
     def add_operator(self):
@@ -23,12 +24,14 @@ class OperatorGroup(th.nn.Module):
     def sum_operators(self):
         """
         Sum up the operators in the group. Coefficients not multiplied! To be implemented in subclasses.
+        Returns a matrix of shape (self.ns, self.ns).
         """
         pass
 
     def sample(self):
         """
         Sample the total operator with static or stochastic coefficients. To be implemented in subclasses.
+        Returns the operator matrix of shape (self.ns, self.ns) and a list of coefficients. The length of the list is the batchsize.
         """
         pass
 
@@ -37,8 +40,8 @@ class PauliOperatorGroup(OperatorGroup):
     This class deals with a group of operators (composite Pauli operators on n-qubit systems). 
     Each operator is a direct product of Pauli operators. It is specified by a string of Pauli operator names.  For example, "XI" is the 2-body operator X_1 \otimes I_2.
     """
-    def __init__(self, n_qubits: int, id: str):
-        super().__init__(n_qubits, id)
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1):
+        super().__init__(n_qubits, id, batchsize)
         self.pauli = Pauli(n_qubits)
     
     def add_operator(self, PauliSequence: str):
@@ -63,52 +66,68 @@ class StaticPauliOperatorGroup(PauliOperatorGroup):
     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a static coefficient. 
     Each operator is a direct product of Pauli operators. It is specified by a string of Pauli operator names.  For example, "XI" is the 2-body operator X_1 \otimes I_2.
     """
-    def __init__(self, n_qubits: int, id: str, coef: float, requires_grad: bool = False):
-        super().__init__(n_qubits, id)
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, coef: float = 1, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize)
         if requires_grad:
-            self.register_parameter("coef", th.nn.Parameter(th.tensor(coef)))
+            self.register_parameter("coef", th.nn.Parameter(th.tensor(coef, dtype=th.float)))
         else:
-            self.register_buffer("coef", th.tensor(coef))
+            self.register_buffer("coef", th.tensor(coef, dtype=th.float))
     
     def sample(self, dt: float):
         """
         This function sum up the operators in the group.
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
         """
-        return self.sum_operators() * self.coef
+        ops = self.sum_operators() 
+        return ops, th.tensor([self.coef] * self.nb, dtype=ops.dtype, device=ops.device)
 
 class WhiteNoisePauliOperatorGroup(PauliOperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a white noise coefficient. 
     """
-    def __init__(self, n_qubits: int, id: str,  amp: float, requires_grad: bool = False):
-        super().__init__(n_qubits, id)
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, amp: float = 1, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize)
         if requires_grad:
-            self.register_parameter("amp", th.nn.Parameter(th.tensor(amp)))
+            self.register_parameter("amp", th.nn.Parameter(th.tensor(amp, dtype=th.float)))
         else:
-            self.register_buffer("amp", th.tensor(amp))
+            self.register_buffer("amp", th.tensor(amp, dtype=th.float))
     
     def sample(self, dt: float):
         """
         This function sample the average of the total operator for a time step dt. 
         Note that the accumulation of the white noise is a Wiener process. dW ~ N(0, sqrt(dt)). 
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
         """
-        noise = np.random.normal(0, 1) * self.amp
-        return noise * self.sum_operators() / np.sqrt(dt)
+        noise = np.random.normal(0, 1, self.nb) 
+        noise = th.tensor(noise, dtype=self.amp.dtype, device=self.amp.device) * self.amp / np.sqrt(dt)
+        return self.sum_operators(), noise
 
 class ColorNoisePauliOperatorGroup(PauliOperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a fluctuating coefficient. 
+    ## TODO: pre-compute the noise history with a convolution.
     """
-    def __init__(self, n_qubits: int, id: str, damping: float, amp: float, requires_grad: bool = False):
-        super().__init__(n_qubits, id)
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, damping: float = 1, amp: float = 1, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize)
         if requires_grad:
-            self.register_parameter("damping", th.nn.Parameter(th.tensor(damping)))
-            self.register_parameter("amp", th.nn.Parameter(th.tensor(amp)))
+            self.register_parameter("damping", th.nn.Parameter(th.tensor(damping, dtype=th.float)))
+            self.register_parameter("amp", th.nn.Parameter(th.tensor(amp, dtype=th.float)))
         else:
-            self.register_buffer("damping", th.tensor(damping))
-            self.register_buffer("amp", th.tensor(amp))
+            self.register_buffer("damping", th.tensor(damping, dtype=th.float))
+            self.register_buffer("amp", th.tensor(amp, dtype=th.float))
 
-        self.register_buffer("noise", th.tensor(0))
+        self.register_buffer("noise", th.randn(self.nb) * amp)
+        
+    def reset_history(self):
+        self.noise = th.randn(self.nb, device=self.amp.device) * self.amp
 
     def z1(self, dt: float):
         return th.exp(-self.damping * dt)
@@ -120,18 +139,24 @@ class ColorNoisePauliOperatorGroup(PauliOperatorGroup):
         """
         This function steps the color noise for a time step dt, then return the total operator.
         dx = -damping * x + amp * dW
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
         """
-        drive = np.random.normal(0, 1) * self.amp
+        drive = np.random.normal(0, 1, self.nb)
+        drive = th.tensor(drive, dtype=self.amp.dtype, device=self.amp.device) * self.amp
         noise_new = self.noise * self.z1(dt) + drive * self.z2(dt)   
         self.noise = noise_new
-        return self.noise * self.sum_operators()
+        return self.sum_operators(), noise_new
  
 class CustomNoiseOperatorGroup(PauliOperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a custom noise. 
     """
-    def __init__(self, n_qubits: int, id: str, noise: callable, shift: float=0, scale: float=1, requires_grad: bool = False):
-        super().__init__(n_qubits, id)
+    def __init__(self, n_qubits: int, id: str, batchsize: int, noise: callable, shift: float=0, scale: float=1, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize)
         if requires_grad:
             self.register_parameter("shift", th.nn.Parameter(th.tensor(shift)))
             self.register_parameter("scale", th.nn.Parameter(th.tensor(scale)))
