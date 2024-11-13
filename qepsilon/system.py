@@ -7,7 +7,7 @@ from qepsilon.density_matrix import DensityMatrix
 from qepsilon.operator_group import *
 from qepsilon.utility import ABAd
 
-class LindbladSystem:
+class LindbladSystem(th.nn.Module):
     """
     This class represents the states of n physical qubits as a open quantum system.
     The states are represented by a density matrix. 
@@ -25,6 +25,7 @@ class LindbladSystem:
     """
 
     def __init__(self, n_qubits: int, batchsize: int = 1):
+        super().__init__()
         self.nq = n_qubits
         self.ns = 2**n_qubits
         self.nb = batchsize 
@@ -90,6 +91,27 @@ class LindbladSystem:
     # def jump(self, jump: list[th.Tensor]):
     #     self._jump = jump
 
+    def reset(self):
+        """
+        Reset the system.
+        """
+        for operator_group in self._hamiltonian_operator_group_dict.values():
+            operator_group.reset()
+        for operator_group in self._jumping_group_dict.values():
+            operator_group.reset()
+
+    def HamiltonianParameters(self):
+        parameters_list = []
+        for operator_group in self._hamiltonian_operator_group_dict.values():
+            parameters_list.extend(list(operator_group.parameters()))
+        return parameters_list
+        
+    def JumpingParameters(self):
+        parameters_list = []
+        for operator_group in self._jumping_group_dict.values():
+            parameters_list.extend(list(operator_group.parameters()))
+        return parameters_list
+    
     ############################################################
     # Methods for adding operator groups
     ############################################################

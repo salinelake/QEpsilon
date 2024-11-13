@@ -38,7 +38,7 @@ class DensityMatrix(th.nn.Module):
             if self._rho is None:
                 self._rho = rho.repeat(self.nb, 1, 1)
             else:
-                self._rho = self._rho * 0 + rho.to(self._rho.device)
+                self._rho = rho.repeat(self.nb, 1, 1).to(self._rho.device)
         elif rho.shape == (self.nb, self.ns, self.ns):
             if self._rho is None:
                 self._rho = rho
