@@ -1,69 +1,136 @@
 import numpy as np
 import torch as th
 import qepsilon as qe
-from qepsilon import WhiteNoisePauliOperatorGroup, ColorNoisePauliOperatorGroup, StaticPauliOperatorGroup
-## do not print the tensor in scientific notation
-th.set_printoptions(sci_mode=False)
+from qepsilon import *
+from qepsilon.task import *
+from matplotlib import pyplot as plt
+import logging
+import time
 
+log_suffix = time.strftime("%Y%m%d-%H%M%S")
+logging.basicConfig(filename=f'log_{log_suffix}.log', level=logging.INFO)
+
+## do not print the tensor in scientific notation
+th.set_printoptions(sci_mode=False, precision=3)
+dev = 'cpu'
 ################################################
 #  define the system
 ################################################
-batchsize = 400
-qubit = qe.LindbladSystem(n_qubits=1, batchsize=batchsize)
+batchsize = 1000
+qubit = qe.LindbladSystem(n_qubits=1, batchsize=batchsize).to(dev)
+qubit.set_rho_by_config([0])
+qubit.to(dev)
 
 ################################################
-# define the noisy terms in the Hamiltonian
+# define the terms in the Hamiltonian
 ################################################
-sx = ColorNoisePauliOperatorGroup(n_qubits=1, id="sx_noise", batchsize=batchsize, damping=1/20, amp=0.1, requires_grad=True)
-# sx = WhiteNoisePauliOperatorGroup(n_qubits=1, id="sx_noise", batchsize=batchsize,  amp=0.1, requires_grad=True)
-sx.add_operator('X')
-qubit.add_operator_group_to_hamiltonian(sx)
+sz_shot = ShotbyShotNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_shot", batchsize=batchsize, amp=0.1290924847126007e-3, requires_grad=False).to(dev)
+sz_shot.add_operator('Z')
+qubit.add_operator_group_to_hamiltonian(sz_shot)
 
-sy = ColorNoisePauliOperatorGroup(n_qubits=1, id="sy_noise", batchsize=batchsize, damping=1/20, amp=0.1, requires_grad=True)
-# sy = WhiteNoisePauliOperatorGroup(n_qubits=1, id="sy_noise", batchsize=batchsize,  amp=0.1, requires_grad=True)
-sy.add_operator('Y')
-qubit.add_operator_group_to_hamiltonian(sy)
+sz0 = ColorNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_color", batchsize=batchsize, tau=3.79406476020813e3, amp=0.056637242436409e-3, requires_grad=False).to(dev)
+sz0.add_operator('Z')
+qubit.add_operator_group_to_hamiltonian(sz0)
+
+sz1 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_60hz", batchsize=batchsize, tau=(1e6/60), amp=0.037787340581417084e-3, requires_grad=False).to(dev)
+sz1.add_operator('Z')
+qubit.add_operator_group_to_hamiltonian(sz1)
+
+sz2 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_120hz", batchsize=batchsize, tau=(1e6/120), amp=0.06451722234487534e-3, requires_grad=False).to(dev)
+sz2.add_operator('Z')
+qubit.add_operator_group_to_hamiltonian(sz2)
+
+sz3 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_180hz", batchsize=batchsize, tau=(1e6/180), amp=0.03498165309429169e-3, requires_grad=False).to(dev)
+sz3.add_operator('Z')
+qubit.add_operator_group_to_hamiltonian(sz3)
+
+sz4 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_240hz", batchsize=batchsize, tau=(1e6/240), amp=0.10737115889787674e-3, requires_grad=False).to(dev)
+sz4.add_operator('Z')
+qubit.add_operator_group_to_hamiltonian(sz4)
 
 ################################################
 # define the jump operators
 ################################################
-sx_jump = StaticPauliOperatorGroup(n_qubits=1, id="sx_jump", batchsize=batchsize, coef=np.sqrt(0.002), requires_grad=False)
+sx_jump = StaticPauliOperatorGroup(n_qubits=1, id="sx_jump", batchsize=batchsize, coef=0.031233053654432297*(1e-3)**0.5, requires_grad=False).to(dev)
 sx_jump.add_operator('X')
 qubit.add_operator_group_to_jumping(sx_jump)
 
-sz_jump = StaticPauliOperatorGroup(n_qubits=1, id="sz_jump", batchsize=batchsize, coef=np.sqrt(0.002), requires_grad=False)
+sz_jump = StaticPauliOperatorGroup(n_qubits=1, id="sz_jump", batchsize=batchsize, coef=0.03273218125104904*(1e-3)**0.5, requires_grad=False).to(dev)
 sz_jump.add_operator('Z')
 qubit.add_operator_group_to_jumping(sz_jump)
+
 ################################################
-# Simulation parameters
+# define the error channel of each pulse
 ################################################
-dt = 0.1
-T = 2.5
-nsteps = int(T / dt)
-theta_list = np.array([0, 60, 120, 180]) * np.pi / 180
-P0_list_ref = [0.3, 0.4, 0.5, 0.6] 
+depol_channel = DepolarizationChannel(n_qubits=1, id="depol_channel", batchsize=batchsize, p=0.00032660365104675293, requires_grad=False).to(dev)
+qubit.add_operator_group_to_channel(depol_channel)
+
+################################################
+# Experimental data
+################################################
+preperation_rate = 0.824
+## load csv data
+data_plain = np.loadtxt('./Data/Fig3C_GreenTriangles.csv', delimiter=',', skiprows=1)
+data_plain = th.tensor(data_plain, dtype=th.float).to(dev)
+data_plain[:, 1] /= preperation_rate
+data_plain[:, 0] *= 1e3
+data_plain = data_plain[1:]
+
+data_echo = np.loadtxt('./Data/Fig3C_RedSquares.csv', delimiter=',', skiprows=1)
+data_echo = th.tensor(data_echo, dtype=th.float).to(dev)
+data_echo[:, 1] /= preperation_rate
+data_echo[:, 0] *= 1e3
+data_echo = data_echo[1:]
+
+data_XY8 = np.loadtxt('./Data/Fig3C_BlueCircles.csv', delimiter=',', skiprows=1)
+data_XY8 = th.tensor(data_XY8, dtype=th.float).to(dev)
+data_XY8[:, 1] /= preperation_rate
+data_XY8[:, 0] *= 1e3
+
+XY8_cycle_time = 1600
 ################################################
 #  train
 ################################################
-nepoch = 100
-for epoch in range(nepoch):
-    P0_list = []
-    for theta in theta_list:
-        sx.reset_history()
-        sy.reset_history()
-        ## set the initial state
-        qubit.set_rho_by_config([0])
-        # first pi/2 rotation along x
-        qubit.rotate(direction=th.tensor([1.0,0,0]), angle=np.pi/2)
-        # free evolution
-        for i in range(nsteps):
-            qubit.step(dt=dt)
-        # second pi/2 rotation along x
-        u = th.tensor([np.cos(theta), np.sin(theta), 0.0], dtype=th.float)
-        qubit.rotate(direction=u, angle=np.pi/2)
-        # observe the probability of being in the state |0>
-        prob_0 = qubit.density_matrix.observe_prob_by_config(qubit.rho, th.tensor([0]))
-        P0_list.append(prob_0.mean())
-    print(f"Epoch={epoch}, Ramsey Fringes for T={T}, theta = {th.tensor(theta_list, dtype=th.float)} are {th.tensor(P0_list, dtype=th.float).detach()}")
-    print(f'Sx Damping={sx.damping.mean()}, Amp={sx.amp.mean()}, Sy Damping={sy.damping.mean()}, Amp={sy.amp.mean()}')
+for op in qubit.hamiltonian_operator_groups:
+    if op.tau is not None:
+        logging.info(f'Hamiltonian: {op.id} Tau={op.tau.mean()}ms, Amp={op.amp.mean()}')
+    else:
+        logging.info(f'Hamiltonian: {op.id} Amp={op.amp.mean()}')
+for op in qubit.jumping_operator_groups:
+    logging.info(f'Jump: {op.id} Amp={op.coef.mean()}')
+logging.info(f"depol_channel: p={depol_channel.p.mean()}")
 
+## Ramsey experiment without echo
+Ramsey_Plain_P0 = RamseyScan(qubit, dt=10, T=3000, theta_list=[0, np.pi], observe_at=data_plain[:, 0])
+Ramsey_Plain_Contrast = th.abs(Ramsey_Plain_P0[:, 1] - Ramsey_Plain_P0[:, 0])
+logging.info(f"Ramsey Plain Data={data_plain[:, 1]}")
+logging.info(f"Ramsey Plain Simulated={Ramsey_Plain_Contrast.detach()}")
+
+## Ramsey experiment with echo
+Ramsey_Echo_Contrast = []
+for T in data_echo[:, 0]:
+    Ramsey_Echo_P0 = RamseySpinEcho(qubit, dt=100, T=T, theta_list=[0, np.pi])
+    Ramsey_Echo_Contrast.append(th.abs(Ramsey_Echo_P0[1] - Ramsey_Echo_P0[0]))
+Ramsey_Echo_Contrast = th.stack(Ramsey_Echo_Contrast)
+logging.info(f"Ramsey Echo Data={data_echo[:, 1]}")
+logging.info(f"Ramsey Echo Simulated={Ramsey_Echo_Contrast.detach()}")
+
+## Ramsey experiment with XY8 sequence
+Ramsey_XY8_P0 = RamseyScan_XY8(qubit, dt=100, T=150000, cycle_time=XY8_cycle_time, theta_list=[0, np.pi], observe_at=data_XY8[:, 0])
+Ramsey_XY8_Contrast = th.abs(Ramsey_XY8_P0[:, 1] - Ramsey_XY8_P0[:, 0])
+logging.info(f"Ramsey XY8 Data={data_XY8[:, 1]}")
+logging.info(f"Ramsey XY8 Simulated={Ramsey_XY8_Contrast.detach()}")
+
+fig, ax = plt.subplots(figsize=(4, 3))
+ax.plot(data_plain[:, 0], Ramsey_Plain_Contrast.detach().numpy() * preperation_rate, label='Simulated', color='green')
+ax.plot(data_plain[:, 0], data_plain[:, 1] * preperation_rate, marker='^', color='green', label='Data', linestyle='None') # triangle marker
+ax.plot(data_echo[:, 0], Ramsey_Echo_Contrast.detach().numpy() * preperation_rate, label='Simulated', color='red')
+ax.plot(data_echo[:, 0], data_echo[:, 1] * preperation_rate, marker='s', color='red', label='Data', linestyle='None') # square marker
+ax.plot(data_XY8[:, 0], Ramsey_XY8_Contrast.detach().numpy() * preperation_rate, label='Simulated', color='blue')
+ax.plot(data_XY8[:, 0], data_XY8[:, 1] * preperation_rate, marker='o', color='blue', label='Data', linestyle='None') # circle marker
+ax.set_xlabel('Time [ms]')
+ax.set_ylabel('Contrast')
+ax.legend()
+plt.show()
+plt.tight_layout()
+plt.savefig(f'ramsey_contrast_{log_suffix}_confirm.png')

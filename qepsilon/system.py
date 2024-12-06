@@ -6,6 +6,9 @@ import torch as th
 from qepsilon.density_matrix import DensityMatrix
 from qepsilon.operator_group import *
 from qepsilon.utility import ABAd
+from qepsilon.particles import Particles
+import logging
+from time import time as timer
 
 class LindbladSystem(th.nn.Module):
     """
@@ -32,12 +35,21 @@ class LindbladSystem(th.nn.Module):
         self.density_matrix = DensityMatrix(n_qubits, batchsize)
         self._hamiltonian_operator_group_dict = {}
         self._jumping_group_dict = {}
+        self._channel_group_dict = {}
         self._ham = None
         self._jump = None
 
     ############################################################
     # Setter and getter  
     ############################################################
+    @property
+    def hamiltonian_operator_groups(self):
+        return list(self._hamiltonian_operator_group_dict.values()) 
+    
+    @property
+    def jumping_operator_groups(self):
+        return list(self._jumping_group_dict.values()) 
+
     @property
     def rho(self):
         """
@@ -112,6 +124,12 @@ class LindbladSystem(th.nn.Module):
             parameters_list.extend(list(operator_group.parameters()))
         return parameters_list
     
+    def ChannelParameters(self):
+        parameters_list = []
+        for operator_group in self._channel_group_dict.values():
+            parameters_list.extend(list(operator_group.parameters()))
+        return parameters_list
+
     ############################################################
     # Methods for adding operator groups
     ############################################################
@@ -139,6 +157,14 @@ class LindbladSystem(th.nn.Module):
             raise ValueError(f"The batchsize of the operator group {operator_group.id} does not match the batchsize of the system.")
         self._jumping_group_dict[operator_group.id] = operator_group
 
+    def add_operator_group_to_channel(self, operator_group: OperatorGroup):
+        """
+        This function adds an operator group to the channel part of the system.
+        """
+        if operator_group.id in self._channel_group_dict:
+            raise ValueError(f"The ID {operator_group.id} already exists.")
+        self._channel_group_dict[operator_group.id] = operator_group
+
     ############################################################
     # Methods for evolving the system
     ############################################################
@@ -153,8 +179,17 @@ class LindbladSystem(th.nn.Module):
         hamiltonian = 0
         for operator_group in self._hamiltonian_operator_group_dict.values():
             ops, coefs = operator_group.sample(dt)
-            hamiltonian += ops[None, :, :] * coefs[:, None, None]
-            # hamiltonian += operator_group.sample(dt)
+            ## sanitary check
+            if coefs.shape != (self.nb,):
+                raise ValueError("The coefficients sampled from an operator group should be a 1D tensor of length equal to the batchsize.")
+            ## no broadcasting if the operators is already batched
+            if ops.shape == (self.nb, self.ns, self.ns):
+                hamiltonian += ops * coefs[:, None, None]
+            ## broadcast if the operators is not already batched
+            elif ops.shape == (self.ns, self.ns):
+                hamiltonian += ops[None, :, :] * coefs[:, None, None]
+            else:
+                raise ValueError(f"The shape of the operator sampled from operator group {operator_group.id} should either be (batchsize, n_states, n_states) or (n_states, n_states).")
         if set_buffer:
             self._ham = hamiltonian
         return hamiltonian
@@ -220,7 +255,7 @@ class LindbladSystem(th.nn.Module):
         self.rho = self.density_matrix.apply_kraus_operation(self.rho, kraus_operators, config)
         return self.rho
  
-class MolecularLindbladSystem(LindbladSystem):
+class ParticleLindbladSystem(LindbladSystem):
     """
     This class represents the states of n physical qubits as a open quantum system.
     The quantum states include the two-level states of each qubit and the center-of-mass position and momentum of each qubit. 
@@ -230,4 +265,53 @@ class MolecularLindbladSystem(LindbladSystem):
 
     For harmonic trapping with frequency omega, the number of beads needed for convergence can be estimated by  (hbar omega / kT).
     """
-    pass
+    def __init__(self, n_qubits: int, batchsize: int, particles: Particles):
+        super().__init__(n_qubits, batchsize)
+        self.particles = particles
+
+    def reset(self):
+        """
+        Reset the system. 
+        In addition to the reset of the quantum system, the center-of-mass positions and momenta of the particles are also reset to arbitrary thermal states.
+        """
+        for operator_group in self._hamiltonian_operator_group_dict.values():
+            operator_group.reset()
+        for operator_group in self._jumping_group_dict.values():
+            operator_group.reset()
+        self.particles.reset()
+        # self.step_particles(3000)
+
+    def step_particles(self, dt: float):
+        """
+        This function steps the thermal motino of the particles for a time step dt.
+        """
+        dt_thermal = self.particles.dt
+        substeps = int(np.round(dt / dt_thermal, 0))
+        if (dt / dt_thermal) != substeps:
+            raise ValueError("The time step dt of integrating Lindblad equation must be an integer multiple of the time step dt_thermal for integrating the thermal motion of particles.")
+        for _ in range(substeps):
+            self.particles.zero_forces()
+            self.particles.modify_forces(self.particles.get_trapping_forces())
+            self.particles.step_langevin(record_traj=True)
+        return
+
+    def step(self, dt: float, set_buffer: bool = False, profile: bool = False):
+        """
+        This function steps the system for a time step dt.
+        """
+        if profile:
+            t0 = timer()
+        self.step_particles(dt)  ## TODO: uncomment this line to include the thermal motion of particles
+        if profile:
+            t1 = timer()
+            logging.info(f"The time taken for stepping the thermal motion of qubits is {t1 - t0}s.")
+        hamiltonian = self.step_hamiltonian(dt, set_buffer=True)
+        if self._jumping_group_dict:
+            jump_operator_list = self.step_jumping(dt, set_buffer)
+        else:
+            jump_operator_list = []
+        self.rho = self.step_rho(dt, hamiltonian, jump_operator_list)
+        if profile:
+            t2 = timer()
+            logging.info(f"The time taken for stepping the quantum states of qubits is {t2 - t1}s.")
+        return self.rho

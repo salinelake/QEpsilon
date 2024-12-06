@@ -226,6 +226,8 @@ class DensityMatrix(th.nn.Module):
         Args:
             rho: the density matrix.
             config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means |01>.
+        Returns:
+            prob: the probability of the spin configuration. Shape: (batchsize).
         """
         if config.shape != (self.nq,):
             raise ValueError("Config must have shape (#qubits).")
