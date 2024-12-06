@@ -299,7 +299,6 @@ class ColorNoisePauliOperatorGroup_Conv(PauliOperatorGroup):
         else:
             ## new white noise, move the stack forward
             self.noise = th.cat([th.randn((self.nb, 1), device=self.noise.device), self.noise[:, :-1]], dim=1)
-        print(self.noise.shape)
         conv_kernel = th.exp(-self.damping * (th.arange(l_kernel, dtype=self.noise.dtype, device=self.noise.device) + 0.5) * dt)
         coef = th.sum(self.noise[:, :l_kernel] * conv_kernel, dim=1)
         coef = th.sqrt(2 * self.damping) * self.amp * coef * np.sqrt(dt)
@@ -311,7 +310,7 @@ class DipolarInteraction(PauliOperatorGroup):
     """
     This class deals with dipolar-dipole interactions.
     """
-    def __init__(self, n_qubits: int, id: str, batchsize: int, particles: Particles, connectivity: th.Tensor, prefactor: float=1, average_nsteps: int = 100, requires_grad: bool = False):
+    def __init__(self, n_qubits: int, id: str, batchsize: int, particles: Particles, connectivity: th.Tensor, prefactor: float=1, average_nsteps: int = 100, qaxis: th.Tensor=th.tensor([0.0, 1.0, 0.0]), requires_grad: bool = False):
         super().__init__(n_qubits, id, batchsize)
         """
         dipolar interaction between pairs of particles.
@@ -330,6 +329,8 @@ class DipolarInteraction(PauliOperatorGroup):
             self.register_buffer("prefactor", th.tensor(prefactor, dtype=th.float))
         self.particles = particles
         self.average_nsteps = average_nsteps
+        self.qaxis = qaxis
+        # self.dcut = 0.1
         ## make connectivity a upper triangular matrix
         self.connectivity = connectivity & (th.triu(th.ones_like(connectivity))==1)
         self.pair_list = th.nonzero(self.connectivity)
@@ -348,11 +349,9 @@ class DipolarInteraction(PauliOperatorGroup):
             op += self.pauli.get_composite_ops(pauli_seq)
             self._ops.append(op)
 
-    def get_dipole_dipole_coef(self, axis: th.Tensor=th.tensor([0.0, 0.0, 1.0])):
+    def get_dipole_dipole_coef(self):
         """
         Get the dipole-dipole interaction coefficients.
-        Args:
-            axis: th.Tensor, the axis of the dipole moment.
         Returns:
             coef: th.Tensor, the dipole-dipole interaction coefficients of shape (nb, npair).
         """
@@ -360,19 +359,16 @@ class DipolarInteraction(PauliOperatorGroup):
         nsteps = self.average_nsteps
         nb = particles.nb
         nq = particles.nq
-        axis = axis / th.norm(axis)
-        coef_avg = 0
-        # for i in range(1, nsteps+1):
-        #     pos = particles.traj[-i]
-        #     distance = pos.reshape(nb,nq,1,3) - pos.reshape(nb,1,nq,3)
-        #     separation = th.norm(distance, dim=-1)
-        #     cos_theta = (distance * axis[None,None,None,:]).sum(dim=-1) / separation
-        #     coef = (1 - 3 * cos_theta**2) / separation**3
-        #     coef_select = coef[self.connectivity.repeat(nb,1,1)].reshape(nb, self.npair)
-        #     coef_avg += coef_select / nsteps
+        axis = self.qaxis / th.norm(self.qaxis)
         pos = th.stack(particles.traj[-nsteps:])  # shape: (nsteps, nb, nq, 3)
         distance = pos.reshape(nsteps, nb, nq, 1, 3) - pos.reshape(nsteps, nb, 1, nq, 3)
         separation = th.norm(distance, dim=-1)
+        
+        # ## clip separation
+        # separation = th.clip(separation, min=self.dcut)
+        # ## renormalize distance
+        # distance = distance / th.norm(distance+1e-8, dim=-1)[...,None] * separation[...,None]
+
         cos_theta = (distance * axis[None,None,None,None,:]).sum(dim=-1) / separation
         coef = (1 - 3 * cos_theta**2) / separation**3  # shape: (nsteps, nb, nq, nq)
         coef_select = coef[self.connectivity.repeat(nsteps,nb,1,1)].reshape(nsteps, nb, self.npair)
@@ -390,6 +386,7 @@ class DipolarInteraction(PauliOperatorGroup):
         """
         total_ops = 0
         coef = self.get_dipole_dipole_coef()
+        # coef = th.ones_like(coef) * coef.mean()  ## TODO: remove this line
         for idx, op in enumerate(self._ops):
             total_ops += op[None,:,:] * coef[:,idx, None,None]
         return total_ops, th.ones_like(coef[:,0])

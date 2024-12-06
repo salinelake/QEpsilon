@@ -196,6 +196,7 @@ def RamseyScan_XY8_TwoQubits(system, dt: float, T: float, cycle_time: float, obs
     dd_iterator = XY8(cycle_time)
     ## 
     P00_list = []
+    loss_list = []
     nsteps = int(T/dt)+1
     observe_steps = []
     for obs_t in observe_at:
@@ -205,6 +206,7 @@ def RamseyScan_XY8_TwoQubits(system, dt: float, T: float, cycle_time: float, obs
     dm = system.density_matrix
     ## reset history of the system
     system.reset()
+    # system.step_particles(3000) # 3ms thermalization
     ## set the initial state
     system.set_rho_by_config([0, 0])
     # first pi/2 rotation along x
@@ -231,7 +233,14 @@ def RamseyScan_XY8_TwoQubits(system, dt: float, T: float, cycle_time: float, obs
             d0 = pos[:,0,0] - tweezers_center[0][0]
             d1 = pos[:,1,0] - tweezers_center[1][0]
             alive_flag = alive_flag & (th.abs(d0) < 0.6) & (th.abs(d1) < 0.6)
+            alive_flag = alive_flag & th.isfinite(prob_00)
+            n_dead = system.nb - alive_flag.sum()
+            loss_list.append(n_dead/system.nb)
+            logging.info(f"At time {i*dt/1000}ms. the total number of lost system is {n_dead}, the number of NaN density matrix is {system.nb - th.isfinite(prob_00).sum()}")
             P00_list.append((prob_00[alive_flag]).sum() / system.nb)
-            logging.info(f"At time {i*dt/1000}ms, the number of alive particles is {alive_flag.sum()}/{system.nb}. The probability of |00> is {P00_list[-1]}")
-            # logging.info(f"At time {i*dt/1000}ms, the dead batch are {th.arange(system.nb)[~alive_flag]}, the probability of |00> is {prob_00}")
-    return th.stack(P00_list)
+            logging.info(f"The probability of |00> is {P00_list[-1]}")
+            # dm_two_terms = system.rho[:, 1, 2] + system.rho[:, 2, 1]
+            # logging.info(f"The coherance of the density matrix is {dm_two_terms}")
+            # logging.info("Probability of |00> is {}".format(prob_00.numpy()))
+            # logging.info("density matrix is {}".format(system.rho.numpy()))
+    return th.stack(P00_list), th.stack(loss_list)

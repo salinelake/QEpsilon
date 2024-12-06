@@ -75,10 +75,12 @@ class DensityMatrix(th.nn.Module):
         """
         This function traces out the density matrix.
         Args:
-            rho: the density matrix to be traced out.
+            rho: the density matrix to be traced out. Shape: (self.nb, self.ns, self.ns).
+        Returns:
+            trace: a (self.nb) tensor, the trace of the density matrix.
         """
         # return th.trace(rho)
-        return th.einsum('ijj', rho)
+        return th.einsum('ijj', rho).real
     
     def normalize(self, rho: th.Tensor):
         """

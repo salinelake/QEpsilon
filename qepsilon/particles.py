@@ -100,7 +100,7 @@ class Particles(th.nn.Module):
     This class represents particles in the QEpsilon project.
     """
 
-    def __init__(self, n_particles: int, batchsize: int = 1, mass: float = 1.0, radial_temp: float = 1.0, axial_temp: float = 1.0, dt: float = 0.1, tau: float = 1.0):
+    def __init__(self, n_particles: int, batchsize: int = 1, mass: float = 1.0, radial_temp: float = 1.0, axial_temp: float = 1.0, dt: float = 0.1, tau: float = None):
         super().__init__()
         self.nq = n_particles
         self.nb = batchsize
@@ -114,7 +114,11 @@ class Particles(th.nn.Module):
         self.traj = []
         self.dt = dt
         ## parameters for Langevin dynamics
-        self.gamma = 1.0 / tau
+        if tau is None:
+            self.tau = 100 * dt
+        else:
+            self.tau = tau  
+        self.gamma = 1.0 / self.tau
 
     ###########################################################################
     # Methods for dealing with optical tweezers

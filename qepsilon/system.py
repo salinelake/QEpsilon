@@ -226,6 +226,9 @@ class LindbladSystem(th.nn.Module):
         rho_new = ABAd(identity - 1j * dt * hamiltonian, rho)
         for jump_operator in jump_operators:
             rho_new += ABAd(jump_operator, rho) * dt
+        rho_trace = self.density_matrix.trace(rho_new)
+        if rho_trace.mean() > 10:
+            rho_new = rho_new / rho_trace[:, None, None]
         return rho_new
 
     def step(self, dt: float, set_buffer: bool = False):
@@ -279,7 +282,7 @@ class ParticleLindbladSystem(LindbladSystem):
         for operator_group in self._jumping_group_dict.values():
             operator_group.reset()
         self.particles.reset()
-        # self.step_particles(3000)
+        # self.step_particles(100) # TODO: remove this line
 
     def step_particles(self, dt: float):
         """

@@ -16,7 +16,7 @@ dev = 'cpu'
 ################################################
 # Load experimental data
 ################################################
-data_folder = '/global/homes/p/pinchenx/cfs_m1027/softwares/QEpsilon/examples/two_qubits/data'
+data_folder = '/home/pinchenx/data.gpfs/QEpsilon/examples/two_qubits/data'
 data_XY8_193 = np.loadtxt(os.path.join(data_folder, 'Fig3D_BlueCircles.csv'), delimiter=',', skiprows=1)
 data_XY8_193 = th.tensor(data_XY8_193, dtype=th.float).to(dev)
 
@@ -41,12 +41,11 @@ data_XY8_126 = th.tensor(data_XY8_126, dtype=th.float).to(dev)
 nparticles = 2
 batchsize = 1000
 dt_thermal = 0.25  # us
-dt_quantum = _dt_  # us
+dt_quantum = 25  # us
 tweezer_sep = _sep_ # um
 data_XY8 = _data_file_
 axial_temperature = _atemp_ # K, note that 100uK temperature is at full tweezer depth, so actual thermal temp is 50uK?
 radial_temperature = _rtemp_ # K, note that 100uK temperature is at full tweezer depth, so actual thermal temp is 50uK?
-relaxation_time = _tau_ # us
 
 preperation_rate = 0.824 # 0.824
 data_XY8[:, 1] /= preperation_rate**2
@@ -59,14 +58,14 @@ ddinteraction_prefactor = (22.15 * Constants.hbar_Hz) * (2 * np.pi) * (2.4 ** 3)
 max_depth = Constants.kb * 1.28e-3 # hbar * Hz 
 particles = Particles(n_particles=nparticles, batchsize=batchsize, mass=59.0 * Constants.amu, 
                       radial_temp=radial_temperature , axial_temp=axial_temperature, 
-                      dt=dt_thermal, tau=relaxation_time)    
+                      dt=dt_thermal)    
 particles.init_tweezers('TZ1', min_waist=0.730, wavelength=0.781, max_depth=max_depth, center=th.tensor([0, 0, 0.0]), axis=th.tensor([0, 0, 1.0]))
 particles.init_tweezers('TZ2', min_waist=0.730, wavelength=0.781, max_depth=max_depth, center=th.tensor([tweezer_sep, 0, 0.0]), axis=th.tensor([0, 0, 1.0]))
 logging.info(f"dt_thermal={dt_thermal}us, dt_quantum={dt_quantum}us, batchsize={batchsize}")
 logging.info(f"tweezer_sep={tweezer_sep}um, cycle_time={XY8_cycle_time}us")
 logging.info(f"radial_temp={particles.radial_temp*1e6}uK, axial_temp={particles.axial_temp*1e6}uK")
-logging.info(f"relaxation_time={relaxation_time/1000}ms")
 particles.reset()
+
 ## define the qubits
 # qubit = qe.LindbladSystem(n_qubits=nparticles, batchsize=batchsize).to(dev)
 qubit = qe.ParticleLindbladSystem(n_qubits=nparticles, batchsize=batchsize, particles=particles).to(dev)
@@ -80,6 +79,7 @@ dipole_int = DipolarInteraction(n_qubits=nparticles, id='dipole_int', batchsize=
                                 connectivity=th.tensor([[False, True], [True, False]]), 
                                 prefactor=ddinteraction_prefactor, 
                                 average_nsteps=int(dt_quantum / dt_thermal), 
+                                qaxis=th.tensor([0.0, 1.0, 0.0]),
                                 requires_grad=False)
 qubit.add_operator_group_to_hamiltonian(dipole_int)
 
@@ -145,11 +145,11 @@ qubit.add_operator_group_to_channel(depol_channel)
 #                           {'params': qubit.JumpingParameters(), 'lr': 0.001},
 #                           {'params': qubit.ChannelParameters(), 'lr': 0.1}])
 # logging.info(f"Epoch={epoch}")
-loss = 0
+# loss = 0
 ## Ramsey experiment with XY8 sequence
-tmax = data_XY8[:, 0].max() + 3200
+tmax = 160000 # us
 obs_at = np.arange(np.ceil(tmax/3200)) * 3200
-Ramsey_XY8_P00 = RamseyScan_XY8_TwoQubits(qubit, dt=dt_quantum, T=tmax, cycle_time=XY8_cycle_time, observe_at=obs_at)
+Ramsey_XY8_P00, loss = RamseyScan_XY8_TwoQubits(qubit, dt=dt_quantum, T=tmax, cycle_time=XY8_cycle_time, observe_at=obs_at)
 # loss += ((Ramsey_XY8_P00 - data_XY8[:, 1]) ** 2).mean()
 logging.info(f"Ramsey XY8 Data={data_XY8[:, 1]}")
 logging.info(f"Ramsey XY8 Simulated={Ramsey_XY8_P00.detach()}")
@@ -160,6 +160,9 @@ logging.info(f"Ramsey XY8 Simulated={Ramsey_XY8_P00.detach()}")
 
 np.save('Ramsey_XY8_t.npy', obs_at)
 np.save('Ramsey_XY8_P00.npy', Ramsey_XY8_P00.detach().numpy())
+np.save('Ramsey_XY8_loss.npy', loss.detach().numpy())
+
+## plot the probability of |00>
 fig, ax = plt.subplots(figsize=(4, 3))
 ax.plot(obs_at/1000, Ramsey_XY8_P00.detach().numpy() * preperation_rate**2, label='Simulated', color='blue')
 ax.plot(data_XY8[:, 0]/1000, data_XY8[:, 1] * preperation_rate**2, marker='o', color='blue', label='Data', linestyle='None') # circle marker
