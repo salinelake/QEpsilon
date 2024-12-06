@@ -1,0 +1,19 @@
+# batch submit
+cd sep1.26um_atemp100uK_rtemp25uK
+sbatch submit.sh
+cd ..
+cd sep1.43um_atemp100uK_rtemp25uK
+sbatch submit.sh
+cd ..
+cd sep1.60um_atemp100uK_rtemp25uK
+sbatch submit.sh
+cd ..
+cd sep1.68um_atemp100uK_rtemp25uK
+sbatch submit.sh
+cd ..
+cd sep1.93um_atemp100uK_rtemp25uK
+sbatch submit.sh
+cd ..
+cd sep2.35um_atemp100uK_rtemp25uK
+sbatch submit.sh
+cd ..
