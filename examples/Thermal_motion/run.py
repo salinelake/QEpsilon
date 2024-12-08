@@ -8,11 +8,13 @@ import matplotlib.pyplot as plt
 radial_temp = 40e-6 # K
 axial_temp = 80e-6 # K
 max_depth = Constants.kb * 1.28e-3 # hbar * MHz 
-nq = 2
-nb = 1
+nq = 2 # number of qubits
+nb = 1 # batchsize, simulating an ensemble of independent systems at the same time.
 dt = 0.25 # us
-sep = 1.680
+sep = 1.680 # um
 ## initialize the particles, dt is time step, tau is the coherent time of thermal motion. 
+## Here tau is set to be 100ms so the thermal motion is almost an isolated system on the scale of ms. 
+## setting tau to be much larger than the simulation time is equivalent to simulating an isolated, adiabatic system.
 particles = Particles(n_particles=nq, batchsize=nb, mass=59.0 * Constants.amu, 
                     radial_temp=radial_temp, axial_temp=axial_temp, 
                     dt = dt, tau=100000)
@@ -22,9 +24,10 @@ particles.init_tweezers('TZ1', min_waist=0.730, wavelength=0.781,
 ## setup the second tweezer
 particles.init_tweezers('TZ2', min_waist=0.730, wavelength=0.781, 
                         max_depth=max_depth, center=th.tensor([sep, 0, 0]), axis=th.tensor([0, 0, 1.0]))
-## do the initial thermalization
+## Put particles at the tweezer centers and then do the initial thermalization, the position and velocity will obey Boltzmann distribution.
 particles.reset()
 print('After initial thermalization, positions=', particles.get_positions())
+
 ## run isothermal simulation for 40000 steps with time step dt
 nsteps = 40000
 temp_list = []
@@ -44,8 +47,8 @@ traj = particles.get_trajectory() # (nsteps, nb, nq, 3)
 
 
 
-fig, ax = plt.subplots()
 ######################### plot the trajectory #########################
+fig, ax = plt.subplots()
 ax.scatter(traj[:,:,0,0].flatten(), traj[:,:,0,2].flatten(), s=np.ones(traj[:,:,0,0].flatten().shape[0]) * 4, color='black')
 ax.scatter(traj[:,:,1,0].flatten(), traj[:,:,1,2].flatten(), s=np.ones(traj[:,:,1,0].flatten().shape[0]) * 4, color='blue')
 

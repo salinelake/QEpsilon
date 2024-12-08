@@ -1,7 +1,7 @@
 import os
 
 
-_sep = [1.26,1.43, 1.6,1.68, 1.93, 2.35] # um
+_sep = [1.26,1.43, 1.6, 1.68, 1.93, 2.35] # um
 _atemp_ = [  100e-6 ] # K, note that 100uK temperature is at full tweezer depth, so actual thermal temp is 50uK?
 _rtemp_ = [  25e-6 ] # K, note that 100uK temperature is at full tweezer depth, so actual thermal temp is 50uK?
 

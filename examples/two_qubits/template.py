@@ -55,10 +55,10 @@ ddinteraction_prefactor = (22.15 * Constants.hbar_Hz) * (2 * np.pi) * (2.4 ** 3)
 # _ddinteraction_prefactor = (0.328 * 1.21 * Constants.bohr_radius)**2 / (4 * np.pi * Constants.epsilon0) / 4.0 ## J/4 in unit of hbar * MHz * um^3
 ## define the thermal states
 
-max_depth = Constants.kb * 1.28e-3 # hbar * Hz 
+max_depth = Constants.kb * 0.215e-3 # hbar * MHz 
 particles = Particles(n_particles=nparticles, batchsize=batchsize, mass=59.0 * Constants.amu, 
                       radial_temp=radial_temperature , axial_temp=axial_temperature, 
-                      dt=dt_thermal)    
+                      dt=dt_thermal, tau = 100000)    
 particles.init_tweezers('TZ1', min_waist=0.730, wavelength=0.781, max_depth=max_depth, center=th.tensor([0, 0, 0.0]), axis=th.tensor([0, 0, 1.0]))
 particles.init_tweezers('TZ2', min_waist=0.730, wavelength=0.781, max_depth=max_depth, center=th.tensor([tweezer_sep, 0, 0.0]), axis=th.tensor([0, 0, 1.0]))
 logging.info(f"dt_thermal={dt_thermal}us, dt_quantum={dt_quantum}us, batchsize={batchsize}")
