@@ -24,45 +24,49 @@ qubit.to(dev)
 ################################################
 # define the terms in the Hamiltonian
 ################################################
-sz_shot = ShotbyShotNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_shot", batchsize=batchsize, amp=0.1290924847126007e-3, requires_grad=False).to(dev)
+sz_shot = ShotbyShotNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_shot", batchsize=batchsize, amp=0.28886616230010986e-3, requires_grad=False).to(dev)
 sz_shot.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz_shot)
 
-sz0 = ColorNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_color", batchsize=batchsize, tau=3.79406476020813e3, amp=0.056637242436409e-3, requires_grad=False).to(dev)
+sz0 = ColorNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_color", batchsize=batchsize, tau=3.5981204509735107e3, amp=0.05603799596428871e-3, requires_grad=False).to(dev)
 sz0.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz0)
 
-sz1 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_60hz", batchsize=batchsize, tau=(1e6/60), amp=0.037787340581417084e-3, requires_grad=False).to(dev)
+sz1 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_60hz", batchsize=batchsize, tau=(1e6/60), amp=0.0365261472761631e-3, requires_grad=False).to(dev)
 sz1.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz1)
 
-sz2 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_120hz", batchsize=batchsize, tau=(1e6/120), amp=0.06451722234487534e-3, requires_grad=False).to(dev)
+sz2 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_120hz", batchsize=batchsize, tau=(1e6/120), amp=0.06091545894742012e-3, requires_grad=False).to(dev)
 sz2.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz2)
 
-sz3 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_180hz", batchsize=batchsize, tau=(1e6/180), amp=0.03498165309429169e-3, requires_grad=False).to(dev)
+sz3 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_180hz", batchsize=batchsize, tau=(1e6/180), amp=0.03468571603298187e-3, requires_grad=False).to(dev)
 sz3.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz3)
 
-sz4 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_240hz", batchsize=batchsize, tau=(1e6/240), amp=0.10737115889787674e-3, requires_grad=False).to(dev)
+sz4 = PeriodicNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_240hz", batchsize=batchsize, tau=(1e6/240), amp=0.10632599145174026e-3, requires_grad=False).to(dev)
 sz4.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz4)
 
 ################################################
 # define the jump operators
 ################################################
-sx_jump = StaticPauliOperatorGroup(n_qubits=1, id="sx_jump", batchsize=batchsize, coef=0.031233053654432297*(1e-3)**0.5, requires_grad=False).to(dev)
+sx_jump = StaticPauliOperatorGroup(n_qubits=1, id="sx_jump", batchsize=batchsize, coef=0.03112558089196682*(1e-3)**0.5, requires_grad=False).to(dev)
 sx_jump.add_operator('X')
 qubit.add_operator_group_to_jumping(sx_jump)
 
-sz_jump = StaticPauliOperatorGroup(n_qubits=1, id="sz_jump", batchsize=batchsize, coef=0.03273218125104904*(1e-3)**0.5, requires_grad=False).to(dev)
+sy_jump = StaticPauliOperatorGroup(n_qubits=1, id="sy_jump", batchsize=batchsize, coef=0.03429257124662399*(1e-3)**0.5, requires_grad=False).to(dev)
+sy_jump.add_operator('Y')
+qubit.add_operator_group_to_jumping(sy_jump)
+
+sz_jump = StaticPauliOperatorGroup(n_qubits=1, id="sz_jump", batchsize=batchsize, coef=0.03246501088142395*(1e-3)**0.5, requires_grad=False).to(dev)
 sz_jump.add_operator('Z')
 qubit.add_operator_group_to_jumping(sz_jump)
 
 ################################################
 # define the error channel of each pulse
 ################################################
-depol_channel = DepolarizationChannel(n_qubits=1, id="depol_channel", batchsize=batchsize, p=0.00032660365104675293, requires_grad=False).to(dev)
+depol_channel = DepolarizationChannel(n_qubits=1, id="depol_channel", batchsize=batchsize, p=0.0003319382667541504, requires_grad=False).to(dev)
 qubit.add_operator_group_to_channel(depol_channel)
 
 ################################################

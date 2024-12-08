@@ -16,7 +16,7 @@ dev = 'cpu'
 ################################################
 # Load experimental data
 ################################################
-data_folder = '/home/pinchenx/data.gpfs/QEpsilon/examples/two_qubits/data'
+data_folder = '../data'
 data_XY8_193 = np.loadtxt(os.path.join(data_folder, 'Fig3D_BlueCircles.csv'), delimiter=',', skiprows=1)
 data_XY8_193 = th.tensor(data_XY8_193, dtype=th.float).to(dev)
 

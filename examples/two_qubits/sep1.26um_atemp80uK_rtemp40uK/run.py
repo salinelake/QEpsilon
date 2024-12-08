@@ -16,7 +16,7 @@ dev = 'cpu'
 ################################################
 # Load experimental data
 ################################################
-data_folder = '/home/pinchenx/data.gpfs/QEpsilon/examples/two_qubits/data'
+data_folder = '../data'
 data_XY8_193 = np.loadtxt(os.path.join(data_folder, 'Fig3D_BlueCircles.csv'), delimiter=',', skiprows=1)
 data_XY8_193 = th.tensor(data_XY8_193, dtype=th.float).to(dev)
 
@@ -147,7 +147,7 @@ qubit.add_operator_group_to_channel(depol_channel)
 # logging.info(f"Epoch={epoch}")
 # loss = 0
 ## Ramsey experiment with XY8 sequence
-tmax = 160000 # us
+tmax = 50000 # 160000 # us
 obs_at = np.arange(np.ceil(tmax/3200)) * 3200
 Ramsey_XY8_P00, loss = RamseyScan_XY8_TwoQubits(qubit, dt=dt_quantum, T=tmax, cycle_time=XY8_cycle_time, observe_at=obs_at)
 # loss += ((Ramsey_XY8_P00 - data_XY8[:, 1]) ** 2).mean()

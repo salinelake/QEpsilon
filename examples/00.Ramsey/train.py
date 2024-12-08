@@ -62,6 +62,10 @@ sx_jump = StaticPauliOperatorGroup(n_qubits=1, id="sx_jump", batchsize=batchsize
 sx_jump.add_operator('X')
 qubit.add_operator_group_to_jumping(sx_jump)
 
+# sy_jump = StaticPauliOperatorGroup(n_qubits=1, id="sy_jump", batchsize=batchsize, coef=np.sqrt(0.0001), requires_grad=True).to(dev)
+# sy_jump.add_operator('Y')
+# qubit.add_operator_group_to_jumping(sy_jump)
+
 sz_jump = StaticPauliOperatorGroup(n_qubits=1, id="sz_jump", batchsize=batchsize, coef=np.sqrt(0.0001), requires_grad=True).to(dev)
 sz_jump.add_operator('Z')
 qubit.add_operator_group_to_jumping(sz_jump)
@@ -75,7 +79,7 @@ qubit.add_operator_group_to_channel(depol_channel)
 ################################################
 # Experimental data
 ################################################
-preperation_rate = 0.824
+preperation_rate = 0.8 #0.824
 ## load csv data
 data_plain = np.loadtxt('./Data/Fig3C_GreenTriangles.csv', delimiter=',', skiprows=1)
 data_plain = th.tensor(data_plain, dtype=th.float).to(dev)
@@ -129,7 +133,7 @@ for epoch in range(nepoch):
     ## Ramsey experiment with echo
     Ramsey_Echo_Contrast = []
     for T in data_echo[:, 0]:
-        Ramsey_Echo_P0 = RamseySpinEcho(qubit, dt=0.025, T=T, theta_list=[0, np.pi])
+        Ramsey_Echo_P0 = RamseySpinEcho(qubit, dt=0.05, T=T, theta_list=[0, np.pi])
         Ramsey_Echo_Contrast.append(th.abs(Ramsey_Echo_P0[1] - Ramsey_Echo_P0[0]))
     Ramsey_Echo_Contrast = th.stack(Ramsey_Echo_Contrast)
     loss += ((Ramsey_Echo_Contrast - data_echo[:, 1]) ** 2).mean()
@@ -137,7 +141,7 @@ for epoch in range(nepoch):
     logging.info(f"Ramsey Echo Simulated={Ramsey_Echo_Contrast.detach()}")
 
     ## Ramsey experiment with XY8 sequence
-    Ramsey_XY8_P0 = RamseyScan_XY8(qubit, dt=0.025, T=150, cycle_time=XY8_cycle_time, theta_list=[0, np.pi], observe_at=data_XY8[:, 0])
+    Ramsey_XY8_P0 = RamseyScan_XY8(qubit, dt=0.1, T=150, cycle_time=XY8_cycle_time, theta_list=[0, np.pi], observe_at=data_XY8[:, 0])
     Ramsey_XY8_Contrast = th.abs(Ramsey_XY8_P0[:, 1] - Ramsey_XY8_P0[:, 0])
     loss += ((Ramsey_XY8_Contrast - data_XY8[:, 1]) ** 2).mean()
     logging.info(f"Ramsey XY8 Data={data_XY8[:, 1]}")
