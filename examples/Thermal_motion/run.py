@@ -7,21 +7,25 @@ import matplotlib.pyplot as plt
 
 radial_temp = 40e-6 # K
 axial_temp = 80e-6 # K
-max_depth = Constants.kb * 1.28e-3 # hbar * Hz 
+max_depth = Constants.kb * 1.28e-3 # hbar * MHz 
 nq = 2
 nb = 1
 dt = 0.25 # us
 sep = 1.680
+## initialize the particles, dt is time step, tau is the coherent time of thermal motion. 
 particles = Particles(n_particles=nq, batchsize=nb, mass=59.0 * Constants.amu, 
                     radial_temp=radial_temp, axial_temp=axial_temp, 
                     dt = dt, tau=100000)
+## setup the first tweezer, length unit is um, energy unit is hbar*MHz
 particles.init_tweezers('TZ1', min_waist=0.730, wavelength=0.781, 
                         max_depth=max_depth, center=th.tensor([0, 0, 0]), axis=th.tensor([0, 0, 1.0]))
+## setup the second tweezer
 particles.init_tweezers('TZ2', min_waist=0.730, wavelength=0.781, 
                         max_depth=max_depth, center=th.tensor([sep, 0, 0]), axis=th.tensor([0, 0, 1.0]))
+## do the initial thermalization
 particles.reset()
 print('After initial thermalization, positions=', particles.get_positions())
-
+## run isothermal simulation for 40000 steps with time step dt
 nsteps = 40000
 temp_list = []
 for i in range(nsteps):
@@ -35,7 +39,7 @@ for i in range(nsteps):
         # print("Velocities: ", particles.get_velocities())
         print("Positions: ", particles.get_positions())
 
-
+## get the trajectory
 traj = particles.get_trajectory() # (nsteps, nb, nq, 3)
 
 
