@@ -1,0 +1,4 @@
+/scratch/gpfs/pinchenx/QEpsilon/examples/two_qubits/atemp20uK_rtemp20uK_tau1000ms_sep1.93um/run.py:151: DeprecationWarning: __array_wrap__ must accept context and return_scalar arguments (positionally) in the future. (Deprecated NumPy 2.0)
+  obs_at = np.arange(np.ceil(tmax/3200)) * 3200
+/scratch/gpfs/pinchenx/QEpsilon/examples/two_qubits/atemp20uK_rtemp20uK_tau1000ms_sep1.93um/run.py:151: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments.
+  obs_at = np.arange(np.ceil(tmax/3200)) * 3200
