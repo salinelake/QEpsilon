@@ -16,9 +16,11 @@ data_list = [data_XY8_126, data_XY8_143, data_XY8_160, data_XY8_168, data_XY8_19
 ################################################
 # Plot
 ################################################
-sep_list = [1.26,1.43, 1.6,1.68, 1.93, 2.35] # um
-atemp = 80
-rtemp = 40
+sep_list = [1.26, 1.43, 1.6,1.68, 1.93, 2.35] # um
+tau_list = [10000, 10000, 10000, 10000, 1000000, 1000000 ]
+atemp = 18
+rtemp = 18
+tau = 1000000
 spam_scale = 0.824 ** 2
 
 fig, ax = plt.subplots(1, 2, figsize=(10, 4))
@@ -27,7 +29,8 @@ mpl.rcParams['axes.linewidth'] = 2
 mpl.rcParams['xtick.labelsize'] = 20
 mpl.rcParams['ytick.labelsize'] = 20
 for idx, sep in enumerate(sep_list):
-    folder_name = 'sep{:.2f}um_atemp{:.0f}uK_rtemp{:.0f}uK'.format(sep, atemp, rtemp)
+    tau = tau_list[idx]
+    folder_name = 'atemp{:.0f}uK_rtemp{:.0f}uK_tau{:.0f}ms_sep{:.2f}um'.format(atemp, rtemp, tau/1000, sep)
     data = data_list[idx]
     sim_P00 = np.load(os.path.join(folder_name, 'Ramsey_XY8_P00.npy')) * spam_scale
     sim_t = np.load(os.path.join(folder_name, 'Ramsey_XY8_t.npy')) / 1000
@@ -37,10 +40,10 @@ for idx, sep in enumerate(sep_list):
         loss = np.zeros_like(sim_t)
     ax[0].plot(sim_t, sim_P00+idx*0.5,  )
     ax[0].scatter(data[:,0], data[:,1]+idx*0.5, np.ones_like(data[:,0])*30, marker='*', label=f'r={sep}um')
-    ax[1].plot(sim_t, loss*100, label=f'r={sep}um')
+    ax[1].plot(np.concatenate([[0], sim_t]), np.concatenate([[0], loss*100]), label=f'r={sep}um')
 
 # ax[0].legend(fontsize=10)
-ax[0].set_title(r'$T_r=40\mu K, T_a=80\mu K$')
+ax[0].set_title(r'$T_r={:.0f}\mu K, T_a={:.0f}\mu K$'.format(rtemp, atemp))
 ax[0].set_xlabel('t [ms]', fontsize=14)
 ax[0].set_ylabel(r'$P_{00}$', fontsize=14)
 
@@ -49,6 +52,6 @@ ax[1].set_xlabel('t [ms]', fontsize=14)
 ax[1].set_ylabel('Molecular Loss [%]', fontsize=14)
 ax[1].set_xlim(-10, 220)
 fig.tight_layout()
-fig.savefig('compare.png', dpi=300)
+fig.savefig(f'compare_atemp{atemp}uK_rtemp{rtemp}uK_tau{tau}ms.png', dpi=300)
 
 

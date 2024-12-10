@@ -44,9 +44,9 @@ dt_thermal = 0.25  # us
 dt_quantum = 25  # us
 tweezer_sep = _sep_ # um
 data_XY8 = _data_file_
-axial_temperature = _atemp_ # K, note that 100uK temperature is at full tweezer depth, so actual thermal temp is 50uK?
-radial_temperature = _rtemp_ # K, note that 100uK temperature is at full tweezer depth, so actual thermal temp is 50uK?
-
+axial_temperature = _atemp_ # K
+radial_temperature = _rtemp_ # K
+tau = _tau_ # us
 preperation_rate = 0.824 # 0.824
 data_XY8[:, 1] /= preperation_rate**2
 data_XY8[:, 0] *= 1e3
@@ -58,7 +58,7 @@ ddinteraction_prefactor = (22.15 * Constants.hbar_Hz) * (2 * np.pi) * (2.4 ** 3)
 max_depth = Constants.kb * 0.215e-3 # hbar * MHz 
 particles = Particles(n_particles=nparticles, batchsize=batchsize, mass=59.0 * Constants.amu, 
                       radial_temp=radial_temperature , axial_temp=axial_temperature, 
-                      dt=dt_thermal, tau = 100000)    
+                      dt=dt_thermal, tau = tau)    
 particles.init_tweezers('TZ1', min_waist=0.730, wavelength=0.781, max_depth=max_depth, center=th.tensor([0, 0, 0.0]), axis=th.tensor([0, 0, 1.0]))
 particles.init_tweezers('TZ2', min_waist=0.730, wavelength=0.781, max_depth=max_depth, center=th.tensor([tweezer_sep, 0, 0.0]), axis=th.tensor([0, 0, 1.0]))
 logging.info(f"dt_thermal={dt_thermal}us, dt_quantum={dt_quantum}us, batchsize={batchsize}")
@@ -147,7 +147,7 @@ qubit.add_operator_group_to_channel(depol_channel)
 # logging.info(f"Epoch={epoch}")
 # loss = 0
 ## Ramsey experiment with XY8 sequence
-tmax = 160000 # us
+tmax = data_XY8[:, 0].max() + 3200 #160000 # us
 obs_at = np.arange(np.ceil(tmax/3200)) * 3200
 Ramsey_XY8_P00, loss = RamseyScan_XY8_TwoQubits(qubit, dt=dt_quantum, T=tmax, cycle_time=XY8_cycle_time, observe_at=obs_at)
 # loss += ((Ramsey_XY8_P00 - data_XY8[:, 1]) ** 2).mean()

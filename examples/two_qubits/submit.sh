@@ -7,7 +7,7 @@
 ##SBATCH --gres=gpu:1
 ##SBATCH --constraint=gpu80
 
-#SBATCH --time=1:30:00
+#SBATCH --time=1:00:00
 #SBATCH --job-name=2qubits
 
 
