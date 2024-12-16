@@ -2,10 +2,13 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+mpl.rcParams['axes.linewidth'] = 1.5
+mpl.rcParams['xtick.labelsize'] = 16
+mpl.rcParams['ytick.labelsize'] = 16
 ################################################
 # Load experimental data
 ################################################
-data_folder = '/home/pinchenx/data.gpfs/QEpsilon/examples/two_qubits/data'
+data_folder = './data'
 data_XY8_193 = np.loadtxt(os.path.join(data_folder, 'Fig3D_BlueCircles.csv'), delimiter=',', skiprows=1)
 data_XY8_235 = np.loadtxt(os.path.join(data_folder, 'Fig3E_PurpleTriangles.csv'), delimiter=',', skiprows=1)
 data_XY8_168 = np.loadtxt(os.path.join(data_folder, 'Fig3E_GreenSquares.csv'), delimiter=',', skiprows=1)
@@ -17,7 +20,7 @@ data_list = [data_XY8_126, data_XY8_143, data_XY8_160, data_XY8_168, data_XY8_19
 # Plot
 ################################################
 sep_list = [1.26, 1.43, 1.6,1.68, 1.93, 2.35] # um
-tau_list = [10000, 10000, 10000, 10000, 1000000, 1000000 ]
+tau_list = [4000, 4000, 6000, 10000, 1000000, 1000000 ]
 atemp = 18
 rtemp = 18
 tau = 1000000
@@ -40,16 +43,16 @@ for idx, sep in enumerate(sep_list):
         loss = np.zeros_like(sim_t)
     ax[0].plot(sim_t, sim_P00+idx*0.5,  )
     ax[0].scatter(data[:,0], data[:,1]+idx*0.5, np.ones_like(data[:,0])*30, marker='*', label=f'r={sep}um')
-    ax[1].plot(np.concatenate([[0], sim_t]), np.concatenate([[0], loss*100]), label=f'r={sep}um')
+    ax[1].plot(np.concatenate([[0], sim_t]), np.concatenate([[0], loss*100]), label=r'$\Delta$={:.2f}um'.format(sep))
 
 # ax[0].legend(fontsize=10)
 ax[0].set_title(r'$T_r={:.0f}\mu K, T_a={:.0f}\mu K$'.format(rtemp, atemp))
 ax[0].set_xlabel('t [ms]', fontsize=14)
-ax[0].set_ylabel(r'$P_{00}$', fontsize=14)
+ax[0].set_ylabel(r'$P_{\uparrow\uparrow}$', fontsize=14)
 
 ax[1].legend(fontsize=8, loc='upper right', frameon=False)
 ax[1].set_xlabel('t [ms]', fontsize=14)
-ax[1].set_ylabel('Molecular Loss [%]', fontsize=14)
+ax[1].set_ylabel('Escape-trap Percentage [%]', fontsize=14)
 ax[1].set_xlim(-10, 220)
 fig.tight_layout()
 fig.savefig(f'compare_atemp{atemp}uK_rtemp{rtemp}uK_tau{tau}ms.png', dpi=300)

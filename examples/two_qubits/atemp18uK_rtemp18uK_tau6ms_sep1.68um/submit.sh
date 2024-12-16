@@ -12,8 +12,11 @@
 
 
 # load modules or conda environments here
-module purge
-module load anaconda3/2023.3
-conda activate /home/pinchenx/data.gpfs/envs/qepsilon
+# module purge
+# module load anaconda3/2023.3
+# conda activate /home/pinchenx/data.gpfs/envs/qepsilon
+# python run.py
+
+conda activate qepsilon
 python run.py
 
