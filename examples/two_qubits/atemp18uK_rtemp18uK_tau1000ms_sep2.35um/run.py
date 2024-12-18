@@ -7,7 +7,7 @@ import torch as th
 import qepsilon as qe
 from qepsilon import *
 from qepsilon.task import *
-from qepsilon.utility import Constants
+from qepsilon.utilities import Constants
 
 logging.basicConfig(filename=f'simulation.log', level=logging.INFO)
 ## do not print the tensor in scientific notation
@@ -16,7 +16,8 @@ dev = 'cpu'
 ################################################
 # Load experimental data
 ################################################
-data_folder = '/home/pinchenx/data.gpfs/QEpsilon/examples/two_qubits/data'
+# data_folder = '/home/pinchenx/data.gpfs/QEpsilon/examples/two_qubits/data'
+data_folder = '/global/homes/p/pinchenx/cfs_m1027/softwares/QEpsilon/examples/two_qubits/data'
 data_XY8_193 = np.loadtxt(os.path.join(data_folder, 'Fig3D_BlueCircles.csv'), delimiter=',', skiprows=1)
 data_XY8_193 = th.tensor(data_XY8_193, dtype=th.float).to(dev)
 
@@ -89,7 +90,7 @@ sz_shot.add_operator('ZI')
 sz_shot.add_operator('IZ')
 qubit.add_operator_group_to_hamiltonian(sz_shot)
 
-sz0 = ColorNoisePauliOperatorGroup(n_qubits=nparticles, id="sz_noise_color", batchsize=batchsize, tau=3.5519464015960693e3, amp=0.05605236068367958e-3, requires_grad=False).to(dev)
+sz0 = LangevinNoisePauliOperatorGroup(n_qubits=nparticles, id="sz_noise_color", batchsize=batchsize, tau=3.5519464015960693e3, amp=0.05605236068367958e-3, requires_grad=False).to(dev)
 sz0.add_operator('ZI')
 sz0.add_operator('IZ')
 qubit.add_operator_group_to_hamiltonian(sz0)

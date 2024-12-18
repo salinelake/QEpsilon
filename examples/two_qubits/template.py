@@ -7,7 +7,7 @@ import torch as th
 import qepsilon as qe
 from qepsilon import *
 from qepsilon.task import *
-from qepsilon.utility import Constants
+from qepsilon.utilities import Constants
 
 logging.basicConfig(filename=f'simulation.log', level=logging.INFO)
 ## do not print the tensor in scientific notation
