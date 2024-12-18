@@ -1,7 +1,9 @@
-import torch as th
 import numpy as np
+import torch as th
 
 
+
+## dynamical decoupling sequence
 class XY8:
     def __init__(self, cycle_time: float):
         self.direction_sequence = [th.tensor([1.0,0,0]), th.tensor([0,1.0,0]), th.tensor([1.0,0,0]), th.tensor([0,1.0,0]), 

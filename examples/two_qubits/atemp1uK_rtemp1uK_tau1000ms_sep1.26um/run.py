@@ -7,7 +7,7 @@ import torch as th
 import qepsilon as qe
 from qepsilon import *
 from qepsilon.task import *
-from qepsilon.utility import Constants
+from qepsilon.utilities import Constants
 
 logging.basicConfig(filename=f'simulation.log', level=logging.INFO)
 ## do not print the tensor in scientific notation
@@ -16,7 +16,7 @@ dev = 'cpu'
 ################################################
 # Load experimental data
 ################################################
-data_folder = '/home/pinchenx/data.gpfs/QEpsilon/examples/two_qubits/data'
+data_folder = '../data'
 data_XY8_193 = np.loadtxt(os.path.join(data_folder, 'Fig3D_BlueCircles.csv'), delimiter=',', skiprows=1)
 data_XY8_193 = th.tensor(data_XY8_193, dtype=th.float).to(dev)
 

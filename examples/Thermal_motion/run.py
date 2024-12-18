@@ -1,8 +1,10 @@
+import numpy as np
+import torch as th
 import qepsilon as qe
 from qepsilon.particles import OpticalTweezer
 from qepsilon.particles import Particles
 from qepsilon.operator_group import DipolarInteraction
-from qepsilon.utility import *
+from qepsilon.utilities import *
 import matplotlib.pyplot as plt
 
 radial_temp = 40e-6 # K

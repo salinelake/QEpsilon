@@ -2,7 +2,7 @@ import warnings
 import logging
 import numpy as np
 import torch as th
-from qepsilon.dynamical_decoupling import XY8
+from qepsilon.utilities import XY8
 ############################################################
 # Single-qubit Tasks
 ############################################################

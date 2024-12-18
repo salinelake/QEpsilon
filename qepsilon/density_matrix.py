@@ -4,19 +4,16 @@ This module deals with density matrices.
 
 import torch as th
 from qepsilon.tls import Pauli
-from qepsilon.utility import compose, ABAd, bin2idx
+from qepsilon.utilities import compose, ABAd, bin2idx, trace
 
 class DensityMatrix(th.nn.Module):
     """
-    This class deals with density matrices of an ensemble of n-qubit systems. Basic quantum operations on the ensemble of density matrices are implemented.
-    Quantum operations are not necessarily unitary. A quantum operation is also called a quantum channel. 
+    Base class for density matrices.
     """
-    def __init__(self, n_qubits: int, batchsize: int = 1):
+    def __init__(self, num_states: int, batchsize: int = 1):
         super().__init__()
-        self.nq = n_qubits
-        self.ns = 2**n_qubits
+        self.ns = num_states
         self.nb = batchsize
-        self.pauli = Pauli(n_qubits)
         self.register_buffer("_rho", None) ## initialize later. Shape will be (self.nb, self.ns, self.ns)
 
     ############################################################
@@ -46,8 +43,35 @@ class DensityMatrix(th.nn.Module):
                 self._rho = rho.to(self._rho.device)
         else:
             raise ValueError("Density matrix must have shape (2^n, 2^n) or (batchsize, 2^n, 2^n).")
-
     
+    ############################################################
+    # Basic operations on density matrices. Methods below do not update the stored density matrix. Use setter if you want to update.
+    ############################################################
+    def normalize(self, rho: th.Tensor):
+        """
+        This function normalizes the density matrix.
+        Args:
+            rho: the density matrix to be normalized.
+        """
+        return rho / trace(rho)[:, None, None]
+    
+
+
+
+class QubitDensityMatrix(DensityMatrix):
+    """
+    This class deals with density matrices of an ensemble of n-qubit systems. Basic quantum operations on the ensemble of density matrices are implemented.
+    Quantum operations are not necessarily unitary. A quantum operation is also called a quantum channel. 
+    """
+    def __init__(self, n_qubits: int = 1, batchsize: int = 1):
+        self.nq = n_qubits
+        self.ns = 2**n_qubits
+        super().__init__(num_states=self.ns, batchsize=batchsize)
+        self.pauli = Pauli(n_qubits)
+
+    ############################################################
+    # Getters and setters for the density matrix
+    ############################################################
     def set_rho_by_config(self, config: th.Tensor):
         """
         This function sets the density matrix as |config><config|.
@@ -67,29 +91,10 @@ class DensityMatrix(th.nn.Module):
             else:
                 one_body_rho.append(th.tensor([[0, 0], [0, 1]], dtype=th.cfloat))
         self.set_rho(compose(one_body_rho))
-
-    ############################################################
-    # Basic operations on density matrices. Methods below do not update the stored density matrix. Use setter if you want to update.
-    ############################################################
-    def trace(self, rho: th.Tensor):
-        """
-        This function traces out the density matrix.
-        Args:
-            rho: the density matrix to be traced out. Shape: (self.nb, self.ns, self.ns).
-        Returns:
-            trace: a (self.nb) tensor, the trace of the density matrix.
-        """
-        # return th.trace(rho)
-        return th.einsum('ijj', rho).real
     
-    def normalize(self, rho: th.Tensor):
-        """
-        This function normalizes the density matrix.
-        Args:
-            rho: the density matrix to be normalized.
-        """
-        return rho / self.trace(rho)[:, None, None]
-    
+    ############################################################
+    # Basic operations on density matrices
+    ############################################################
     def partial_trace(self, rho: th.Tensor, config: th.Tensor):
         """
         This function traces out the qubits specified in config.
@@ -124,7 +129,7 @@ class DensityMatrix(th.nn.Module):
         # Reshape the result back to a matrix
         new_shape = (self.nb, 2**len(keep_indices), 2**len(keep_indices))
         return traced_rho.reshape(new_shape)
-
+    
     def apply_unitary_rotation(self, rho: th.Tensor, u: th.Tensor, theta: float, config=None):
         """
         This function applies the unitary rotation operator about the direction u by angle theta to the density matrix. The rotation is simultaneous performed on selected qubits.
@@ -182,23 +187,6 @@ class DensityMatrix(th.nn.Module):
     ############################################################
     # Observing the density matrix
     ############################################################
-    def observe_one_qubit(self, rho: th.Tensor, observable: th.Tensor, idx: int):
-        """
-        This function observes the one-qubit observable on the idx-th qubit.
-        Args:
-            rho: the density matrix to be observed.
-            observable: the one-qubit observable.
-            idx: the index of the qubit to be observed.
-        """
-        if observable.shape != (2, 2):
-            raise ValueError("One-qubit observable must have shape (2, 2).")
-        if observable.dtype != th.cfloat:
-            raise ValueError("One-qubit observable must be a complex tensor (th.cfloat).")
-        one_body_ops = [self.pauli.I] * self.nq
-        one_body_ops[idx] = observable
-        ops = compose(one_body_ops).unsqueeze(0)
-        return self.trace(th.matmul(ops, rho))
-    
     def observe_paulix_one_qubit(self, rho: th.Tensor, idx: int):
         return self.observe_one_qubit(rho, self.pauli.X, idx)
     
@@ -236,6 +224,23 @@ class DensityMatrix(th.nn.Module):
         if config.dtype != th.int64:
             raise ValueError("Config must be an integer tensor (th.int64).")
         idx = bin2idx(config)
-        prob = rho[:, idx, idx].real / self.trace(rho).real
+        prob = rho[:, idx, idx].real / trace(rho).real
         return prob
  
+    def observe_one_qubit(self, rho: th.Tensor, observable: th.Tensor, idx: int):
+        """
+        This function observes the one-qubit observable on the idx-th qubit.
+        Args:
+            rho: the density matrix to be observed.
+            observable: the one-qubit observable.
+            idx: the index of the qubit to be observed.
+        """
+        if observable.shape != (2, 2):
+            raise ValueError("One-qubit observable must have shape (2, 2).")
+        if observable.dtype != th.cfloat:
+            raise ValueError("One-qubit observable must be a complex tensor (th.cfloat).")
+        one_body_ops = [self.pauli.I] * self.nq
+        one_body_ops[idx] = observable
+        ops = compose(one_body_ops).unsqueeze(0)
+        return trace(th.matmul(ops, rho))
+    

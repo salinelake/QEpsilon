@@ -90,7 +90,7 @@ sz_shot.add_operator('ZI')
 sz_shot.add_operator('IZ')
 qubit.add_operator_group_to_hamiltonian(sz_shot)
 
-sz0 = ColorNoisePauliOperatorGroup(n_qubits=nparticles, id="sz_noise_color", batchsize=batchsize, tau=3.5519464015960693e3, amp=0.05605236068367958e-3, requires_grad=False).to(dev)
+sz0 = LangevinNoisePauliOperatorGroup(n_qubits=nparticles, id="sz_noise_color", batchsize=batchsize, tau=3.5519464015960693e3, amp=0.05605236068367958e-3, requires_grad=False).to(dev)
 sz0.add_operator('ZI')
 sz0.add_operator('IZ')
 qubit.add_operator_group_to_hamiltonian(sz0)

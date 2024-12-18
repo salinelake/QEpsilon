@@ -17,25 +17,25 @@ dev = 'cpu'
 #  define the system
 ################################################
 batchsize = 1000
-qubit = qe.LindbladSystem(n_qubits=1, batchsize=batchsize).to(dev)
+qubit = qe.QubitLindbladSystem(n_qubits=1, batchsize=batchsize).to(dev)
 qubit.set_rho_by_config([0])
 qubit.to(dev)
 
 ################################################
 # define the terms in the Hamiltonian
 ################################################
-# sx = ColorNoisePauliOperatorGroup(n_qubits=1, id="sx_noise", batchsize=batchsize, tau=5, amp=0.2, requires_grad=True).to(dev)
+# sx = LangevinNoisePauliOperatorGroup(n_qubits=1, id="sx_noise", batchsize=batchsize, tau=5, amp=0.2, requires_grad=True).to(dev)
 # sx.add_operator('X')
 # qubit.add_operator_group_to_hamiltonian(sx)
 
-# sy = ColorNoisePauliOperatorGroup(n_qubits=1, id="sy_noise", batchsize=batchsize, tau=5, amp=0.2, requires_grad=True).to(dev)
+# sy = LangevinNoisePauliOperatorGroup(n_qubits=1, id="sy_noise", batchsize=batchsize, tau=5, amp=0.2, requires_grad=True).to(dev)
 # sy.add_operator('Y')
 # qubit.add_operator_group_to_hamiltonian(sy)
 sz_shot = ShotbyShotNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_shot", batchsize=batchsize, amp=0.1, requires_grad=True).to(dev)
 sz_shot.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz_shot)
 
-sz0 = ColorNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_color", batchsize=batchsize, tau=20, amp=0.01, requires_grad=True).to(dev)
+sz0 = LangevinNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_color", batchsize=batchsize, tau=20, amp=0.01, requires_grad=True).to(dev)
 sz0.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz0)
 

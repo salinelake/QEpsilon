@@ -2,20 +2,21 @@
 This file contains the system class for the QEpsilon project.
 """
 
+import numpy as np
 import torch as th
-from qepsilon.density_matrix import DensityMatrix
+from qepsilon.density_matrix import DensityMatrix, QubitDensityMatrix
 from qepsilon.operator_group import *
-from qepsilon.utility import ABAd
+from qepsilon.utilities import ABAd, trace
 from qepsilon.particles import Particles
 import logging
 from time import time as timer
 
 class LindbladSystem(th.nn.Module):
     """
-    This class represents the states of n physical qubits as a open quantum system.
+    This class represents a generic open quantum system.
     The states are represented by a density matrix. 
     The evolution of the system is governed by the Lindblad equation, which is a generalization of the Schrodinger equation for open quantum systems.
-    Both the Hamiltonian and the jump operators in the Lindblad equation allows fluctuating coefficients. So technically, we are dealing with a stochastic master equation. 
+    Both the Hamiltonian and the jump operators here allows fluctuating coefficients. So technically, we are dealing with a stochastic master equation. 
     
     The Lindblad equation is given as
     $d\rho(t) / dt = -i [H(t), \rho(t)] + \sum_k L_k(t) \rho(t) L_k(t)^\dagger - 1/2 \{L_k(t)^\dagger L_k(t), \rho(t)\}$
@@ -27,12 +28,11 @@ class LindbladSystem(th.nn.Module):
     This corresponds to the case where the qubits are coupled to noisy environments such as inhomogeneous, fluctuating magnetic fields. 
     """
 
-    def __init__(self, n_qubits: int, batchsize: int = 1):
+    def __init__(self, num_states: int, batchsize: int = 1):
         super().__init__()
-        self.nq = n_qubits
-        self.ns = 2**n_qubits
+        self.ns = num_states
         self.nb = batchsize 
-        self.density_matrix = DensityMatrix(n_qubits, batchsize)
+        self.density_matrix = DensityMatrix(num_states, batchsize)
         self._hamiltonian_operator_group_dict = {}
         self._jumping_group_dict = {}
         self._channel_group_dict = {}
@@ -64,26 +64,6 @@ class LindbladSystem(th.nn.Module):
     def rho(self, rho: th.Tensor):
         self.density_matrix.set_rho(rho)
     
-    def set_rho_by_config(self, config):
-        if isinstance(config, th.Tensor):
-            _c = config
-        elif isinstance(config, np.ndarray):
-            if config.shape != (self.nq,):
-                raise ValueError("Config must have shape (#qubits).")
-            if config.dtype != np.int64:
-                raise ValueError("Config must be an integer array.")
-            _c = th.tensor(config, dtype=th.int64)
-        elif isinstance(config, list):
-            if len(config) != self.nq:
-                raise ValueError("Config must have length (#qubits).")
-            if not all(isinstance(i, int) for i in config):
-                raise ValueError("Config must be a list of integers.")
-            _c = th.tensor(config, dtype=th.int64)
-        else:
-            raise ValueError("Config must be a 0/1 tensor, a 0/1 numpy array, or a list of 0/1 integers.")
-        if not all(i in [0, 1] for i in _c):
-            raise ValueError("Config must be a sequence of 0/1 integers. Example for 2-qubit system: [0, 1] means |01>.")
-        self.density_matrix.set_rho_by_config(_c)
 
     @property
     def hamiltonian(self):
@@ -223,13 +203,25 @@ class LindbladSystem(th.nn.Module):
         """
         rho = self.rho
         identity = th.eye(self.ns, dtype=th.cfloat).to(rho.device).unsqueeze(0)
-        rho_new = ABAd(identity - 1j * dt * hamiltonian, rho)
+        ## get the effective Hamiltonian=H + 1/2j \sum_k L_k^\dagger L_k
+        ham_eff = hamiltonian * 1.0
+        for jump_operator in jump_operators:
+            ham_eff -= 1j * 0.5 * th.matmul(jump_operator.conj().permute(0, 2, 1), jump_operator)
+        ## first part: (1-i*dt*H_eff)rho(1+i*dt*H_eff)
+        rho_new = ABAd(identity - 1j * dt * ham_eff, rho)
+        ## second part: dt * \sum_k L_k \rho L_k^\dagger
         for jump_operator in jump_operators:
             rho_new += ABAd(jump_operator, rho) * dt
-        rho_trace = self.density_matrix.trace(rho_new)
+        ## normalize if the trace of rho_new is too large
+        rho_trace = trace(rho_new)
         if rho_trace.mean() > 10:
             rho_new = rho_new / rho_trace[:, None, None]
         return rho_new
+
+    def normalize(self):
+        rho_trace = trace(self.rho)
+        self.rho = self.rho / rho_trace[:, None, None]
+        return
 
     def step(self, dt: float, set_buffer: bool = False):
         """
@@ -242,6 +234,60 @@ class LindbladSystem(th.nn.Module):
             jump_operator_list = []
         self.rho = self.step_rho(dt, hamiltonian, jump_operator_list)
         return self.rho
+
+    def step_unitary(self, dt: float, set_buffer: bool = False):
+        """
+        This function steps the system for a time step dt without considering the jump operators.
+        """
+        hamiltonian = self.step_hamiltonian(dt, set_buffer)
+        rho = self.rho
+        evo_op = th.linalg.matrix_exp(-1j * dt * hamiltonian)
+        rho_new = ABAd(evo_op, rho)
+        self.rho = rho_new
+        return self.rho
+
+class QubitLindbladSystem(LindbladSystem):
+    """
+    This class represents the states of n physical qubits as a open quantum system.
+    The states are represented by a density matrix. 
+    The evolution of the system is governed by the Lindblad equation, which is a generalization of the Schrodinger equation for open quantum systems.
+    Both the Hamiltonian and the jump operators in the Lindblad equation allows fluctuating coefficients. So technically, we are dealing with a stochastic master equation. 
+    
+    The Lindblad equation is given as
+    $d\rho(t) / dt = -i [H(t), \rho(t)] + \sum_k L_k(t) \rho(t) L_k(t)^\dagger - 1/2 \{L_k(t)^\dagger L_k(t), \rho(t)\}$
+    where H(t) is the Hamiltonian, L_k(t) is the jump operator. Note that the coefficients of the jump operators are absorbed into L_k(t).
+
+    In this class, each component of the Hamiltonian $H(t)$, and each jump operator $L_k(t)$, is represented by a OperatorGroup object. 
+    Each OperatorGroup object contains a group of operators and the corresponding coefficients. 
+    The operators themselves are time-independent, like a Pauli operator. But the coefficients can be time-dependent stochastic processes. 
+    This corresponds to the case where the qubits are coupled to noisy environments such as inhomogeneous, fluctuating magnetic fields. 
+    """
+    def __init__(self, n_qubits: int, batchsize: int):
+        self.nq = n_qubits
+        super().__init__(2**n_qubits, batchsize)
+        self.density_matrix = QubitDensityMatrix(n_qubits=self.nq, batchsize=batchsize)
+
+
+    def set_rho_by_config(self, config):
+        if isinstance(config, th.Tensor):
+            _c = config
+        elif isinstance(config, np.ndarray):
+            if config.shape != (self.nq,):
+                raise ValueError("Config must have shape (#qubits).")
+            if config.dtype != np.int64:
+                raise ValueError("Config must be an integer array.")
+            _c = th.tensor(config, dtype=th.int64)
+        elif isinstance(config, list):
+            if len(config) != self.nq:
+                raise ValueError("Config must have length (#qubits).")
+            if not all(isinstance(i, int) for i in config):
+                raise ValueError("Config must be a list of integers.")
+            _c = th.tensor(config, dtype=th.int64)
+        else:
+            raise ValueError("Config must be a 0/1 tensor, a 0/1 numpy array, or a list of 0/1 integers.")
+        if not all(i in [0, 1] for i in _c):
+            raise ValueError("Config must be a sequence of 0/1 integers. Example for 2-qubit system: [0, 1] means |01>.")
+        self.density_matrix.set_rho_by_config(_c)
 
     def rotate(self, direction: th.Tensor, angle: float, config=None):
         """
@@ -257,8 +303,8 @@ class LindbladSystem(th.nn.Module):
         """
         self.rho = self.density_matrix.apply_kraus_operation(self.rho, kraus_operators, config)
         return self.rho
- 
-class ParticleLindbladSystem(LindbladSystem):
+    
+class ParticleLindbladSystem(QubitLindbladSystem):
     """
     This class represents the states of n physical qubits as a open quantum system.
     The quantum states include the two-level states of each qubit and the center-of-mass position and momentum of each qubit. 
@@ -304,7 +350,7 @@ class ParticleLindbladSystem(LindbladSystem):
         """
         if profile:
             t0 = timer()
-        self.step_particles(dt)  ## TODO: uncomment this line to include the thermal motion of particles
+        self.step_particles(dt)  
         if profile:
             t1 = timer()
             logging.info(f"The time taken for stepping the thermal motion of qubits is {t1 - t0}s.")

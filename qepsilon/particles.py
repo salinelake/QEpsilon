@@ -5,7 +5,7 @@ This file contains the particle class for the QEpsilon project.
 import torch as th
 import numpy as np
 import warnings
-from .utility import Constants
+from qepsilon.utilities import Constants
 
 class OpticalTweezer:
     def __init__(self, min_waist, wavelength, max_depth, center: th.Tensor, axis: th.Tensor=th.tensor([0.0, 0.0, 1.0]), on = True):

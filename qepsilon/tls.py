@@ -3,7 +3,7 @@ This module deals with Pauli operators and related operations.
 """
 
 import torch as th
-from qepsilon.utility import compose
+from qepsilon.utilities import compose
 
 class Pauli(th.nn.Module):
     """

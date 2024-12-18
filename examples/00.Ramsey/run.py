@@ -28,7 +28,7 @@ sz_shot = ShotbyShotNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_shot", batc
 sz_shot.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz_shot)
 
-sz0 = ColorNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_color", batchsize=batchsize, tau=3.5981204509735107e3, amp=0.05603799596428871e-3, requires_grad=False).to(dev)
+sz0 = LangevinNoisePauliOperatorGroup(n_qubits=1, id="sz_noise_color", batchsize=batchsize, tau=3.5981204509735107e3, amp=0.05603799596428871e-3, requires_grad=False).to(dev)
 sz0.add_operator('Z')
 qubit.add_operator_group_to_hamiltonian(sz0)
 
