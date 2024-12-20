@@ -44,6 +44,10 @@ class DensityMatrix(th.nn.Module):
         else:
             raise ValueError("Density matrix must have shape (2^n, 2^n) or (batchsize, 2^n, 2^n).")
     
+    @property
+    def trace(self):
+        return trace(self._rho)
+
     ############################################################
     # Basic operations on density matrices. Methods below do not update the stored density matrix. Use setter if you want to update.
     ############################################################

@@ -62,7 +62,11 @@ class LindbladSystem(th.nn.Module):
 
     @rho.setter
     def rho(self, rho: th.Tensor):
-        self.density_matrix.set_rho(rho)
+        if rho.dtype != th.cfloat:
+            _rho = rho.to(th.cfloat)
+        else:
+            _rho = rho
+        self.density_matrix.set_rho(_rho)
     
 
     @property
@@ -123,6 +127,8 @@ class LindbladSystem(th.nn.Module):
             raise ValueError(f"The ID {operator_group.id} already exists.")
         if operator_group.nb != self.nb:
             raise ValueError(f"The batchsize of the operator group {operator_group.id} does not match the batchsize of the system.")
+        if operator_group.ns != self.ns:
+            raise ValueError(f"The dimension of the operator group {operator_group.id} does not match the number of states of the system.")
         self._hamiltonian_operator_group_dict[operator_group.id] = operator_group
 
     def add_operator_group_to_jumping(self, operator_group: OperatorGroup):
@@ -135,6 +141,8 @@ class LindbladSystem(th.nn.Module):
             raise ValueError(f"The ID {operator_group.id} already exists.")
         if operator_group.nb != self.nb:
             raise ValueError(f"The batchsize of the operator group {operator_group.id} does not match the batchsize of the system.")
+        if operator_group.ns != self.ns:
+            raise ValueError(f"The dimension of the operator group {operator_group.id} does not match the number of states of the system.")
         self._jumping_group_dict[operator_group.id] = operator_group
 
     def add_operator_group_to_channel(self, operator_group: OperatorGroup):
@@ -143,6 +151,7 @@ class LindbladSystem(th.nn.Module):
         """
         if operator_group.id in self._channel_group_dict:
             raise ValueError(f"The ID {operator_group.id} already exists.")
+        ## TODO: check if self.ns=operator_group.ns; check also if self.nb=operator_group.nb
         self._channel_group_dict[operator_group.id] = operator_group
 
     ############################################################
@@ -185,8 +194,17 @@ class LindbladSystem(th.nn.Module):
         jump_operator_list = []
         for operator_group in self._jumping_group_dict.values():
             ops, coefs = operator_group.sample(dt)
-            jump_operator_list.append(ops[None, :, :] * coefs[:, None, None])
-            # jump_operator_list.append(operator_group.sample(dt))
+            ## sanitary check
+            if coefs.shape != (self.nb,):
+                raise ValueError("The coefficients sampled from an operator group should be a 1D tensor of length equal to the batchsize.")
+            ## no broadcasting if the operators is already batched
+            if ops.shape == (self.nb, self.ns, self.ns):
+                jump_operator_list.append(ops * coefs[:, None, None])
+            ## broadcast if the operators is not already batched
+            elif ops.shape == (self.ns, self.ns):
+                jump_operator_list.append(ops[None, :, :] * coefs[:, None, None])
+            else:
+                raise ValueError(f"The shape of the operator sampled from operator group {operator_group.id} should be (batchsize, n_states, n_states) or (n_states, n_states).")
         if set_buffer:
             self._jump = jump_operator_list
         return jump_operator_list
@@ -246,6 +264,25 @@ class LindbladSystem(th.nn.Module):
         self.rho = rho_new
         return self.rho
 
+    def observe(self, operator):
+        """
+        This function observes the system with an operator.
+        """
+        if isinstance(operator, OperatorGroup) is False:
+            raise ValueError("The operator must be an OperatorGroup object. It should not be a plain array or tensor.")
+        ops, coefs = operator.sample(dt=0)
+        ## sanitary check
+        if coefs.shape != (self.nb,):
+            raise ValueError("The coefficients sampled from an operator group should be a 1D tensor of length equal to the batchsize.")
+        ## no broadcasting if the operators is already batched
+        if ops.shape == (self.nb, self.ns, self.ns):
+            ops = ops * coefs[:, None, None]
+        ## broadcast if the operators is not already batched
+        elif ops.shape == (self.ns, self.ns):
+            ops = ops[None, :, :] * coefs[:, None, None]
+        return trace(th.matmul(ops, self.rho))
+        
+    
 class QubitLindbladSystem(LindbladSystem):
     """
     This class represents the states of n physical qubits as a open quantum system.

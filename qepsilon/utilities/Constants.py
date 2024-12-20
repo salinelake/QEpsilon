@@ -27,6 +27,7 @@ class Constants(object):
     elementary_charge = 1.0 # electron charge
 
     ## length units in um
+    cm = 10000
     mm = 1000
     um = 1.0
     nm = 1e-3
@@ -38,11 +39,6 @@ class Constants(object):
     us = 1
     ns = 1e-3
     ps = 1e-6
+    fs = 1e-9
      
-
-
-    # ## magnetic units
-    # muB = 1.0   # Bohr magneton
-    # Tesla = 5.7883818060e-5 # eV/muB
-    # electron_g_factor = 2.00231930436 # dimensionless
-    # electron_gyro_ratio = electron_g_factor / hbar # muB/eV/ps
+ 

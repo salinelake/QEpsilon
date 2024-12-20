@@ -5,6 +5,8 @@ from ..utilities import compose
 from ..particles import Particles
 from .base_operators import OperatorGroup
 
+## TODO: add prefactor to the operator group
+
 class PauliOperatorGroup(OperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems). 

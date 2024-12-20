@@ -33,6 +33,25 @@ class Pauli(th.nn.Module):
         """
         return th.eye(2, dtype=th.cfloat)
 
+    def _U(self):
+        """
+        This function returns the raising operator as a 2x2 complex tensor.
+        """
+        return th.tensor([[0, 1], [0, 0]], dtype=th.cfloat)
+    
+    def _D(self):
+        """
+        This function returns the lowering operator as a 2x2 complex tensor.
+        """
+        return th.tensor([[0, 0], [1, 0]], dtype=th.cfloat)
+
+
+    def _N(self):
+        """
+        This function returns the number operator as a 2x2 complex tensor.
+        """
+        return th.tensor([[1, 0], [0, 0]], dtype=th.cfloat)
+
     def __init__(self, n_qubits: int):
         super().__init__()
         """
@@ -45,6 +64,9 @@ class Pauli(th.nn.Module):
         self.register_buffer("Y", self._Y())
         self.register_buffer("Z", self._Z())
         self.register_buffer("I", self._I())
+        self.register_buffer("U", self._U())
+        self.register_buffer("D", self._D())
+        self.register_buffer("N", self._N())
     
     def along_u(self, u: th.FloatTensor):
         """

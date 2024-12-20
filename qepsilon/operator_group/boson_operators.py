@@ -3,6 +3,7 @@ import torch as th
 from ..boson import Boson
 from .base_operators import OperatorGroup
 
+## TODO: add prefactor to the operator group
 class BosonOperatorGroup(OperatorGroup):
     def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1):
         self.nm = num_modes  # number of modes
