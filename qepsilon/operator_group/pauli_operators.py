@@ -45,7 +45,7 @@ class IdentityPauliOperatorGroup(PauliOperatorGroup):
         super().__init__(n_qubits, id, batchsize)
         self.add_operator("I"*n_qubits)
 
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         ops = self.sum_operators()
         return ops, th.ones(self.nb, dtype=ops.dtype, device=ops.device)
 
@@ -61,7 +61,7 @@ class StaticPauliOperatorGroup(PauliOperatorGroup):
         else:
             self.register_buffer("coef", th.tensor(coef, dtype=th.float))
     
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function sum up the operators in the group.
         Args:
@@ -96,7 +96,7 @@ class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
     def reset(self):
         self.seed = th.randn(self.nb, dtype=self.logamp.dtype, device=self.logamp.device)
 
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function sum up the operators in the group.
         Args:
@@ -126,7 +126,7 @@ class WhiteNoisePauliOperatorGroup(PauliOperatorGroup):
     def amp(self):
         return th.exp(self.logamp)
 
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function sample the average of the total operator for a time step dt. 
         Note that the accumulation of the white noise is a Wiener process. dW ~ N(0, sqrt(dt)). 
@@ -167,7 +167,7 @@ class PeriodicNoisePauliOperatorGroup(PauliOperatorGroup):
     def reset(self):
         self.phase = th.rand(self.nb, device=self.phase.device) * 2 * np.pi 
     
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function steps the periodic noise for a time step dt, then return the total operator.
         """
@@ -217,7 +217,7 @@ class LangevinNoisePauliOperatorGroup(PauliOperatorGroup):
     def z2(self, dt: float):
         return th.sqrt(1 - th.exp(-2 * self.damping * dt))
 
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function steps the noise for a time step dt, then return the total operator.
         dx = -damping * x + amp * dW
@@ -356,7 +356,7 @@ class DipolarInteraction(PauliOperatorGroup):
         coef_avg = th.mean(coef_select, dim=0)
         return self.prefactor * coef_avg
 
-    def sample(self, dt = None):   
+    def _sample(self, dt = None):   
         """
         This function steps the custom noise for a time step dt, then return the total operator.
         Args:
@@ -378,6 +378,8 @@ class DepolarizationChannel(PauliOperatorGroup):
     """
     def __init__(self, n_qubits: int, id: str, batchsize: int, p: float, requires_grad: bool = False):
         super().__init__(n_qubits, id, batchsize)
+        if self.static:
+            raise ValueError("DepolarizationChannel can not be set to static. ")
         if p<0 or p>1:
             raise ValueError("p must be between 0 and 1")
         _p = th.atanh(th.tensor(p, dtype=th.float) * 2 - 1)
@@ -389,7 +391,7 @@ class DepolarizationChannel(PauliOperatorGroup):
     def p(self):
         return (th.tanh(self._p)+1)/2.0
 
-    def sample(self):
+    def _sample(self):
         """
         This function sample the Kraus operators of the depolarizing channel.
         """

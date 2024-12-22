@@ -41,4 +41,46 @@ class Constants(object):
     ps = 1e-6
     fs = 1e-9
      
- 
+
+
+class Constants_Metal(object):
+    """Class whose members are fundamental constants.
+    Inner Unit:
+        Length: um
+        Time: us
+        Energy: hbar \times Hz
+    """
+    ## energy units in hbar*THz
+    hbar_THz = 1.0
+    hbar_MHz = 1e-6 * hbar_THz
+    hbar_Hz = 1e-6 * hbar_MHz
+    eV = hbar_Hz / 6.582119569e-16  
+    meV = 1e-3 * eV
+    Ry = 13.605693123 * eV 
+    mRy = 1e-3 * Ry  
+    Joule = 6.241509e18 * eV  
+    amu_cc =  931.49410372e6 * eV 
+
+    ## physical constants
+    kb = 8.6173303e-5 * eV # hbar * THz / K
+    speed_of_light = 299792458 # pm/ps
+    amu = amu_cc / speed_of_light**2 # hbar * THz / (pm/ps)^2
+    epsilon0 = None  # e^2(hbar*THz*pm)^-1
+    elementary_charge = 1.0 # electron charge
+
+    ## length units in pm
+    cm = 1e10
+    mm = 1e9
+    um = 1e6
+    nm = 1e3
+    Angstrom = 100
+    pm = 1
+    bohr_radius = 0.52917721092 * Angstrom 
+    
+    ## time units in ps
+    ms = 1e9
+    us = 1e6
+    ns = 1e3
+    ps = 1
+    fs = 1e-3
+     

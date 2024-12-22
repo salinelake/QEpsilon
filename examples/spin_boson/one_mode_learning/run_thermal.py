@@ -2,7 +2,10 @@ import numpy as np
 import torch as th
 import matplotlib.pyplot as plt
 import qepsilon as qe
-from qepsilon.utilities import *
+from qepsilon.utilities import compose, trace
+# from qepsilon.utilities import Constants_Metal as Constants
+from qepsilon.utilities import Constants as Constants
+
 from qepsilon import LindbladSystem
 from qepsilon.operator_group import *
 th.set_printoptions(sci_mode=False, precision=2)
@@ -15,13 +18,13 @@ We will initialize the system and define the Hamiltonian and Lindbladian terms.
 ## simulation parameters
 batchsize = 1
 dt = 0.005 * Constants.fs  ## in unit of us
-nsteps = int(Constants.ps / dt)
+nsteps = int(0.2 * Constants.ps / dt)
 ## spin parameters
 spin_omega = 0
 
 ## boson bath parameters
 num_modes = 1
-nmax = 10
+nmax = 6
 num_boson_states = (nmax+1)**num_modes
 omega_in_cm = 84 # cm^-1 => ~10meV  ~ 0.4ps
 omega = Constants.speed_of_light * (omega_in_cm/ Constants.cm) * 2 * np.pi   # us^-1
@@ -55,8 +58,8 @@ spin_identity = IdentityPauliOperatorGroup(n_qubits=1, id="spin_identity", batch
 boson_identity = IdentityBosonOperatorGroup(num_modes=num_modes, id="boson_identity", nmax=nmax, batchsize=batchsize)
 
 ## add the harmonic energy term
-boson_harmonic = HarmonicOscillatorBosonOperatorGroup(num_modes=num_modes, id="boson_harmonic", batchsize=batchsize, nmax=nmax, omega= th.ones(num_modes)*omega)
-system_harmonic = ComposedOperatorGroups(id="system_harmonic", OP1=spin_identity, OP2=boson_harmonic)
+boson_harmonic = HarmonicOscillatorBosonOperatorGroup(num_modes=num_modes, id="boson_harmonic", batchsize=batchsize, nmax=nmax, omega= omega)
+system_harmonic = ComposedOperatorGroups(id="system_harmonic", OP_list = [spin_identity, boson_harmonic], static=True)
 system.add_operator_group_to_hamiltonian(system_harmonic)
 
 ## add the spin-boson coupling term: c^\dagger b
@@ -65,7 +68,7 @@ couple_spin.add_operator('N')
 couple_boson = StaticBosonOperatorGroup(num_modes=num_modes, id="couple_boson", nmax=nmax, batchsize=batchsize, coef=1.0)
 couple_boson.add_operator('U')
 couple_boson.add_operator('D')
-system_couple = ComposedOperatorGroups(id="system_couple", OP1=couple_spin, OP2=couple_boson)
+system_couple = ComposedOperatorGroups(id="system_couple", OP_list = [couple_spin, couple_boson], static=True)
 system.add_operator_group_to_hamiltonian(system_couple)
  
 """
@@ -74,12 +77,12 @@ Define the Lindbladian terms
 ## add the Lindbladian terms for maintaining a thermal bath
 boson_up_jump = StaticBosonOperatorGroup(num_modes=num_modes, id="boson_up_jump", nmax=nmax, batchsize=batchsize, coef=np.sqrt(gamma*occupation))
 boson_up_jump.add_operator('U')
-system_up_jump = ComposedOperatorGroups(id="system_up_jump", OP1=spin_identity, OP2=boson_up_jump)
+system_up_jump = ComposedOperatorGroups(id="system_up_jump", OP_list = [spin_identity, boson_up_jump], static=True)
 system.add_operator_group_to_jumping(system_up_jump)
 
 boson_down_jump = StaticBosonOperatorGroup(num_modes=num_modes, id="boson_down_jump", nmax=nmax, batchsize=batchsize, coef=np.sqrt(gamma*(1+occupation)))
 boson_down_jump.add_operator('D')
-system_down_jump = ComposedOperatorGroups(id="system_down_jump", OP1=spin_identity, OP2=boson_down_jump)
+system_down_jump = ComposedOperatorGroups(id="system_down_jump", OP_list = [spin_identity, boson_down_jump], static=True)
 system.add_operator_group_to_jumping(system_down_jump)
 
 """
@@ -87,19 +90,19 @@ Define the operators we want to observe
 """
 obs_spin_sz = StaticPauliOperatorGroup(n_qubits=1, id="obs_spin_sz", batchsize=batchsize, coef=1.0)
 obs_spin_sz.add_operator('Z')
-obs_system_sz = ComposedOperatorGroups(id="obs_system_sz", OP1=obs_spin_sz, OP2=boson_identity)
+obs_system_sz = ComposedOperatorGroups(id="obs_system_sz", OP_list = [obs_spin_sz, boson_identity], static=True)
 
 obs_spin_sx = StaticPauliOperatorGroup(n_qubits=1, id="obs_spin_sx", batchsize=batchsize, coef=1.0)
 obs_spin_sx.add_operator('X')
-obs_system_sx = ComposedOperatorGroups(id="obs_system_sx", OP1=obs_spin_sx, OP2=boson_identity)
+obs_system_sx = ComposedOperatorGroups(id="obs_system_sx", OP_list = [obs_spin_sx, boson_identity], static=True)
 
 obs_spin_excited = StaticPauliOperatorGroup(n_qubits=1, id="obs_spin_excited", batchsize=batchsize, coef=1)
 obs_spin_excited.add_operator('N')
-obs_system_excited = ComposedOperatorGroups(id="obs_system_excited", OP1=obs_spin_excited, OP2=boson_identity)
+obs_system_excited = ComposedOperatorGroups(id="obs_system_excited", OP_list = [obs_spin_excited, boson_identity], static=True)
 
 obs_boson_N = StaticBosonOperatorGroup(num_modes=num_modes, id="obs_boson_N", nmax=nmax, batchsize=batchsize, coef=1.0)
 obs_boson_N.add_operator('N')
-obs_system_N = ComposedOperatorGroups(id="obs_system_N", OP1=spin_identity, OP2=obs_boson_N)
+obs_system_N = ComposedOperatorGroups(id="obs_system_N", OP_list = [spin_identity, obs_boson_N], static=True)
 
 """
 Run the simulation
@@ -116,7 +119,7 @@ for i in range(nsteps):
         sigma_x = system.observe(obs_system_sx).numpy().mean()
         ne = system.observe(obs_system_excited).numpy().mean()
         boson_N = system.observe(obs_system_N).numpy().mean()
-        print('t={:.3f}ps, sigma_z={:.3f}, sigma_x={:.3f}, ne={:.3f}'.format(i*dt*1e6, sigma_z, sigma_x, ne))
+        print('t={:.3f}ps, sigma_z={:.3f}, sigma_x={:.3f}, ne={:.3f}'.format(i*dt/Constants.ps, sigma_z, sigma_x, ne))
         print('boson_N (target={:.3f})={:.3f}'.format(occupation, boson_N))
         ne_list.append(ne)
         t_list.append(i*dt)

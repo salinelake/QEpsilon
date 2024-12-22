@@ -31,9 +31,12 @@ class BosonOperatorGroup(OperatorGroup):
 class IdentityBosonOperatorGroup(BosonOperatorGroup):
     def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1):
         super().__init__(num_modes, id, nmax, batchsize)
-        self.add_operator("I"*num_modes)
+        self._ops.append("I"*num_modes)
 
-    def sample(self, dt: float):
+    def add_operator(self, boson_sequence: str):
+        raise ValueError("IdentityBosonOperatorGroup does not support adding operators")
+
+    def _sample(self, dt: float):
         ops = self.sum_operators()
         return ops, th.ones(self.nb, dtype=ops.dtype, device=ops.device)
 
@@ -47,14 +50,13 @@ class StaticBosonOperatorGroup(BosonOperatorGroup):
         super().__init__(num_modes, id, nmax, batchsize)
         ## require coef is a scalar
         if not isinstance(coef, float):
-            print(type(coef))
             raise ValueError("coef must be a float scalar")
         if requires_grad:
             self.register_parameter("coef", th.nn.Parameter(th.tensor(coef, dtype=th.float)))
         else:
             self.register_buffer("coef", th.tensor(coef, dtype=th.float))
 
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function returns the sum of the operators in the group.
         Args:
@@ -65,20 +67,27 @@ class StaticBosonOperatorGroup(BosonOperatorGroup):
         """
         ops = self.sum_operators()
         return ops, th.ones(self.nb, dtype=ops.dtype, device=ops.device) * self.coef
-    
+
 class HarmonicOscillatorBosonOperatorGroup(BosonOperatorGroup):
     """
     static operator H = \sum_i \omega_i (a_i^\dagger a_i + 1/2)
     """
     def __init__(self, num_modes, id: str, nmax: int, batchsize: int, omega: th.Tensor, requires_grad: bool = False):
         super().__init__(num_modes, id, nmax, batchsize)
-        if omega.shape != (self.nm,):
-            raise ValueError("omega specifies the frequency of each mode. It must have shape (num_modes,)")
-        if omega.dtype != th.float:
-            raise ValueError("omega specifies the frequency of each mode. It must be a real float tensor.")
-        if omega.min()<=0:
-            raise ValueError("omega specifies the frequency of each mode. It must be all positive.")
-        log_omega = th.log(omega)
+        if self.nm == 1:
+            if isinstance(omega, float) is False:
+                raise ValueError("omega must be a float scalar for single mode system")
+            if omega <= 0:
+                raise ValueError("omega must be positive")
+            log_omega = th.tensor([np.log(omega)], dtype=th.float)
+        else:
+            if omega.shape != (self.nm,):
+                raise ValueError("omega specifies the frequency of each mode. It must have shape (num_modes,)")
+            if omega.dtype != th.float:
+                raise ValueError("omega specifies the frequency of each mode. It must be a real float tensor.")
+            if omega.min()<=0:
+                raise ValueError("omega specifies the frequency of each mode. It must be all positive.")
+            log_omega = th.log(omega)
         if requires_grad:
             self.register_parameter("log_omega", th.nn.Parameter(log_omega))
         else:
@@ -92,7 +101,7 @@ class HarmonicOscillatorBosonOperatorGroup(BosonOperatorGroup):
     def omega(self):
         return th.exp(self.log_omega)
     
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function returns H = \sum_i \omega_i (a_i^\dagger a_i + 1/2) and a all-one coefficient tensor.
         Args:
@@ -126,7 +135,7 @@ class WhiteNoiseBosonOperatorGroup(BosonOperatorGroup):
     def amp(self):
         return th.exp(self.logamp)
 
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function sample the average of the total operator for a time step dt. 
         Note that the accumulation of the white noise is a Wiener process. dW ~ N(0, sqrt(dt)). 
@@ -182,7 +191,7 @@ class LangevinNoiseBosonOperatorGroup(BosonOperatorGroup):
     def z2(self, dt: float):
         return th.sqrt(1 - th.exp(-2 * self.damping * dt))
 
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function steps the noise for a time step dt, then return the total operator.
         dx = -damping * x + amp * dW
@@ -217,7 +226,7 @@ class ColorNoiseBosonOperatorGroup(LangevinNoiseBosonOperatorGroup):  ## TODO: t
         self.phase = th.rand(self.nb) * 2 * np.pi
         self.noise = th.randn(self.nb, device=self.amp.device) * self.amp
 
-    def sample(self, dt: float):
+    def _sample(self, dt: float):
         """
         This function steps the noise for a time step dt, then return the total operator.
         The coefficient is a stochastic process: xi(t) = sqrt(2)*cos(omega*t+phi) * x(t). phi is a random phase.

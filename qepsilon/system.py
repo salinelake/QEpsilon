@@ -51,6 +51,28 @@ class LindbladSystem(th.nn.Module):
         return list(self._jumping_group_dict.values()) 
 
     @property
+    def channel_operator_groups(self):
+        return list(self._channel_group_dict.values()) 
+
+    def get_hamiltonian_operator_group_by_ID(self, id: str):
+        if id in self._hamiltonian_operator_group_dict:
+            return self._hamiltonian_operator_group_dict[id]
+        else:
+            raise ValueError(f"The ID {id} does not exist in the Hamiltonian operator group dictionary.")
+        
+    def get_jumping_operator_group_by_ID(self, id: str):
+        if id in self._jumping_group_dict:
+            return self._jumping_group_dict[id]
+        else:
+            raise ValueError(f"The ID {id} does not exist in the jumping operator group dictionary.")
+        
+    def get_channel_operator_group_by_ID(self, id: str):
+        if id in self._channel_group_dict:
+            return self._channel_group_dict[id]
+        else:
+            raise ValueError(f"The ID {id} does not exist in the channel operator group dictionary.")
+        
+    @property
     def rho(self):
         """
         This property returns the density matrix of the system.
@@ -280,7 +302,7 @@ class LindbladSystem(th.nn.Module):
         ## broadcast if the operators is not already batched
         elif ops.shape == (self.ns, self.ns):
             ops = ops[None, :, :] * coefs[:, None, None]
-        return trace(th.matmul(ops, self.rho))
+        return trace(th.matmul(ops, self.rho)) / trace(self.rho)
         
     
 class QubitLindbladSystem(LindbladSystem):
