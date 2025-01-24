@@ -5,8 +5,6 @@ from ..utilities import compose
 from ..particles import Particles
 from .base_operators import OperatorGroup
 
-## TODO: add prefactor to the operator group
-
 class PauliOperatorGroup(OperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems). 
@@ -18,7 +16,7 @@ class PauliOperatorGroup(OperatorGroup):
         super().__init__(id, ns, batchsize)
         self.pauli = Pauli(n_qubits)
     
-    def add_operator(self, PauliSequence: str):
+    def add_operator(self, PauliSequence: str, prefactor: float = 1):
         """
         Add an operator to the group. Stored as a string of Pauli operator names. 
         Args:
@@ -27,6 +25,7 @@ class PauliOperatorGroup(OperatorGroup):
         if len(PauliSequence) != self.nq:
             raise ValueError("length of PauliSequence must be the number of qubits")
         self._ops.append(PauliSequence)
+        self._prefactors.append(prefactor)
         return
     
     def sum_operators(self):
@@ -36,8 +35,8 @@ class PauliOperatorGroup(OperatorGroup):
             total_ops: th.Tensor, the total operator matrix of shape (self.ns, self.ns).
         """
         total_ops = 0
-        for op in self._ops:
-            total_ops += self.pauli.get_composite_ops(op)
+        for op, prefactor in zip(self._ops, self._prefactors):
+            total_ops += self.pauli.get_composite_ops(op) * prefactor
         return total_ops
 
 class IdentityPauliOperatorGroup(PauliOperatorGroup):
@@ -61,7 +60,7 @@ class StaticPauliOperatorGroup(PauliOperatorGroup):
         else:
             self.register_buffer("coef", th.tensor(coef, dtype=th.float))
     
-    def _sample(self, dt: float):
+    def _sample(self, dt: float = 1.0):
         """
         This function sum up the operators in the group.
         Args:
@@ -137,7 +136,7 @@ class WhiteNoisePauliOperatorGroup(PauliOperatorGroup):
             coef: th.Tensor, the coefficient of shape (self.nb,).
         """
         noise = np.random.normal(0, 1, self.nb) 
-        noise = th.tensor(noise, dtype=self.amp.dtype, device=self.amp.device) * self.amp / np.sqrt(dt)
+        noise = th.tensor(noise, dtype=self.logamp.dtype, device=self.logamp.device) * self.amp / np.sqrt(dt)
         return self.sum_operators(), noise
 
 class PeriodicNoisePauliOperatorGroup(PauliOperatorGroup):
@@ -151,28 +150,38 @@ class PeriodicNoisePauliOperatorGroup(PauliOperatorGroup):
             amp: float, the amplitude of the noise.
         """
         super().__init__(n_qubits, id, batchsize)
-        self.register_buffer("tau", th.tensor(tau, dtype=th.float))
+        # self.register_buffer("tau", th.tensor(tau, dtype=th.float))
         self.register_buffer("phase", th.rand(self.nb) * 2 * np.pi )
+        # self.phase = th.rand(self.nb) * 2 * np.pi
+        self.time = 0
         if amp<0:
             raise ValueError("amp must be non-negative")
         logamp = th.log(th.tensor(amp, dtype=th.float))
         if requires_grad:
             self.register_parameter("logamp", th.nn.Parameter(logamp))
+            self.register_parameter("logtau", th.nn.Parameter(th.log(th.tensor(tau, dtype=th.float))))
         else:
             self.register_buffer("logamp", logamp)
+            self.register_buffer("logtau", th.log(th.tensor(tau, dtype=th.float)))
     @property
     def amp(self):
         return th.exp(self.logamp)
+    @property
+    def tau(self):
+        return th.exp(self.logtau)
     
     def reset(self):
         self.phase = th.rand(self.nb, device=self.phase.device) * 2 * np.pi 
+        self.time = 0
     
     def _sample(self, dt: float):
         """
         This function steps the periodic noise for a time step dt, then return the total operator.
         """
-        self.phase += 2 * np.pi * dt / self.tau
-        noise = self.amp * th.sin(self.phase)
+        self.time += dt
+        # self.phase += 2 * np.pi * dt / self.tau
+        phase = self.phase + 2 * np.pi * self.time / self.tau
+        noise = self.amp * th.sin(phase)
         return self.sum_operators(), noise
 
 class LangevinNoisePauliOperatorGroup(PauliOperatorGroup):
@@ -195,7 +204,7 @@ class LangevinNoisePauliOperatorGroup(PauliOperatorGroup):
             self.register_buffer("logamp", logamp)
 
         self.register_buffer("noise", th.randn(self.nb) * amp)
-    
+
     @property
     def amp(self):
         return th.exp(self.logamp)
@@ -209,7 +218,7 @@ class LangevinNoisePauliOperatorGroup(PauliOperatorGroup):
         return 1 / self.tau
     
     def reset(self):
-        self.noise = th.randn(self.nb, device=self.amp.device) * self.amp
+        self.noise = th.randn(self.nb, device=self.logamp.device) * self.amp
 
     def z1(self, dt: float):
         return th.exp(- self.damping * dt)
@@ -228,7 +237,7 @@ class LangevinNoisePauliOperatorGroup(PauliOperatorGroup):
             coef: th.Tensor, the coefficient of shape (self.nb,).
         """
         drive = np.random.normal(0, 1, self.nb)
-        drive = th.tensor(drive, dtype=self.amp.dtype, device=self.amp.device) * self.amp
+        drive = th.tensor(drive, dtype=self.logamp.dtype, device=self.logamp.device) * self.amp
         noise_new = self.noise * self.z1(dt) + drive * self.z2(dt)   
         self.noise = noise_new
         return self.sum_operators(), noise_new
@@ -286,6 +295,47 @@ class LangevinNoisePauliOperatorGroup(PauliOperatorGroup):
 #         return self.sum_operators(), coef
 
 
+class ColorNoisePauliOperatorGroup(LangevinNoisePauliOperatorGroup):  ## TODO: test autocorrelation
+    """
+    This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a color noise coefficient. 
+    The autocorrelation function of the color noise is ~exp(-t/tau)cos(omega*t). 
+    """
+    def __init__(self, n_qubits, id: str, batchsize: int = 1, tau: float = 1, amp: float = 1, omega: float = 1, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize, tau, amp, requires_grad)
+        if requires_grad:
+            self.register_parameter("omega", th.nn.Parameter(th.tensor(omega, dtype=th.float)))
+        else:
+            self.register_buffer("omega", th.tensor(omega, dtype=th.float))
+        self.register_buffer("phase", th.rand(self.nb) * 2 * np.pi)
+        self.time = 0
+
+    def reset(self):
+        self.time = 0
+        self.phase = th.rand(self.nb, device=self.logamp.device) * 2 * np.pi
+        self.noise = th.randn(self.nb, device=self.logamp.device) * self.amp.detach()
+
+    def _sample(self, dt: float):
+        """
+        This function steps the noise for a time step dt, then return the total operator.
+        The coefficient is a stochastic process: xi(t) = sqrt(2)*cos(omega*t+phi) * x(t). phi is a random phase.
+        x(t) is a Langevin process: dx = -damping * x + amp * dW
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
+        """
+        ## update the Langevin process
+        drive = np.random.normal(0, 1, self.nb)
+        drive = th.tensor(drive, dtype=self.logamp.dtype, device=self.logamp.device) * self.amp
+        noise_new = self.noise * self.z1(dt) + drive * self.z2(dt)   
+        self.noise = noise_new
+        ## get the coefficient
+        self.time += dt
+        phase = self.omega * self.time + self.phase
+        coef = np.sqrt(2) * th.cos(phase) * noise_new
+        return self.sum_operators(), coef
+
 
 class DipolarInteraction(PauliOperatorGroup):
     """
@@ -330,6 +380,12 @@ class DipolarInteraction(PauliOperatorGroup):
             op += self.pauli.get_composite_ops(pauli_seq)
             self._ops.append(op)
 
+    def add_operator(self, prefactor: float = 1):
+        raise ValueError("DipolarInteraction does not support adding operators")
+
+    def sum_operators(self):
+        raise ValueError("DipolarInteraction does not support summing operators")
+
     def get_dipole_dipole_coef(self):
         """
         Get the dipole-dipole interaction coefficients.
@@ -344,7 +400,7 @@ class DipolarInteraction(PauliOperatorGroup):
         pos = th.stack(particles.traj[-nsteps:])  # shape: (nsteps, nb, nq, 3)
         distance = pos.reshape(nsteps, nb, nq, 1, 3) - pos.reshape(nsteps, nb, 1, nq, 3)
         separation = th.norm(distance, dim=-1)
-        
+        axis = axis.to(device=separation.device)
         # ## clip separation
         # separation = th.clip(separation, min=self.dcut)
         # ## renormalize distance
@@ -367,7 +423,6 @@ class DipolarInteraction(PauliOperatorGroup):
         """
         total_ops = 0
         coef = self.get_dipole_dipole_coef()
-        # coef = th.ones_like(coef) * coef.mean()  ## TODO: remove this line
         for idx, op in enumerate(self._ops):
             total_ops += op[None,:,:] * coef[:,idx, None,None]
         return total_ops, th.ones_like(coef[:,0])
@@ -391,6 +446,12 @@ class DepolarizationChannel(PauliOperatorGroup):
     def p(self):
         return (th.tanh(self._p)+1)/2.0
 
+    def add_operator(self, prefactor: float = 1):
+        raise ValueError("DepolarizationChannel does not support adding operators")
+
+    def sum_operators(self):
+        raise ValueError("DepolarizationChannel does not support summing operators")
+
     def _sample(self):
         """
         This function sample the Kraus operators of the depolarizing channel.
@@ -400,3 +461,5 @@ class DepolarizationChannel(PauliOperatorGroup):
                th.sqrt(self.p / 3) * self.pauli.Y, 
                th.sqrt(self.p / 3) * self.pauli.Z]
         return ops
+
+

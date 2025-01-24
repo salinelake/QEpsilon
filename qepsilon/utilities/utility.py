@@ -26,7 +26,14 @@ def ABAd(A: th.Tensor, B: th.Tensor):
     if A.dim() == 2:
         return th.matmul(A, th.matmul(B, A.conj().T))
     elif A.dim() == 3:
-        return th.matmul(A, th.matmul(B, A.conj().permute(0, 2, 1)))
+        if A.is_sparse:
+            nb = A.shape[0]
+            result = []
+            for i in range(nb):
+                result.append(th.matmul(A[i], th.matmul(B[i], A[i].conj().T)))
+            return th.stack(result)
+        else:
+            return th.matmul(A, th.matmul(B, A.conj().permute(0, 2, 1)))
     else:
         raise ValueError("A and B must be 2D or 3D tensors.")
 

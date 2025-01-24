@@ -43,8 +43,7 @@ class DensityMatrix(th.nn.Module):
                 self._rho = rho.to(self._rho.device)
         else:
             raise ValueError("Density matrix must have shape (2^n, 2^n) or (batchsize, 2^n, 2^n).")
-        self._rho = self.normalize(self._rho)
-        
+            
     @property
     def trace(self):
         return trace(self._rho)

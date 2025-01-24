@@ -16,6 +16,7 @@ class Constants(object):
     eV = hbar_Hz / 6.582119569e-16  
     Ry = 13.605693123 * eV 
     mRy = 1e-3 * Ry  
+    Hartree = 27.211386245981 * eV
     Joule = 6.241509e18 * eV  
     amu_cc =  931.49410372e6 * eV 
 
@@ -58,6 +59,7 @@ class Constants_Metal(object):
     meV = 1e-3 * eV
     Ry = 13.605693123 * eV 
     mRy = 1e-3 * Ry  
+    Hartree = 27.211386245981 * eV
     Joule = 6.241509e18 * eV  
     amu_cc =  931.49410372e6 * eV 
 
@@ -83,4 +85,6 @@ class Constants_Metal(object):
     ns = 1e3
     ps = 1
     fs = 1e-3
+    As = 1e-6
+    time_au = 2.4188843265864e-2 * fs
      

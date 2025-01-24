@@ -13,7 +13,7 @@ class OperatorGroup(th.nn.Module):
         self.id = id
         self.nb = batchsize
         self._ops = []
-        self._prefactor = []
+        self._prefactors = []
         self.op_static = None
         self.coef_static = None
 
@@ -79,6 +79,10 @@ class ComposedOperatorGroups(OperatorGroup):
     def reset(self):
         for OP in self.OP_list:
             OP.reset()
+
+    def to(self, device='cuda'):
+        for OP in self.OP_list:
+            OP.to(device=device)
 
     def add_operator(self, prefactor: float=1.0):
         raise ValueError("Cannot add operator to a composed operator group. The operators in the subsystems are specified at initialization.")

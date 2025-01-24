@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import qepsilon as qe
 from qepsilon.utilities import compose, trace
 # from qepsilon.utilities import Constants_Metal as Constants
-from qepsilon.utilities import Constants as Constants
+from qepsilon.utilities import Constants_Metal as Constants
 
 from qepsilon import LindbladSystem
 from qepsilon.operator_group import *
@@ -16,24 +16,24 @@ This is a simple spin-boson model with a single spin coupled to a single bosonic
 We will initialize the system and define the Hamiltonian and Lindbladian terms.
 """
 ## simulation parameters
-batchsize = 1
-dt = 0.005 * Constants.fs  ## in unit of us
-nsteps = int(0.2 * Constants.ps / dt)
+batchsize = 2
+dt = 0.01 * Constants.fs  ## in unit of us
+nsteps = int(1 * Constants.ps / dt)
 ## spin parameters
 spin_omega = 0
 
 ## boson bath parameters
 num_modes = 1
-nmax = 6
+nmax = 10
 num_boson_states = (nmax+1)**num_modes
-omega_in_cm = 84 # cm^-1 => ~10meV  ~ 0.4ps
+omega_in_cm = 160 # cm^-1 => ~10meV  ~ 0.4ps
 omega = Constants.speed_of_light * (omega_in_cm/ Constants.cm) * 2 * np.pi   # us^-1
 
 ## bath relaxation
 tau = 0.1 * Constants.ps  ## relaxation time of the boson bath
 tau_in_ps = tau / Constants.ps
-gamma = 1 / tau
 kbT = Constants.kb * 300  ## room temperature: 25.8 meV, boson occupation decays to 0.01 for level 10,
+gamma = 1 / tau  
 occupation = 1/(np.exp(omega/kbT)-1)
 
 ## spin-boson coupling
@@ -46,7 +46,9 @@ num_states = 2 * num_boson_states  ## we will have one spin coupled to all the b
 system = LindbladSystem(num_states=num_states, batchsize=batchsize)
 rho0_boson = th.diag(th.exp(-th.arange(num_boson_states)*omega/kbT))
 rho0_boson = rho0_boson / trace(rho0_boson)
-rho0_spin = th.tensor([[0.5, 0.5], [0.5, 0.5]])
+# rho0_spin = th.tensor([[0.1, 0.3], [0.3, 0.9]])
+# rho0_spin = th.tensor([[0.5, 0.5], [0.5, 0.5]])
+rho0_spin = th.tensor([[0.01, 0.1], [0.1, 0.99]])
 rho0 = th.kron(rho0_spin, rho0_boson)
 system.rho=rho0  
 
@@ -118,9 +120,9 @@ for i in range(nsteps):
         sigma_z = system.observe(obs_system_sz).numpy().mean()
         sigma_x = system.observe(obs_system_sx).numpy().mean()
         ne = system.observe(obs_system_excited).numpy().mean()
-        boson_N = system.observe(obs_system_N).numpy().mean()
+        boson_N = system.observe(obs_system_N).numpy() 
         print('t={:.3f}ps, sigma_z={:.3f}, sigma_x={:.3f}, ne={:.3f}'.format(i*dt/Constants.ps, sigma_z, sigma_x, ne))
-        print('boson_N (target={:.3f})={:.3f}'.format(occupation, boson_N))
+        print('boson_N (target={:.4f})={}'.format(occupation, boson_N))
         ne_list.append(ne)
         t_list.append(i*dt)
         sx_list.append(sigma_x)
@@ -134,8 +136,8 @@ ax[0].set_ylabel(r'$N_e/N$')
 ax[0].legend()
 
 ax[1].plot(t_list / Constants.fs, sx_list, label='Sx')
-ax[1].plot(t_list / Constants.fs, sz_list, label='Sz')
+# ax[1].plot(t_list / Constants.fs, sz_list, label='Sz')
 ax[1].set_xlabel('t [fs]')
 ax[1].set_ylabel(r'$\langle \sigma_i \rangle$')
 ax[1].legend()
-plt.savefig('ne_tau{:.2f}ps_nmax{:d}.png'.format(tau_in_ps, nmax), dpi=300)
+plt.savefig('ne_tau{:.2f}ps_nmax{:d}_dt{:.1f}as.png'.format(tau_in_ps, nmax, dt/Constants.As), dpi=300)

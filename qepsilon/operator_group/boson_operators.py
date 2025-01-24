@@ -3,7 +3,6 @@ import torch as th
 from ..boson import Boson
 from .base_operators import OperatorGroup
 
-## TODO: add prefactor to the operator group
 class BosonOperatorGroup(OperatorGroup):
     def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1):
         self.nm = num_modes  # number of modes
@@ -11,7 +10,7 @@ class BosonOperatorGroup(OperatorGroup):
         super().__init__(id, self.ns, batchsize)
         self.boson = Boson(nmax)
 
-    def add_operator(self, boson_sequence: str):
+    def add_operator(self, boson_sequence: str, prefactor: float = 1):
         """
         Add an operator to the group. Stored as a string of boson operator names. 
         Args:
@@ -20,19 +19,22 @@ class BosonOperatorGroup(OperatorGroup):
         if len(boson_sequence) != self.nm:
             raise ValueError("length of boson_sequence must be the number of modes")
         self._ops.append(boson_sequence)
+        self._prefactors.append(prefactor)
         return
     
     def sum_operators(self):
         total_ops = 0
-        for op in self._ops:
-            total_ops += self.boson.get_composite_ops(op)
+        if len(self._ops) != len(self._prefactors):
+            raise ValueError("The number of operators and prefactors do not match")
+        for op, prefactor in zip(self._ops, self._prefactors):
+            total_ops += self.boson.get_composite_ops(op) * prefactor
         return total_ops
 
 class IdentityBosonOperatorGroup(BosonOperatorGroup):
     def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1):
         super().__init__(num_modes, id, nmax, batchsize)
         self._ops.append("I"*num_modes)
-
+        self._prefactors.append(1.0)
     def add_operator(self, boson_sequence: str):
         raise ValueError("IdentityBosonOperatorGroup does not support adding operators")
 
@@ -56,7 +58,7 @@ class StaticBosonOperatorGroup(BosonOperatorGroup):
         else:
             self.register_buffer("coef", th.tensor(coef, dtype=th.float))
 
-    def _sample(self, dt: float):
+    def _sample(self, dt: float = 1.0):
         """
         This function returns the sum of the operators in the group.
         Args:
@@ -95,12 +97,19 @@ class HarmonicOscillatorBosonOperatorGroup(BosonOperatorGroup):
         for idx in range(self.nm):
             _ops = ['I'] * self.nm
             _ops[idx] = 'N'
-            self.add_operator(''.join(_ops))
-        self.add_operator('I'*self.nm)
+            self._ops.append(''.join(_ops))
+        self._ops.append('I'*self.nm)
+        
     @property
     def omega(self):
         return th.exp(self.log_omega)
     
+    def add_operator(self, boson_sequence: str):
+        raise ValueError("HarmonicOscillatorBosonOperatorGroup does not support manually adding operators")
+
+    def sum_operators(self):
+        raise ValueError("HarmonicOscillatorBosonOperatorGroup does not support summing operators with `sum_operators`")
+
     def _sample(self, dt: float):
         """
         This function returns H = \sum_i \omega_i (a_i^\dagger a_i + 1/2) and a all-one coefficient tensor.
@@ -146,14 +155,14 @@ class WhiteNoiseBosonOperatorGroup(BosonOperatorGroup):
             coef: th.Tensor, the coefficient of shape (self.nb,).
         """
         noise = np.random.normal(0, 1, self.nb) 
-        noise = th.tensor(noise, dtype=self.amp.dtype, device=self.amp.device) * self.amp / np.sqrt(dt)
+        noise = th.tensor(noise, dtype=self.logamp.dtype, device=self.logamp.device) * self.amp / np.sqrt(dt)
         return self.sum_operators(), noise
     
 class LangevinNoiseBosonOperatorGroup(BosonOperatorGroup):
     """
     This class deals with a group of operators (composite boson operators on n-mode systems) and a Langevin noise coefficient. 
     """
-    def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1, amp: float = 1, tau: float = 1, requires_grad: bool = False):
+    def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1, tau: float = 1, amp: float = 1, requires_grad: bool = False):
         super().__init__(num_modes, id, nmax, batchsize)
         if amp<0:
             raise ValueError("amp must be non-negative")
@@ -183,7 +192,7 @@ class LangevinNoiseBosonOperatorGroup(BosonOperatorGroup):
         return 1 / self.tau
     
     def reset(self):
-        self.noise = th.randn(self.nb, device=self.amp.device) * self.amp
+        self.noise = th.randn(self.nb, device=self.logamp.device) * self.amp
 
     def z1(self, dt: float):
         return th.exp(- self.damping * dt)
@@ -202,7 +211,7 @@ class LangevinNoiseBosonOperatorGroup(BosonOperatorGroup):
             coef: th.Tensor, the coefficient of shape (self.nb,).
         """
         drive = np.random.normal(0, 1, self.nb)
-        drive = th.tensor(drive, dtype=self.amp.dtype, device=self.amp.device) * self.amp
+        drive = th.tensor(drive, dtype=self.logamp.dtype, device=self.logamp.device) * self.amp
         noise_new = self.noise * self.z1(dt) + drive * self.z2(dt)   
         self.noise = noise_new
         return self.sum_operators(), noise_new
@@ -212,19 +221,19 @@ class ColorNoiseBosonOperatorGroup(LangevinNoiseBosonOperatorGroup):  ## TODO: t
     This class deals with a group of operators (composite boson operators on n-mode systems) and a color noise coefficient. 
     The autocorrelation function of the color noise is ~exp(-t/tau)cos(omega*t). 
     """
-    def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1, amp: float = 1, tau: float = 1, omega: float = 1, requires_grad: bool = False):
+    def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1, tau: float = 1, amp: float = 1, omega: float = 1, requires_grad: bool = False):
         super().__init__(num_modes, id, nmax, batchsize, amp, tau, requires_grad)
         if requires_grad:
             self.register_parameter("omega", th.nn.Parameter(th.tensor(omega, dtype=th.float)))
         else:
             self.register_buffer("omega", th.tensor(omega, dtype=th.float))
         self.register_buffer("phase", th.rand(self.nb) * 2 * np.pi)
-        self.register_buffer("time", th.zeros(1, dtype=th.float))
+        self.time = 0
 
     def reset(self):
-        self.time = th.zeros(1, dtype=th.float)
-        self.phase = th.rand(self.nb) * 2 * np.pi
-        self.noise = th.randn(self.nb, device=self.amp.device) * self.amp
+        self.time = 0 
+        self.phase = th.rand(self.nb, device=self.logamp.device) * 2 * np.pi
+        self.noise = th.randn(self.nb, device=self.logamp.device) * self.amp
 
     def _sample(self, dt: float):
         """
@@ -239,7 +248,7 @@ class ColorNoiseBosonOperatorGroup(LangevinNoiseBosonOperatorGroup):  ## TODO: t
         """
         ## update the Langevin process
         drive = np.random.normal(0, 1, self.nb)
-        drive = th.tensor(drive, dtype=self.amp.dtype, device=self.amp.device) * self.amp
+        drive = th.tensor(drive, dtype=self.logamp.dtype, device=self.logamp.device) * self.amp
         noise_new = self.noise * self.z1(dt) + drive * self.z2(dt)   
         self.noise = noise_new
         ## get the coefficient

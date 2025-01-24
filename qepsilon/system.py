@@ -9,6 +9,7 @@ from qepsilon.operator_group import *
 from qepsilon.utilities import ABAd, trace
 from qepsilon.particles import Particles
 import logging
+import warnings
 from time import time as timer
 
 class LindbladSystem(th.nn.Module):
@@ -33,12 +34,25 @@ class LindbladSystem(th.nn.Module):
         self.ns = num_states
         self.nb = batchsize 
         self.density_matrix = DensityMatrix(num_states, batchsize)
-        self._hamiltonian_operator_group_dict = {}
-        self._jumping_group_dict = {}
-        self._channel_group_dict = {}
+        self._hamiltonian_operator_group_dict = th.nn.ModuleDict()
+        self._jumping_group_dict = th.nn.ModuleDict()
+        self._channel_group_dict = th.nn.ModuleDict()
         self._ham = None
         self._jump = None
-
+        self._ham_eff = None
+    
+    def to(self, device='cuda'):
+        self.density_matrix.to(device=device)
+        for operator_group in self._hamiltonian_operator_group_dict.values():
+            operator_group.to(device=device)
+        for operator_group in self._jumping_group_dict.values():
+            operator_group.to(device=device)
+        for operator_group in self._channel_group_dict.values():
+            operator_group.to(device=device)
+        if self._ham is not None:
+            self._ham = self._ham.to(device=device)
+        if self._jump is not None:
+            self._jump = [jump.to(device=device) for jump in self._jump]
     ############################################################
     # Setter and getter  
     ############################################################
@@ -85,7 +99,7 @@ class LindbladSystem(th.nn.Module):
     @rho.setter
     def rho(self, rho: th.Tensor):
         if rho.dtype != th.cfloat:
-            _rho = rho.to(th.cfloat)
+            _rho = rho.to(dtype=th.cfloat)
         else:
             _rho = rho
         self.density_matrix.set_rho(_rho)
@@ -231,7 +245,7 @@ class LindbladSystem(th.nn.Module):
             self._jump = jump_operator_list
         return jump_operator_list
 
-    def step_rho(self, dt: float, hamiltonian: th.Tensor, jump_operators: list[th.Tensor]):
+    def step_rho(self, dt: float, hamiltonian: th.Tensor, jump_operators: list[th.Tensor], time_independent: bool = False, profile: bool = False):
         """
         This function steps the density matrix for a time step dt.
         Args:
@@ -242,20 +256,50 @@ class LindbladSystem(th.nn.Module):
             rho_new: a (self.nb, self.ns, self.ns) tensor, the density matrix at time t+dt.
         """
         rho = self.rho
-        identity = th.eye(self.ns, dtype=th.cfloat).to(rho.device).unsqueeze(0)
+        identity = th.eye(self.ns, dtype=th.cfloat).to(rho.device).unsqueeze(0).repeat(self.nb, 1, 1)
         ## get the effective Hamiltonian=H + 1/2j \sum_k L_k^\dagger L_k
-        ham_eff = hamiltonian * 1.0
-        for jump_operator in jump_operators:
-            ham_eff -= 1j * 0.5 * th.matmul(jump_operator.conj().permute(0, 2, 1), jump_operator)
+        if profile:
+            t0 = timer()
+            th.cuda.synchronize()
+        if time_independent and self._ham_eff is not None:
+            ham_eff = self._ham_eff
+        else:
+            ham_eff = hamiltonian.clone()
+            for jump_operator in jump_operators:
+                ham_eff -= 1j * 0.5 * th.matmul(jump_operator.conj().permute(0, 2, 1), jump_operator)
+            if time_independent:
+                self._ham_eff = ham_eff
+        if profile:
+            th.cuda.synchronize()
+            t1 = timer()
+            logging.info(f"The time taken for getting the effective Hamiltonian is {t1 - t0}s.")
+        ## sparsify tensors if the dimension of the matrix is larger than 2000
+        if self.ns > 2000:
+            identity = identity.to_sparse()
+            ham_eff = ham_eff.to_sparse()
+            # rho = rho.to_sparse()
+            jump_operators = [jump_operator.to_sparse() for jump_operator in jump_operators]
         ## first part: (1-i*dt*H_eff)rho(1+i*dt*H_eff)
         rho_new = ABAd(identity - 1j * dt * ham_eff, rho)
+        if profile:
+            th.cuda.synchronize()
+            t2 = timer()
+            logging.info(f"The time taken for the unitary contribution to the density matrix evolution is {t2 - t1}s.")
         ## second part: dt * \sum_k L_k \rho L_k^\dagger
         for jump_operator in jump_operators:
             rho_new += ABAd(jump_operator, rho) * dt
-        ## normalize if the trace of rho_new is too large
-        rho_trace = trace(rho_new)
-        if rho_trace.mean() > 10:
-            rho_new = rho_new / rho_trace[:, None, None]
+        if rho_new.is_sparse:
+            rho_new = rho_new.to_dense()
+        if profile:
+            th.cuda.synchronize()
+            t3 = timer()
+            logging.info(f"The time taken for the Lindblad contribution to the density matrix evolution is {t3 - t2}s.")
+        ###  Do not normalize here. Sometimes we may be evolving a general operator instead of density matrix ###
+        # ## normalize if the trace of rho_new is too large.
+        # rho_trace = trace(rho_new)
+        # if th.abs(rho_trace.mean()-1) > 0.1:
+        #     print('normalize')
+        #     rho_new = rho_new / rho_trace[:, None, None]
         return rho_new
 
     def normalize(self):
@@ -263,16 +307,31 @@ class LindbladSystem(th.nn.Module):
         self.rho = self.rho / rho_trace[:, None, None]
         return
 
-    def step(self, dt: float, set_buffer: bool = False):
+    def step(self, dt: float, set_buffer: bool = False, time_independent: bool = False, profile: bool = False):
         """
         This function steps the system for a time step dt.
         """
+        if profile:
+            t0 = timer()
+            th.cuda.synchronize()
         hamiltonian = self.step_hamiltonian(dt, set_buffer)
+        if profile:
+            th.cuda.synchronize()
+            t1 = timer()
+            logging.info(f"The time taken for stepping the Hamiltonian is {t1 - t0}s.")
         if self._jumping_group_dict:
             jump_operator_list = self.step_jumping(dt, set_buffer)
         else:
             jump_operator_list = []
-        self.rho = self.step_rho(dt, hamiltonian, jump_operator_list)
+        if profile:
+            th.cuda.synchronize()
+            t2 = timer()
+            logging.info(f"The time taken for stepping the jump operators is {t2 - t1}s.")
+        self.rho = self.step_rho(dt, hamiltonian, jump_operator_list, time_independent, profile=profile)
+        if profile:
+            th.cuda.synchronize()
+            t3 = timer()
+            logging.info(f"The time taken for stepping the density matrix is {t3 - t2}s.")
         return self.rho
 
     def step_unitary(self, dt: float, set_buffer: bool = False):
