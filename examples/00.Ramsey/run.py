@@ -7,6 +7,8 @@ from matplotlib import pyplot as plt
 import logging
 import time
 
+## Here the time unit is us. 
+
 log_suffix = time.strftime("%Y%m%d-%H%M%S")
 logging.basicConfig(filename=f'log_{log_suffix}.log', level=logging.INFO)
 

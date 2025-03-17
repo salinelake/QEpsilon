@@ -5,6 +5,10 @@ from ..utilities import compose
 from ..particles import Particles
 from .base_operators import OperatorGroup
 
+###########################################################################
+# Base class for Pauli operator groups.
+###########################################################################
+
 class PauliOperatorGroup(OperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems). 
@@ -38,6 +42,10 @@ class PauliOperatorGroup(OperatorGroup):
         for op, prefactor in zip(self._ops, self._prefactors):
             total_ops += self.pauli.get_composite_ops(op) * prefactor
         return total_ops
+
+###########################################################################
+# Operators groups involving simple stochastic processes. 
+###########################################################################
 
 class IdentityPauliOperatorGroup(PauliOperatorGroup):
     def __init__(self, n_qubits: int, id: str, batchsize: int = 1):
@@ -337,6 +345,11 @@ class ColorNoisePauliOperatorGroup(LangevinNoisePauliOperatorGroup):  ## TODO: t
         return self.sum_operators(), coef
 
 
+###########################################################################
+# Operators groups involving motion of classical particles.
+###########################################################################
+
+
 class DipolarInteraction(PauliOperatorGroup):
     """
     This class deals with dipolar-dipole interactions.
@@ -426,6 +439,60 @@ class DipolarInteraction(PauliOperatorGroup):
         for idx, op in enumerate(self._ops):
             total_ops += op[None,:,:] * coef[:,idx, None,None]
         return total_ops, th.ones_like(coef[:,0])
+
+class spin_oscillators_interaction(PauliOperatorGroup):
+    """
+    Spin-(classical) Oscillator interaction as an approximation to spin-boson interaction. 
+    For each oscillator, the interaction is coef * x * N, where x is the position of the oscillator, and N is the number operator of the qubit (1 for spin-up, 0 for spin-down).
+    """
+    def __init__(self, n_qubits: int, id: str, batchsize: int, particles: Particles, coef: th.Tensor, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize)
+        """
+        Args:
+            n_qubits: int, the number of qubits.
+            id: str, the id of the operator group.
+            batchsize: int, the batch size.
+            particles: Particles, the particles object.
+        """
+        if particles.ndim != 1:
+            raise ValueError(f"The number of dimensions of a particle must be 1 for it to approximate a bosonic mode")
+        self.particles = particles
+        self.nmodes = particles.nq
+
+        if coef.shape != (self.nmodes,):
+            raise ValueError(f"The number of coefficients must be equal to the number of modes.")
+        if requires_grad:
+            self.register_parameter("coef", th.nn.Parameter(coef))
+        else:
+            self.register_buffer("coef", coef)
+
+    def _sample(self, dt = None):   
+        """
+        Sample the spin-oscillators interaction for a time step dt.
+        Args:
+            dt: float, the time step. Not used here.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.nb, self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
+        """
+        ## sanity check
+        if dt is not None:
+            raise ValueError("spin_oscillators_interaction does not integrate oscillator motion. dt must be None.")
+        ## get the positions of the oscillators
+        oscillator_positions = self.particles.get_positions()
+        if oscillator_positions.shape != (self.nb, self.nmodes, 1):
+            raise ValueError(f"The shape of the oscillator positions must be (self.nb, self.nmodes, 1).")
+        ## compute the interaction
+        ops = self.sum_operators() 
+        coef = 0 
+        for i in range(self.nmodes):
+            coef += self.coef[i] * oscillator_positions[:,i,0]
+        return ops, coef
+
+
+###########################################################################
+# Operators groups serving as quantum channels.
+###########################################################################
 
 class DepolarizationChannel(PauliOperatorGroup):
     """

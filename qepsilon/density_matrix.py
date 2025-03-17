@@ -4,7 +4,7 @@ This module deals with density matrices.
 
 import torch as th
 from qepsilon.tls import Pauli
-from qepsilon.utilities import compose, ABAd, bin2idx, trace
+from qepsilon.utilities import compose, ABAd, qubitconf2idx, trace
 
 class DensityMatrix(th.nn.Module):
     """
@@ -211,7 +211,7 @@ class QubitDensityMatrix(DensityMatrix):
             raise ValueError("Config must have shape (#qubits).")
         if config.dtype != th.int64:
             raise ValueError("Config must be an integer tensor (th.int64).")
-        idx = bin2idx(config)
+        idx = qubitconf2idx(config)
         return rho[:, idx, idx]
     
     def observe_prob_by_config(self, rho: th.Tensor, config: th.Tensor):
@@ -227,7 +227,7 @@ class QubitDensityMatrix(DensityMatrix):
             raise ValueError("Config must have shape (#qubits).")
         if config.dtype != th.int64:
             raise ValueError("Config must be an integer tensor (th.int64).")
-        idx = bin2idx(config)
+        idx = qubitconf2idx(config)
         prob = rho[:, idx, idx].real / trace(rho).real
         return prob
  

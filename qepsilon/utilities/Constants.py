@@ -8,12 +8,13 @@ class Constants(object):
     Inner Unit:
         Length: um
         Time: us
-        Energy: hbar \times Hz
+        Energy: hbar \times MHz
     """
     ## energy units in hbar*MHz
     hbar_MHz = 1.0
     hbar_Hz = 1e-6 * hbar_MHz
     eV = hbar_Hz / 6.582119569e-16  
+    meV = 1e-3 * eV
     Ry = 13.605693123 * eV 
     mRy = 1e-3 * Ry  
     Hartree = 27.211386245981 * eV
@@ -47,11 +48,12 @@ class Constants(object):
 class Constants_Metal(object):
     """Class whose members are fundamental constants.
     Inner Unit:
-        Length: um
-        Time: us
-        Energy: hbar \times Hz
+        Length: pm
+        Time: ps
+        Energy: hbar \times THz
     """
     ## energy units in hbar*THz
+    hbar = 1.0 # hbar = hbar_THz * ps = 1.0
     hbar_THz = 1.0
     hbar_MHz = 1e-6 * hbar_THz
     hbar_Hz = 1e-6 * hbar_MHz

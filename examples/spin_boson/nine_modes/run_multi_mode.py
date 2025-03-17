@@ -38,7 +38,7 @@ nmax = nmax[:keep_modes]
 num_modes = len(nmax)
 assert num_modes == len(omega_in_cm) == len(lambda_in_cm)
 num_boson_states = np.prod(nmax+1)
-omega = Constants.speed_of_light * (omega_in_cm/ Constants.cm) * 2 * np.pi   # us^-1
+omega = Constants.speed_of_light * (omega_in_cm/ Constants.cm) * 2 * np.pi   # ps^-1
 
 ## bath relaxation
 tau = 0.1 * Constants.ps  ## relaxation time of the boson bath

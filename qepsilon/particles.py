@@ -5,7 +5,7 @@ This file contains the particle class for the QEpsilon project.
 import torch as th
 import numpy as np
 import warnings
-from qepsilon.utilities import Constants
+from qepsilon.utilities import Constants, Constants_Metal 
 
 class OpticalTweezer:
     def __init__(self, min_waist, wavelength, max_depth, center: th.Tensor, axis: th.Tensor=th.tensor([0.0, 0.0, 1.0]), on = True):
@@ -100,18 +100,33 @@ class Particles(th.nn.Module):
     This class represents particles in the QEpsilon project.
     """
 
-    def __init__(self, n_particles: int, batchsize: int = 1, mass: float = 1.0, radial_temp: float = 1.0, axial_temp: float = 1.0, dt: float = 0.1, tau: float = None):
+    def __init__(self, n_particles: int, batchsize: int = 1, ndim: int = 3, mass: float or th.Tensor = 1.0, dt: float = 0.1, tau: float = None, unit: str = 'pm_ps'):
         super().__init__()
         self.nq = n_particles
         self.nb = batchsize
-        self.positions = th.zeros(batchsize, n_particles, 3)
-        self.velocities = th.zeros(batchsize, n_particles, 3)
-        self.forces = th.zeros(batchsize, n_particles, 3)
-        self.masses = th.ones(n_particles) * mass
-        self.radial_temp = radial_temp
-        self.axial_temp = axial_temp
-        self._traps_dict = {}
-        self.traj = []
+        self.ndim = ndim
+        self.positions = th.zeros(batchsize, n_particles, ndim)
+        self.velocities = th.zeros(batchsize, n_particles, ndim)
+        self.forces = th.zeros(batchsize, n_particles, ndim)
+        if isinstance(mass, float):
+            self.masses = th.ones(n_particles) * mass
+        elif isinstance(mass, th.Tensor):
+            if mass.shape != (n_particles,):
+                raise ValueError(f"Mass must have shape ({n_particles,})")
+            else:
+                self.masses = mass.to(dtype=self.positions.dtype, device=self.positions.device)
+        else:
+            raise ValueError(f"Mass must be a float or a tensor.")
+        ## energy engine and force engine
+        self.energy_engine = None
+        self.force_engine = None
+        ## unit system
+        if unit == 'um_us':
+            self.unit = Constants
+        elif unit == 'pm_ps':
+            self.unit = Constants_Metal
+        else:
+            raise ValueError(f"Unit must be 'um_us' or 'pm_ps'")
         self.dt = dt
         ## parameters for Langevin dynamics
         if tau is None:
@@ -119,6 +134,166 @@ class Particles(th.nn.Module):
         else:
             self.tau = tau  
         self.gamma = 1.0 / self.tau
+ 
+    ###########################################################################
+    # Methods for dealing with particles
+    ###########################################################################
+    def get_positions(self):
+        return self.positions.clone().detach()
+    
+    def get_velocities(self):
+        return self.velocities.clone().detach()
+
+    def get_temperature(self):
+        temp = (self.get_velocities()**2) * self.masses[None,:,None] / self.unit.kb
+        temp = temp.mean(1)
+        return temp
+
+    def get_forces(self):
+        return self.forces.clone().detach()
+
+    def get_trajectory(self):
+        return th.stack(self.traj)
+    
+    def set_positions(self, positions: th.Tensor):
+        if positions.shape == (self.nb, self.nq, self.ndim):
+            self.positions = positions
+        elif positions.shape == (self.nq, self.ndim):
+            self.positions = positions.repeat(self.nb,1,1)
+        else:
+            raise ValueError(f"Positions must have shape ({self.nb}, {self.nq}, {self.ndim}) or ({self.nq}, {self.ndim})")
+ 
+    def set_gaussian_velocities(self, temp: float = None):
+        self.velocities = th.randn_like(self.positions)
+        temp = th.ones(self.ndim, dtype=self.positions.dtype, device=self.positions.device) * temp
+        self.velocities *= th.sqrt(self.unit.kb * temp)[None,None,:]
+        self.velocities *= th.sqrt(1 / self.masses[None,:,None])
+
+    def set_velocities(self, velocities: th.Tensor):
+        if velocities.shape != (self.nb, self.nq, self.ndim):
+            raise ValueError(f"Velocities must have shape ({self.nb}, {self.nq}, {self.ndim})")
+        self.velocities = velocities
+
+    def zero_forces(self):
+        self.forces = th.zeros_like(self.positions).detach()
+ 
+    def modify_forces(self, df: th.Tensor):
+        """
+        Modify the forces on the particles.
+        """
+        self.forces += df
+
+    def modify_forces_by_harmonic_trap(self, omega: float or th.Tensor, x0: th.Tensor = None):
+        """
+        Modify the forces on the particles by a harmonic trap.
+        Args:
+            omega: float or th.Tensor, the frequency of the harmonic trap. Shape: (self.ndim) or (self.nq,self.ndim)
+            x0: th.Tensor, the position of the harmonic trap. Shape: (self.ndim) or (self.nq,self.ndim)
+        """
+        if omega is float:
+            _omega = th.ones(self.ndim, dtype=self.masses.dtype, device=self.masses.device) * omega
+            _omega = _omega.reshape(1,1,self.ndim)
+        elif isinstance(omega, th.Tensor):
+            if omega.shape == (self.ndim,):
+                _omega = omega.reshape(1,1,self.ndim)
+            elif omega.shape == (self.nq, self.ndim):
+                _omega = omega.reshape(1,self.nq,self.ndim)
+            else:
+                raise ValueError(f"omega must have shape ({self.ndim,}) or ({self.nq}, {self.ndim})")
+        else:
+            raise ValueError(f"omega must be a float or a tensor of shape ({self.ndim,}) or ({self.nq}, {self.ndim})")
+
+        if x0 is None:
+            eq_pos = th.zeros(self.ndim, dtype=self.positions.dtype, device=self.positions.device).reshape(1,1,self.ndim)
+        elif isinstance(x0, th.Tensor):
+            if x0.shape == (self.ndim,):
+                eq_pos = x0.reshape(1,1,self.ndim).to(dtype=self.positions.dtype, device=self.positions.device)
+            elif x0.shape == (self.nq, self.ndim):
+                eq_pos = x0.reshape(1,self.nq,self.ndim).to(dtype=self.positions.dtype, device=self.positions.device)
+            else:
+                raise ValueError(f"x0 must have shape ({self.ndim,}) or ({self.nq}, {self.ndim})")
+        else:
+            raise ValueError(f"The equilibrium position x0 must be a tensor")
+        self.forces += - self.masses[None,:,None] * _omega**2 * (self.positions - eq_pos)
+        return
+
+    def reset(self):
+        """
+        Reset the particles to a thermal equilibrium state.
+        """
+        self.set_gaussian_velocities()
+        self.traj = []
+
+
+    ###########################################################################
+    # Methods for simulating dynamics
+    ###########################################################################    
+    def get_noise(self, temp: float = None):
+        noise = th.randn_like(self.positions)
+        temp = th.ones(self.ndim, dtype=self.positions.dtype, device=self.positions.device) * temp
+        noise *= th.sqrt(self.unit.kb * temp)[None,None,:]
+        noise *= th.sqrt(1 / self.masses[None,:,None])
+        return noise
+
+    def step_langevin(self, record_traj=False, temp: float = None):
+        """
+        Isothermal Langevin dynamics. Update the positions and velocities by one time step with mid-point Langevin method.
+        """
+        dt = self.dt
+        ## parameters for Langevin dynamics
+        z1 = np.exp(-dt * self.gamma)
+        z2 = np.sqrt(1 - np.exp(-2 * dt * self.gamma))
+        ## initial values
+        v0 = self.get_velocities()
+        x0 = self.get_positions()
+        ## update velocities for one step with gradient force
+        v1 = v0 + self.forces * dt / self.masses[None,:,None]
+        ## update positions for half step
+        x1 = x0 + 0.5 * v1 * dt
+        ## modify velocity with damping and random force
+        noise = self.get_noise(temp)
+        v1 = z1 * v1 + z2 * noise
+        ## update positions for half step
+        x1 += 0.5 * v1 * dt
+        ## wrap up
+        self.set_positions(x1)
+        self.set_velocities(v1)
+        if record_traj:
+            self.traj.append(x1.clone().detach())
+        return
+
+    def step_adiabatic(self, record_traj=False):
+        """
+        Adiabatic dynamics. Update the positions and velocities by one time step with leapfrog method.
+        """
+        dt = self.dt
+        ## initial values
+        v0 = self.get_velocities()
+        x0 = self.get_positions()
+        ## update velocities for one step with gradient force
+        v1 = v0 + self.forces * dt / self.masses[None,:,None]
+        ## update positions for half step
+        x1 = x0 + v1 * dt
+        ## wrap up
+        self.set_positions(x1)
+        self.set_velocities(v1)
+        if record_traj:
+            self.traj.append(x1.clone().detach())
+        return
+
+class ParticlesInTweezers(Particles):
+    """
+    This class represents particles in the QEpsilon project.
+    """
+
+    def __init__(self, n_particles: int, batchsize: int = 1, mass: float = 1.0, radial_temp: float = 1.0, axial_temp: float = 1.0, dt: float = 0.1, tau: float = None, unit: str = 'um_us'):
+        ndim = 3
+        super().__init__(n_particles, batchsize, ndim, mass, dt, tau, unit)
+        self.radial_temp = radial_temp
+        self.axial_temp = axial_temp
+        self._traps_dict = {}
+        self.traj = []
+ 
 
     ###########################################################################
     # Methods for dealing with optical tweezers
@@ -160,31 +335,7 @@ class Particles(th.nn.Module):
     ###########################################################################
     # Methods for dealing with particles
     ###########################################################################
-    def get_positions(self):
-        return self.positions.clone().detach()
-    
-    def get_velocities(self):
-        return self.velocities.clone().detach()
-
-    def get_temperature(self):
-        temp = (self.get_velocities()**2) * self.masses[None,:,None] / Constants.kb
-        temp = temp.mean(1)
-        return temp
-
-    def get_forces(self):
-        return self.forces.clone().detach()
-
-    def get_trajectory(self):
-        return th.stack(self.traj)
-    
-    def set_positions(self, positions: th.Tensor):
-        if positions.shape == (self.nb, self.nq, 3):
-            self.positions = positions
-        elif positions.shape == (self.nq, 3):
-            self.positions = positions.repeat(self.nb,1,1)
-        else:
-            raise ValueError(f"Positions must have shape ({self.nb}, {self.nq}, 3) or ({self.nq}, 3)")
-
+ 
     def set_positions_at_tweezer_center(self):
         self.positions = th.zeros_like(self.positions)
         if len(self._traps_dict) != self.nq:
@@ -199,17 +350,9 @@ class Particles(th.nn.Module):
             axial_temp = self.axial_temp
         self.velocities = th.randn_like(self.positions)
         temp = th.tensor([self.radial_temp, self.radial_temp, self.axial_temp], dtype=self.positions.dtype, device=self.positions.device)
-        self.velocities *= th.sqrt(Constants.kb * temp)[None,None,:]
+        self.velocities *= th.sqrt(self.unit.kb * temp)[None,None,:]
         self.velocities *= th.sqrt(1 / self.masses[None,:,None])
-
-    def set_velocities(self, velocities: th.Tensor):
-        if velocities.shape != (self.nb, self.nq, 3):
-            raise ValueError(f"Velocities must have shape ({self.nb}, {self.nq}, 3)")
-        self.velocities = velocities
-
-    def zero_forces(self):
-        self.forces = th.zeros_like(self.positions).detach()
-
+ 
     def get_trapping_forces(self):
         """
         Get the trapping forces on the particles.
@@ -221,13 +364,7 @@ class Particles(th.nn.Module):
             if trap.on:
                 forces += trap.get_force(self.positions)
         return forces
-    
-    def modify_forces(self, df: th.Tensor):
-        """
-        Modify the forces on the particles.
-        """
-        self.forces += df
-
+     
     def reset(self):
         """
         Reset the particles to a thermal equilibrium state.
@@ -244,36 +381,10 @@ class Particles(th.nn.Module):
     def get_noise(self):
         noise = th.randn_like(self.positions)
         temp = th.tensor([self.radial_temp, self.radial_temp, self.axial_temp], dtype=self.positions.dtype, device=self.positions.device)
-        noise *= th.sqrt(Constants.kb * temp)[None,None,:]
+        noise *= th.sqrt(self.unit.kb * temp)[None,None,:]
         noise *= th.sqrt(1 / self.masses[None,:,None])
         return noise
-
-    def step_langevin(self, record_traj=False):
-        """
-        Isothermal Langevin dynamics. Update the positions and velocities by one time step with mid-point Langevin method.
-        """
-        dt = self.dt
-        ## parameters for Langevin dynamics
-        z1 = np.exp(-dt * self.gamma)
-        z2 = np.sqrt(1 - np.exp(-2 * dt * self.gamma))
-        ## initial values
-        v0 = self.get_velocities()
-        x0 = self.get_positions()
-        ## update velocities for one step with gradient force
-        v1 = v0 + self.forces * dt / self.masses[None,:,None]
-        ## update positions for half step
-        x1 = x0 + 0.5 * v1 * dt
-        ## modify velocity with damping and random force
-        noise = self.get_noise()
-        v1 = z1 * v1 + z2 * noise
-        ## update positions for half step
-        x1 += 0.5 * v1 * dt
-        ## wrap up
-        self.set_positions(x1)
-        self.set_velocities(v1)
-        if record_traj:
-            self.traj.append(x1.clone().detach())
-        return
+ 
         
     def equilibrate(self, nsteps: int, tau: float = 1):
         """
@@ -288,30 +399,12 @@ class Particles(th.nn.Module):
             self.step_langevin(record_traj=False)
         self.gamma = system_damping
         return
-
-    def step_adiabatic(self, record_traj=False):
-        """
-        Adiabatic dynamics. Update the positions and velocities by one time step with leapfrog method.
-        """
-        dt = self.dt
-        ## initial values
-        v0 = self.get_velocities()
-        x0 = self.get_positions()
-        ## update velocities for one step with gradient force
-        v1 = v0 + self.forces * dt / self.masses[None,:,None]
-        ## update positions for half step
-        x1 = x0 + v1 * dt
-        ## wrap up
-        self.set_positions(x1)
-        self.set_velocities(v1)
-        if record_traj:
-            self.traj.append(x1.clone().detach())
-        return
-
+ 
 
 class PathIntegralParticles(Particles):
-    def __init__(self, n_particles: int, batchsize: int = 1, mass: float = 1.0, temperature: float = 1.0):
-        super().__init__(n_particles, batchsize, mass)
+    def __init__(self, n_particles: int, batchsize: int = 1, mass: float = 1.0, temperature: float = 1.0, unit: str = 'pm_ps'):
+        ndim = 3
+        super().__init__(n_particles, batchsize, ndim, mass, unit=unit)
         self.temperature = temperature
         self.spring_constant = None
         raise NotImplementedError("Path integral particles are not implemented yet")
