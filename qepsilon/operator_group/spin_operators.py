@@ -1,9 +1,9 @@
 import torch as th
 import numpy as np
-from ..tls import Pauli
-from ..utilities import compose
-from ..particles import Particles
-from .base_operators import OperatorGroup
+from qepsilon.tls import Pauli
+from qepsilon.utilities import compose
+from qepsilon.system.particles import Particles
+from qepsilon.operator_group.base_operators import OperatorGroup
 
 ###########################################################################
 # Base class for Pauli operator groups.

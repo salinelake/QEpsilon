@@ -1,13 +1,13 @@
 """
-This file contains the system class for the QEpsilon project.
+This file contains the Lindblad simulation class for the QEpsilon project.
 """
 
 import numpy as np
 import torch as th
-from qepsilon.density_matrix import DensityMatrix, QubitDensityMatrix
 from qepsilon.operator_group import *
+from qepsilon.system.density_matrix import DensityMatrix, QubitDensityMatrix
+from qepsilon.system.particles import Particles
 from qepsilon.utilities import ABAd, trace
-from qepsilon.particles import Particles
 import logging
 import warnings
 from time import time as timer

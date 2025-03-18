@@ -1,15 +1,13 @@
 """
-This file contains the unitary system class for the QEpsilon project.
+This file contains the unitary simulation class for the QEpsilon project.
 """
 
 import numpy as np
 import torch as th
 from qepsilon.operator_group import *
+from qepsilon.system.pure_ensemble import PureStatesEnsemble, QubitPureStatesEnsemble
 from qepsilon.utilities import expectation_pse
-from qepsilon.particles import Particles
-from qepsilon.pure_ensemble import PureStatesEnsemble
 import logging
-import warnings
 from time import time as timer
 
 class UnitarySystem(th.nn.Module):
@@ -214,7 +212,7 @@ class QubitUnitarySystem(UnitarySystem):
     def __init__(self, n_qubits: int, batchsize: int):
         self.nq = n_qubits
         super().__init__(2**n_qubits, batchsize)
-        self.pure_ensemble = QubitPureEnsemble(n_qubits=self.nq, batchsize=batchsize)
+        self.pure_ensemble = QubitPureStatesEnsemble(n_qubits=self.nq, batchsize=batchsize)
 
 
     def set_pse_by_config(self, config):

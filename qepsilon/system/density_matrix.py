@@ -91,9 +91,9 @@ class QubitDensityMatrix(DensityMatrix):
             if s not in [0, 1]:
                 raise ValueError("Config must be a 0 or 1 tensor.")
             if s == 0:
-                one_body_rho.append(th.tensor([[1, 0], [0, 0]], dtype=th.cfloat))
-            else:
                 one_body_rho.append(th.tensor([[0, 0], [0, 1]], dtype=th.cfloat))
+            else:
+                one_body_rho.append(th.tensor([[1, 0], [0, 0]], dtype=th.cfloat))
         self.set_rho(compose(one_body_rho))
     
     ############################################################

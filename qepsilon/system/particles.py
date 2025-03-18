@@ -117,9 +117,7 @@ class Particles(th.nn.Module):
                 self.masses = mass.to(dtype=self.positions.dtype, device=self.positions.device)
         else:
             raise ValueError(f"Mass must be a float or a tensor.")
-        ## energy engine and force engine
-        self.energy_engine = None
-        self.force_engine = None
+        
         ## unit system
         if unit == 'um_us':
             self.unit = Constants
@@ -128,6 +126,7 @@ class Particles(th.nn.Module):
         else:
             raise ValueError(f"Unit must be 'um_us' or 'pm_ps'")
         self.dt = dt
+        
         ## parameters for Langevin dynamics
         if tau is None:
             self.tau = 100 * dt
@@ -190,7 +189,7 @@ class Particles(th.nn.Module):
             omega: float or th.Tensor, the frequency of the harmonic trap. Shape: (self.ndim) or (self.nq,self.ndim)
             x0: th.Tensor, the position of the harmonic trap. Shape: (self.ndim) or (self.nq,self.ndim)
         """
-        if omega is float:
+        if isinstance(omega, float):
             _omega = th.ones(self.ndim, dtype=self.masses.dtype, device=self.masses.device) * omega
             _omega = _omega.reshape(1,1,self.ndim)
         elif isinstance(omega, th.Tensor):
@@ -217,11 +216,11 @@ class Particles(th.nn.Module):
         self.forces += - self.masses[None,:,None] * _omega**2 * (self.positions - eq_pos)
         return
 
-    def reset(self):
+    def reset(self, temp: float = None):
         """
         Reset the particles to a thermal equilibrium state.
         """
-        self.set_gaussian_velocities()
+        self.set_gaussian_velocities(temp=temp)
         self.traj = []
 
 
