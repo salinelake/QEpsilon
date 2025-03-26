@@ -6,7 +6,7 @@ import numpy as np
 import torch as th
 from qepsilon.operator_group import *
 from qepsilon.system.pure_ensemble import PureStatesEnsemble, QubitPureStatesEnsemble
-from qepsilon.utilities import expectation_pse
+from qepsilon.utilities import expectation_pse, apply_to_pse
 import logging
 from time import time as timer
 
@@ -110,7 +110,7 @@ class UnitarySystem(th.nn.Module):
         self.pse = self.pse / pse_norm[:, None]
         return
 
-    def step_hamiltonian(self, dt: float, set_buffer: bool = False):
+    def step_hamiltonian(self, dt: float, set_buffer: bool = False, verbose: bool = False):
         """
         This function steps the Hamiltonian for a time step dt. 
         Args:
@@ -120,10 +120,12 @@ class UnitarySystem(th.nn.Module):
         """
         hamiltonian = 0
         for operator_group in self._hamiltonian_operator_group_dict.values():
+            #### sample the operator group and get the coefficients
             ops, coefs = operator_group.sample(dt)
             ## sanitary check
             if coefs.shape != (self.nb,):
                 raise ValueError("The coefficients sampled from an operator group should be a 1D tensor of length equal to the batchsize.")
+            #### add the interaction terms to the Hamiltonian, this is much more computationally expensive than sampling the operator group
             ## no broadcasting if the operators is already batched
             if ops.shape == (self.nb, self.ns, self.ns):
                 hamiltonian += ops * coefs[:, None, None]
@@ -132,6 +134,9 @@ class UnitarySystem(th.nn.Module):
                 hamiltonian += ops[None, :, :] * coefs[:, None, None]
             else:
                 raise ValueError(f"The shape of the operator sampled from operator group {operator_group.id} should either be (batchsize, n_states, n_states) or (n_states, n_states).")
+            if verbose:
+                print(f"get operator matrix from operator group {operator_group.id}:")
+                print(f"coefficient={coefs}")
         if set_buffer:
             self._ham = hamiltonian
         return hamiltonian
@@ -145,7 +150,9 @@ class UnitarySystem(th.nn.Module):
         ## sparsify tensors if the dimension of the matrix is larger than 2000
         if self.ns > 2000:
             evolution_matrix = evolution_matrix.to_sparse()
-        pse_new = th.matmul(evolution_matrix, self.pse.T).T
+        pse_new = apply_to_pse(self.pse, evolution_matrix)
+        if pse_new.is_sparse:
+            pse_new = pse_new.to_dense()
         return pse_new
 
     def step(self, dt: float, set_buffer: bool = False, time_independent: bool = False, profile: bool = False):

@@ -4,6 +4,7 @@ from qepsilon.tls import Pauli
 from qepsilon.utilities import compose
 from qepsilon.system.particles import Particles
 from qepsilon.operator_group.base_operators import OperatorGroup
+import warnings
 
 ###########################################################################
 # Base class for Pauli operator groups.
@@ -14,10 +15,10 @@ class PauliOperatorGroup(OperatorGroup):
     This class deals with a group of operators (composite Pauli operators on n-qubit systems). 
     Each operator is a direct product of Pauli operators. It is specified by a string of Pauli operator names.  For example, "XI" is the 2-body operator X_1 \otimes I_2.
     """
-    def __init__(self, n_qubits: int, id: str, batchsize: int = 1):
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, static: bool = False):
         self.nq = n_qubits
         ns = 2**n_qubits
-        super().__init__(id, ns, batchsize)
+        super().__init__(id, ns, batchsize, static)
         self.pauli = Pauli(n_qubits)
     
     def add_operator(self, PauliSequence: str, prefactor: float = 1):
@@ -61,8 +62,8 @@ class StaticPauliOperatorGroup(PauliOperatorGroup):
     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a static coefficient. 
     Each operator is a direct product of Pauli operators. It is specified by a string of Pauli operator names.  For example, "XI" is the 2-body operator X_1 \otimes I_2.
     """
-    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, coef: float = 1, requires_grad: bool = False):
-        super().__init__(n_qubits, id, batchsize)
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, coef: float = 1, static: bool = True, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize, static)
         if requires_grad:
             self.register_parameter("coef", th.nn.Parameter(th.tensor(coef, dtype=th.float)))
         else:
@@ -472,22 +473,26 @@ class spin_oscillators_interaction(PauliOperatorGroup):
         Args:
             dt: float, the time step. Not used here.
         Returns:
-            ops: th.Tensor, the operator matrix of shape (self.nb, self.ns, self.ns).
+            ops: th.Tensor, the operator matrix of shape ( self.ns, self.ns).
             coef: th.Tensor, the coefficient of shape (self.nb,).
         """
         ## sanity check
         if dt is not None:
-            raise ValueError("spin_oscillators_interaction does not integrate oscillator motion. dt must be None.")
+            warnings.warn("spin_oscillators_interaction does not integrate oscillator motion. dt is ignored.")
         ## get the positions of the oscillators
         oscillator_positions = self.particles.get_positions()
         if oscillator_positions.shape != (self.nb, self.nmodes, 1):
             raise ValueError(f"The shape of the oscillator positions must be (self.nb, self.nmodes, 1).")
-        ## compute the interaction
-        ops = self.sum_operators() 
+        oscillator_positions = oscillator_positions.to(device=self.coef.device)
         coef = 0 
         for i in range(self.nmodes):
             coef += self.coef[i] * oscillator_positions[:,i,0]
-        return ops, coef
+        # get the operator
+        if self.op_static is None:
+            self.op_static = self.sum_operators()
+        return self.op_static, coef
+        # ops = self.sum_operators()
+        # return ops, coef
 
 
 ###########################################################################

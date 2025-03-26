@@ -38,7 +38,7 @@ class OperatorGroup(th.nn.Module):
         """
         pass
 
-    def sample(self, dt: float):
+    def sample(self, dt: float=None):
         if self.static:
             if self.op_static is None:
                 op, coef = self._sample(dt)

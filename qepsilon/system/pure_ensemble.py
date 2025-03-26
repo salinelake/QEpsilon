@@ -67,8 +67,10 @@ class PureStatesEnsemble(th.nn.Module):
         Returns:
             expectation: the expectation of the operator. Shape: (batchsize).
         """
-        if operator.shape != (self.ns, self.ns):
-            raise ValueError("Operator must have shape (ns, ns).")
+        if operator.shape == (self.ns, self.ns) or operator.shape == (self.nb, self.ns, self.ns):
+            pass
+        else:
+            raise ValueError("Operator must have shape (ns, ns) or (batchsize, ns, ns).")
         if operator.dtype != th.cfloat:
             raise ValueError("Operator must be a complex tensor (th.cfloat).")
         return expectation_pse(self._pse, operator)

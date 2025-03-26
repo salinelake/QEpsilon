@@ -5,7 +5,7 @@ import torch as th
 from matplotlib import pyplot as plt
 import qepsilon as qe
 from qepsilon.utilities import Constants_Metal as Constants
-from qepsilon.utilities import trace, bin2idx
+from qepsilon.utilities import trace, qubitconf2idx
 from model import holstein_1D
 
 th.set_printoptions(sci_mode=False, precision=5)
@@ -16,7 +16,7 @@ dev = 'cuda'
 ################################################
 batchsize = 4
 nq = 8
-hopping_value = 83 
+hopping_value = 8.3 
 hopping_coef = hopping_value * Constants.meV  # 83meV
 model = holstein_1D(nsite=nq, batchsize=batchsize)
 system = model.system
@@ -67,35 +67,35 @@ beta = 1 / (Constants.kb * temperature)
 # ## initialization of a thermal state
 mat_hop, coef = op_hop.sample(0)
 static_hamiltonian = mat_hop[None,:,:] * coef[:,None,None]
-# print('computing thermal state for one-electron section ... T={}K'.format(temperature))
+print('computing thermal state for one-electron section ... T={}K'.format(temperature))
+sec_index = []
+for i in range(nq):
+    config_1bd = th.zeros(nq, dtype=int)
+    config_1bd[i] = 1
+    sec_index.append(int(qubitconf2idx(config_1bd).numpy().sum()))
+dim_sec = len(sec_index)
+ham_sec = th.zeros_like(static_hamiltonian[:,:dim_sec,:dim_sec])
+for i, idx_i in enumerate(sec_index):
+    for j, idx_j in enumerate(sec_index):
+        ham_sec[:,i,j] = static_hamiltonian[:,idx_i,idx_j]
+thermal_dm_sec = th.matrix_exp(-beta * ham_sec)
+thermal_dm = th.zeros_like(static_hamiltonian)
+for i, idx_i in enumerate(sec_index):
+    for j, idx_j in enumerate(sec_index):
+        thermal_dm[:,idx_i,idx_j] = thermal_dm_sec[:,i,j]
+thermal_dm = thermal_dm / trace(thermal_dm)[:,None,None]
+thermal_dm = thermal_dm.to(device=dev)
+
+# ## initialization of a fully localized state
 # sec_index = []
 # for i in range(nq):
 #     config_1bd = th.ones(nq, dtype=int)
 #     config_1bd[i] = 0
 #     sec_index.append(int(bin2idx(config_1bd).numpy().sum()))
-# dim_sec = len(sec_index)
-# ham_sec = th.zeros_like(static_hamiltonian[:,:dim_sec,:dim_sec])
-# for i, idx_i in enumerate(sec_index):
-#     for j, idx_j in enumerate(sec_index):
-#         ham_sec[:,i,j] = static_hamiltonian[:,idx_i,idx_j]
-# thermal_dm_sec = th.matrix_exp(-beta * ham_sec)
 # thermal_dm = th.zeros_like(static_hamiltonian)
 # for i, idx_i in enumerate(sec_index):
-#     for j, idx_j in enumerate(sec_index):
-#         thermal_dm[:,idx_i,idx_j] = thermal_dm_sec[:,i,j]
-# thermal_dm = thermal_dm / trace(thermal_dm)[:,None,None]
+#         thermal_dm[:,idx_i,idx_i] = 1 / nq
 # thermal_dm = thermal_dm.to(device=dev)
-
-## initialization of a fully localized state
-sec_index = []
-for i in range(nq):
-    config_1bd = th.ones(nq, dtype=int)
-    config_1bd[i] = 0
-    sec_index.append(int(bin2idx(config_1bd).numpy().sum()))
-thermal_dm = th.zeros_like(static_hamiltonian)
-for i, idx_i in enumerate(sec_index):
-        thermal_dm[:,idx_i,idx_i] = 1 / nq
-thermal_dm = thermal_dm.to(device=dev)
 
 ## equilibration
 system.density_matrix.set_rho(thermal_dm)

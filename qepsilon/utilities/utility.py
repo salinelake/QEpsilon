@@ -38,6 +38,7 @@ def ABAd(A: th.Tensor, B: th.Tensor):
         raise ValueError("A and B must be 2D or 3D tensors.")
 
 def apply_to_pse(pse: th.Tensor, ops: th.Tensor):
+    ## TODO: fix error when pse is sparse.
     """
     This function applies an operator to pure state ensemble.
     Args:
@@ -54,7 +55,7 @@ def apply_to_pse(pse: th.Tensor, ops: th.Tensor):
     if ops.dim() == 2:
         return th.matmul(pse, ops.T)
     elif ops.dim() == 3:
-        return th.matmul(ops, pse.unsqueeze(-1)).squeeze(-1) 
+        return (ops * pse[:,None,:]).sum(-1)
     else:
         raise ValueError("Operator must have shape (nb, ns, ns) or (ns, ns).")
 

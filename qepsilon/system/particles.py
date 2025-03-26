@@ -132,7 +132,10 @@ class Particles(th.nn.Module):
             self.tau = 100 * dt
         else:
             self.tau = tau  
-        self.gamma = 1.0 / self.tau
+        self.gamma = 1.0 / self.tau   ## this gamma is the damping coefficient in dv/dt = -gamma v + noise
+ 
+        ## history of positions
+        self.traj = []
  
     ###########################################################################
     # Methods for dealing with particles
@@ -229,8 +232,8 @@ class Particles(th.nn.Module):
     ###########################################################################    
     def get_noise(self, temp: float = None):
         noise = th.randn_like(self.positions)
-        temp = th.ones(self.ndim, dtype=self.positions.dtype, device=self.positions.device) * temp
-        noise *= th.sqrt(self.unit.kb * temp)[None,None,:]
+        _temp = th.ones(self.ndim, dtype=self.positions.dtype, device=self.positions.device) * temp
+        noise *= th.sqrt(self.unit.kb * _temp)[None,None,:]
         noise *= th.sqrt(1 / self.masses[None,:,None])
         return noise
 
