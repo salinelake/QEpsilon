@@ -5,7 +5,7 @@ This file contains the unitary simulation class for the QEpsilon project.
 import numpy as np
 import torch as th
 from qepsilon.operator_group import *
-from qepsilon.system.pure_ensemble import PureStatesEnsemble, QubitPureStatesEnsemble
+from qepsilon.system.pure_ensemble import *
 from qepsilon.utilities import expectation_pse, apply_to_pse
 import logging
 from time import time as timer
@@ -29,15 +29,35 @@ class UnitarySystem(th.nn.Module):
         self.pure_ensemble = PureStatesEnsemble(num_states, batchsize)
         self._hamiltonian_operator_group_dict = th.nn.ModuleDict()
         self._ham = None
+        self._evo = None
     
+    ############################################################
+    ## methods for storing the evolution operator. Needed when, e.g., evaluating correlation functions.
+    ############################################################
+    def reset_evo(self):
+        self._evo = th.eye(self.ns, dtype=th.cfloat, device=self.pse.device).unsqueeze(0).repeat(self.nb, 1, 1)
+
+    def accumulate_evo(self, evo: th.Tensor):
+        self._evo =  th.matmul(evo, self._evo)
+
+    @property
+    def evo(self):
+        return self._evo.clone()
+
+    ############################################################
+    ## methods for moving the system to GPU, overiding the .to() method of th.nn.Module
+    ############################################################
     def to(self, device='cuda'):
         self.pure_ensemble.to(device=device)
         for operator_group in self._hamiltonian_operator_group_dict.values():
             operator_group.to(device=device)
         if self._ham is not None:
             self._ham = self._ham.to(device=device)
+        if self._evo is not None:
+            self._evo = self._evo.to(device=device)
+        
     ############################################################
-    # Setter and getter  
+    # Setter and getter for the Hamiltonian operator groups and the pure state ensemble
     ############################################################
     @property
     def hamiltonian_operator_groups(self):
@@ -85,9 +105,6 @@ class UnitarySystem(th.nn.Module):
             parameters_list.extend(list(operator_group.parameters()))
         return parameters_list
 
-    ############################################################
-    # Methods for adding operator groups
-    ############################################################
     def add_operator_group_to_hamiltonian(self, operator_group: OperatorGroup):
         """
         This function adds an operator group to the Hamiltonian part of the system.
@@ -141,7 +158,7 @@ class UnitarySystem(th.nn.Module):
             self._ham = hamiltonian
         return hamiltonian
 
-    def step_pse(self, dt: float, hamiltonian: th.Tensor):
+    def step_pse(self, dt: float, hamiltonian: th.Tensor, set_buffer=False):
         """
         This function steps the pure state ensemble for a time step dt.
         """
@@ -150,6 +167,8 @@ class UnitarySystem(th.nn.Module):
         ## sparsify tensors if the dimension of the matrix is larger than 2000
         if self.ns > 2000:
             evolution_matrix = evolution_matrix.to_sparse()
+        if set_buffer:
+            self.accumulate_evo(evolution_matrix)
         pse_new = apply_to_pse(self.pse, evolution_matrix)
         if pse_new.is_sparse:
             pse_new = pse_new.to_dense()
@@ -179,7 +198,7 @@ class UnitarySystem(th.nn.Module):
             th.cuda.synchronize()
             t1 = timer()
             logging.info(f"The time taken for stepping the Hamiltonian is {t1 - t0}s.")
-        self.pse = self.step_pse(dt, hamiltonian)
+        self.pse = self.step_pse(dt, hamiltonian, set_buffer)
         if profile:
             th.cuda.synchronize()
             t2 = timer()
@@ -205,6 +224,35 @@ class UnitarySystem(th.nn.Module):
         return expectation_pse(self.pse, ops)
         
     
+class TightBindingUnitarySystem(UnitarySystem):
+    """
+    This class represents the states of an ensemble of tight binding systems.
+    """
+    def __init__(self, n_sites: int, batchsize: int):
+        super().__init__(num_states=n_sites, batchsize=batchsize)
+        self.pure_ensemble = TightBindingPureStatesEnsemble(n_sites=n_sites, batchsize=batchsize)
+        
+    def set_pse_by_config(self, config: th.Tensor):
+        if isinstance(config, th.Tensor):
+            _c = config
+        elif isinstance(config, np.ndarray):
+            if config.shape != (self.nq,):
+                raise ValueError("Config must have shape (#qubits).")
+            if config.dtype != np.int64:
+                raise ValueError("Config must be an integer array.")
+            _c = th.tensor(config, dtype=th.int64)
+        elif isinstance(config, list):
+            if len(config) != self.nq:
+                raise ValueError("Config must have length (#qubits).")
+            if not all(isinstance(i, int) for i in config):
+                raise ValueError("Config must be a list of integers.")
+            _c = th.tensor(config, dtype=th.int64)
+        else:
+            raise ValueError("Config must be a 0/1 tensor, a 0/1 numpy array, or a list of 0/1 integers.")
+        if not all(i in [0, 1] for i in _c):
+            raise ValueError("Config must be a sequence of 0/1 integers. Example for 2-qubit system: [0, 1] means |01>.")
+        self.pure_ensemble.set_pse_by_config(_c)
+
 class QubitUnitarySystem(UnitarySystem):
     """
     This class represents the states of an ensemble of pure n-qubit systems.

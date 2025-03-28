@@ -3,7 +3,7 @@ This file contains the pure states ensemble class for the QEpsilon project.
 """
 
 import torch as th
-from qepsilon.tls import Pauli
+from qepsilon.operator_basis.tls import Pauli
 from qepsilon.utilities import compose, qubitconf2idx, apply_to_pse, expectation_pse
 
 class PureStatesEnsemble(th.nn.Module):
@@ -75,7 +75,62 @@ class PureStatesEnsemble(th.nn.Module):
             raise ValueError("Operator must be a complex tensor (th.cfloat).")
         return expectation_pse(self._pse, operator)
 
+class TightBindingPureStatesEnsemble(PureStatesEnsemble):
+    """
+    This class deals with pure states of an ensemble of tight binding systems.
+    """
+    def __init__(self, n_sites: int, batchsize: int):
+        super().__init__(num_states=n_sites, batchsize=batchsize)
+        
+    def set_pse_by_config(self, config: th.Tensor):
+        """
+        This function sets the pure states by a configuration.
+        Args:
+            config: a 0 or 1 tensor that specifies the configuration. Shape: (nsites). Should contain exactly one 1.
+        """
+        if config.shape != (self.ns,):
+            raise ValueError("Config must have shape (nsites).")
+        if config.dtype != th.int64:
+            raise ValueError("Config must be an integer tensor (th.int64).")
+        if config.sum() != 1:
+            raise ValueError("Config must contain exactly one 1.")
+        site_index = int((th.arange(self.ns) * config).sum())
+        pse = th.zeros(self.ns, dtype=th.cfloat)
+        pse[site_index] += 1.0
+        self.set_pse(pse)
+        return
 
+    def observe_occupation(self, pse: th.Tensor):
+        """
+        This function observes the occupation of the sites.
+        Args:
+            pse: the pure states. Shape: (batchsize, nsites).
+        Returns:
+            occupation: the occupation of the sites. Shape: (batchsize, nsites).
+        """
+        return th.abs(pse)**2 / self.norm[:, None]**2
+    
+    def observe_r(self, pse: th.Tensor):
+        """
+        This function observes <psi|r|psi>.
+        Args:
+            pse: the pure states. Shape: (batchsize, nsites).
+        Returns:
+            r: Shape: (batchsize).
+        """
+        pos =  th.arange(self.ns).to(dtype=pse.dtype, device=pse.device)
+        return (th.abs(pse)**2 * pos).sum(dim=-1) / self.norm**2
+
+    def observe_r2(self, pse: th.Tensor):
+        """
+        This function observes <psi|r^2|psi>.
+        Args:
+            pse: the pure states. Shape: (batchsize, nsites).
+        Returns:
+            r2: Shape: (batchsize).
+        """
+        pos =  th.arange(self.ns).to(dtype=pse.dtype, device=pse.device)
+        return (th.abs(pse)**2 * pos**2).sum(dim=-1) / self.norm**2
 
 class QubitPureStatesEnsemble(PureStatesEnsemble):
     """

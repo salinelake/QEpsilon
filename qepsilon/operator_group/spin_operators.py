@@ -1,6 +1,6 @@
 import torch as th
 import numpy as np
-from qepsilon.tls import Pauli
+from qepsilon.operator_basis.tls import Pauli
 from qepsilon.utilities import compose
 from qepsilon.system.particles import Particles
 from qepsilon.operator_group.base_operators import OperatorGroup
@@ -44,10 +44,6 @@ class PauliOperatorGroup(OperatorGroup):
             total_ops += self.pauli.get_composite_ops(op) * prefactor
         return total_ops
 
-###########################################################################
-# Operators groups involving simple stochastic processes. 
-###########################################################################
-
 class IdentityPauliOperatorGroup(PauliOperatorGroup):
     def __init__(self, n_qubits: int, id: str, batchsize: int = 1):
         super().__init__(n_qubits, id, batchsize)
@@ -80,6 +76,10 @@ class StaticPauliOperatorGroup(PauliOperatorGroup):
         """
         ops = self.sum_operators() 
         return ops, th.ones(self.nb, dtype=ops.dtype, device=ops.device) * self.coef
+
+###########################################################################
+# Operators groups involving simple stochastic processes. 
+###########################################################################
 
 class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
     """

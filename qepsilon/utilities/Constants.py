@@ -57,6 +57,7 @@ class Constants_Metal(object):
     hbar_THz = 1.0
     hbar_MHz = 1e-6 * hbar_THz
     hbar_Hz = 1e-6 * hbar_MHz
+    
     eV = hbar_Hz / 6.582119569e-16  
     meV = 1e-3 * eV
     Ry = 13.605693123 * eV 
@@ -71,7 +72,7 @@ class Constants_Metal(object):
     amu = amu_cc / speed_of_light**2 # hbar * THz / (pm/ps)^2
     epsilon0 = None  # e^2(hbar*THz*pm)^-1
     elementary_charge = 1.0 # electron charge
-
+    
     ## length units in pm
     cm = 1e10
     mm = 1e9
@@ -89,4 +90,7 @@ class Constants_Metal(object):
     fs = 1e-3
     As = 1e-6
     time_au = 2.4188843265864e-2 * fs
-     
+    
+
+    ## additional constants
+    cm_inverse_energy =  speed_of_light / cm * 2 * np.pi * hbar

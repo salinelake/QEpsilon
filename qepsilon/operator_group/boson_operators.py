@@ -1,6 +1,6 @@
 import numpy as np
 import torch as th
-from qepsilon.boson import Boson
+from qepsilon.operator_basis.boson import Boson
 from qepsilon.operator_group.base_operators import OperatorGroup
 
 class BosonOperatorGroup(OperatorGroup):

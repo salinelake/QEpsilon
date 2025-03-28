@@ -12,45 +12,50 @@ from qepsilon.utilities import trace, qubitconf2idx, apply_to_pse
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename='log.txt')
 th.set_printoptions(sci_mode=False, precision=5)
 np.set_printoptions(suppress=True, precision=5)
-dev = 'cpu'
+dev = 'cuda'
 
 ################################################
 #  simulation parameters 
 ################################################
-batchsize = 1
+batchsize = 16
 nq = 6
-hopping_value = 83 
+ns = 2**nq
+hopping_value = 8.3 
 hopping_coef = hopping_value * Constants.meV  # 83meV
-nmodes = 9
-temperature = 300.0
+nmodes = 1
+temperature = 600.0
 tau  = 0.1 * Constants.ps       ## very important.
 mass = th.ones(nmodes) * 100 * Constants.amu
 mass[0] *= 64
-mass[1] *= 4
+# mass[1] *= 4
 ## equilibration
-total_t = 10000 * Constants.fs
+total_t = 1000 * Constants.fs
 dt = 0.1 * Constants.fs
 nsteps =  int(total_t / dt)
-
+## sampling.. current correlation is about 20fs.
+sample_t = 1000 * Constants.fs
+sample_steps = int(sample_t / dt)
+sample_interval = int(Constants.fs / dt)
 ################################################
 #  load DFT data 
 ################################################
 data = np.loadtxt('data.csv', delimiter=',')
 omega_in_cm = data[:nmodes,0]
-lambda_in_cm = data[:nmodes,1]
+lambda_in_cm = data[:nmodes,1] * 2   * 7
 g_factor = np.sqrt(lambda_in_cm / omega_in_cm)
 g_factor = th.tensor(g_factor, dtype=th.float32)
 omega = Constants.speed_of_light * (omega_in_cm/ Constants.cm) * 2 * np.pi   # ps^-1
 omega = th.tensor(omega, dtype=th.float32)
 eq_position = - g_factor * np.sqrt(2) / (mass * omega)**0.5
 x0_std = (Constants.kb * temperature / (mass * omega**2))**0.5
-print('eq_position:', eq_position)
+
 ## initial condition
 initial_config = th.zeros(nq, dtype=int)
 initial_config[0] = 1
 print('#bosonic modes:', nmodes)
 print('omega [ps^-1]:', omega)
 print('g_factor:', g_factor)
+print('reorg energy [meV]:', (g_factor**2 * omega)  / Constants.meV)
 
 ################################################
 # define the simulation (Hamiltonian, classical oscillators, coupling)
@@ -78,7 +83,7 @@ simulation.add_operator_group_to_hamiltonian(op_hop)
 ## add classical harmonic oscillators to approximate bosonic environment
 for i in range(nq):
     oscilators_id = 'osc_{}'.format(i)
-    x0 = eq_position.unsqueeze(-1) if i == 0 else eq_position.unsqueeze(-1) * 0.0
+    x0 = eq_position.clone().unsqueeze(-1) if i == 0 else eq_position.clone().unsqueeze(-1) * 0.0
     x0 += x0_std.unsqueeze(-1) * th.randn(nmodes, 1)
     simulation.add_classical_oscillators(id=oscilators_id, nmodes=nmodes, 
         freqs=omega, masses= mass, couplings=g_factor, x0=x0, init_temp=temperature, tau=tau, unit='pm_ps')
@@ -112,7 +117,7 @@ corr_jj_0_traj = []
 osc_temps_traj = []
 for step in range(nsteps):
     if step % int(Constants.fs / dt) == 0:
-        print('========step-{}, t={}fs========'.format(step, step * dt/Constants.fs))
+        print('========Equilibration: step-{}, t={}fs========'.format(step, step * dt/Constants.fs))
         t_traj.append(step * dt/Constants.fs)
         ## print the occupation of each site
         site_occupation = [ simulation.observe(local_number_ops[i]).real for i in range(nq)]
@@ -179,5 +184,84 @@ ax[1].set_ylabel('oscillator position [pm]')
 ax[2].set_ylabel('oscillator temperature [K]')
 ax[3].set_ylabel(r'$\langle \psi(t) | J\cdot J | \psi(t) \rangle$')
 plt.tight_layout()
-plt.savefig('thermalize_nq{}_T{}_V{}_tau{}.png'.format(nq, temperature, hopping_value, tau/Constants.ps), dpi=200)
+plt.savefig('thermalize_nq{}_T{}_V{}_tau{}_cls.png'.format(nq, temperature, hopping_value, tau/Constants.ps), dpi=200)
 plt.close()
+
+
+
+################################################
+# Sample current correlation
+################################################
+
+t_traj = []
+psi_traj = []    
+evo_op_traj = []
+for step in range(sample_steps):
+    if step % sample_interval == 0:
+        print('========Sampling: step-{}, t={}fs========'.format(step, step * dt/Constants.fs))
+        t_traj.append(step * dt/Constants.fs)
+        if step > 0:
+            evo_op_traj.append(simulation.evo)
+        simulation.reset_evo()
+        simulation.normalize()
+        psi_traj.append(simulation.pse)
+    simulation.step(dt, temp=temperature, set_buffer=True, profile=False)
+
+nsample = len(psi_traj)
+psi_traj = th.stack(psi_traj, dim=0)   # [nsample, batchsize, nstates], the pure state ensemble on t=0, Dt, 2Dt, ...
+evo_op_traj = th.stack(evo_op_traj, dim=0)   # [nsample-1, batchsize, nstates, nstates], the evolution operator for the duration [0,Dt], [Dt,2Dt], ...
+corr_jj_list = []
+corr_T = 48 * Constants.fs  ## the total duration of time we want to calculate the correlation for.
+Dt = dt * sample_interval   ## the time resolution of the correlation function
+corr_n = int(corr_T / Dt) + 1 ## the number of time slices.
+###  get J\psi
+J_pse = apply_to_pse(psi_traj.reshape(len(t_traj) * batchsize, ns), current_op_matrix).reshape(len(t_traj), batchsize, ns)   # (nsample, batchsize, ns)
+for i in range(corr_n):
+    print('calculating the current correlation at t={}fs'.format(i*Dt/Constants.fs))
+    if i == 0:
+        corr = th.sum(th.abs(J_pse) ** 2, dim=-1).mean()
+        corr_jj_list.append(-corr)
+    else:
+        ## get U(i*Dt): [nsample-i]
+        if i == 1:
+            evo_accumulated = evo_op_traj.clone()
+        else:
+            evo_accumulated = th.matmul(evo_op_traj[i-1:], evo_accumulated[:-1] )
+        assert evo_accumulated.shape == (nsample-i, batchsize, ns, ns)
+        ## get UJ_psi
+        UpJUJ_pse = th.matmul(evo_accumulated, J_pse[:-i].unsqueeze(-1))
+        assert UpJUJ_pse.shape == (nsample-i, batchsize, ns, 1)
+        ## get JUJ_psi, J: (ns, ns)
+        UpJUJ_pse = th.matmul(current_op_matrix[None,None,:,:], UpJUJ_pse)  # (1,1,ns,ns) @ (nsample-i, batchsize, ns, 1) -> (nsample-i, batchsize, ns, 1)
+        assert UpJUJ_pse.shape == (nsample-i, batchsize, ns, 1)
+        ## get U^T J U J \psi
+        UpJUJ_pse = th.matmul(evo_accumulated.conj().transpose(2,3), UpJUJ_pse)  # (nsample-i, batchsize, ns, ns) @ (nsample-i, batchsize, ns, 1) -> (nsample-i, batchsize, ns, 1)
+        UpJUJ_pse = UpJUJ_pse.squeeze(-1)
+        assert UpJUJ_pse.shape == (nsample-i, batchsize, ns)
+        corr =  (psi_traj[:-i].conj() * UpJUJ_pse).sum(-1)
+        assert corr.shape == (nsample-i, batchsize)
+        corr_jj_list.append(corr.mean())
+corr_jj_list = th.stack(corr_jj_list, dim=0).cpu().numpy()  # (corr_n)
+corr_t = np.arange(corr_n) * Dt 
+## get reference correlation
+occu_num = 1/(th.exp(omega / Constants.kb / temperature) - 1)  ## thermal average occupation number of the bosonic mode
+exponent = [g_factor**2 * (2 * occu_num + 1 - occu_num * (th.exp(-1j * omega * t)) - (occu_num + 1) * (th.exp(1j * omega * t))) for t in corr_t]
+exponent = th.stack(exponent, dim=0) # (corr_n, nmodes)
+corr_jj_ref = - th.exp( - exponent.sum(dim=-1) ) * 2
+
+## plot corr_jj_list versus time
+fig, ax = plt.subplots(1, 1, figsize=(6, 4))
+ax.plot(corr_t / Constants.fs / 0.02418, -corr_jj_list.real, label='real')
+ax.plot(corr_t / Constants.fs / 0.02418, -corr_jj_list.imag, label='imag')
+ax.plot(corr_t / Constants.fs / 0.02418, -corr_jj_ref.real, linestyle='--', linewidth=2, alpha=0.5, label='real, ref')
+ax.plot(corr_t / Constants.fs / 0.02418, -corr_jj_ref.imag, linestyle='--', linewidth=2, alpha=0.5, label='imag, ref')
+ax.set_xlabel('time [a.u.]')
+ax.set_ylabel(r'$-\langle J(t) J(0)  \rangle$')
+ax.legend()
+plt.tight_layout()
+plt.savefig('current_correlation_nq{}_T{}_V{}_tau{}_cls.png'.format(nq, temperature, hopping_value, tau/Constants.ps), dpi=200)
+plt.close()
+
+
+
+

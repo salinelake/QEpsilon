@@ -3,7 +3,7 @@ This module deals with density matrices.
 """
 
 import torch as th
-from qepsilon.tls import Pauli
+from qepsilon.operator_basis.tls import Pauli
 from qepsilon.utilities import compose, ABAd, qubitconf2idx, trace
 
 class DensityMatrix(th.nn.Module):
