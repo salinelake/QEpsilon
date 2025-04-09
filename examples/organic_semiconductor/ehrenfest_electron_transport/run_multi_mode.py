@@ -22,7 +22,7 @@ nq = 6
 ns = 2**nq
 hopping_value = 8.3 
 hopping_coef = hopping_value * Constants.meV  # 83meV
-nmodes = 1
+nmodes = 9
 temperature = 600.0
 tau  = 0.1 * Constants.ps       ## very important.
 mass = th.ones(nmodes) * 100 * Constants.amu
@@ -44,6 +44,9 @@ omega_in_cm = data[:nmodes,0]
 lambda_in_cm = data[:nmodes,1] * 2   * 7
 g_factor = np.sqrt(lambda_in_cm / omega_in_cm)
 g_factor = th.tensor(g_factor, dtype=th.float32)
+print('omega[cm^-1]:', omega_in_cm)
+print('g_factor:', g_factor)
+exit()
 omega = Constants.speed_of_light * (omega_in_cm/ Constants.cm) * 2 * np.pi   # ps^-1
 omega = th.tensor(omega, dtype=th.float32)
 eq_position = - g_factor * np.sqrt(2) / (mass * omega)**0.5

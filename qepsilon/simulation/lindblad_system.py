@@ -357,11 +357,11 @@ class LindbladSystem(th.nn.Module):
             raise ValueError("The coefficients sampled from an operator group should be a 1D tensor of length equal to the batchsize.")
         ## no broadcasting if the operators is already batched
         if ops.shape == (self.nb, self.ns, self.ns):
-            ops = ops * coefs[:, None, None]
+            ops_batched = ops * coefs[:, None, None]
         ## broadcast if the operators is not already batched
         elif ops.shape == (self.ns, self.ns):
-            ops = ops[None, :, :] * coefs[:, None, None]
-        return trace(th.matmul(ops, self.rho)) / trace(self.rho)
+            ops_batched = ops[None, :, :] * coefs[:, None, None]
+        return trace(th.matmul(ops_batched, self.rho)) / trace(self.rho)
         
     
 class QubitLindbladSystem(LindbladSystem):
@@ -459,7 +459,7 @@ class ParticleLindbladSystem(QubitLindbladSystem):
         for _ in range(substeps):
             self.particles.zero_forces()
             self.particles.modify_forces(self.particles.get_trapping_forces())
-            self.particles.step_langevin(record_traj=True)
+            self.particles.step_langevin(record_traj=False)
         return
 
     def step(self, dt: float, set_buffer: bool = False, profile: bool = False):

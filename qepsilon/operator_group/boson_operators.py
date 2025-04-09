@@ -4,10 +4,10 @@ from qepsilon.operator_basis.boson import Boson
 from qepsilon.operator_group.base_operators import OperatorGroup
 
 class BosonOperatorGroup(OperatorGroup):
-    def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1):
+    def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1, static: bool = False):
         self.nm = num_modes  # number of modes
         self.ns = (nmax+1)**num_modes  # number of states
-        super().__init__(id, self.ns, batchsize)
+        super().__init__(id, self.ns, batchsize, static)
         self.boson = Boson(nmax)
 
     def add_operator(self, boson_sequence: str, prefactor: float = 1):
@@ -48,8 +48,8 @@ class StaticBosonOperatorGroup(BosonOperatorGroup):
     Each operator is a direct product of boson operators. It is specified by a string of boson operator names.  
     For example, "UDI" is the 2-body operator $$a^\dagger_0 \otimes a_1 \otimes I_2$$.
     """
-    def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1, coef: float = 1.0, requires_grad: bool = False):
-        super().__init__(num_modes, id, nmax, batchsize)
+    def __init__(self, num_modes, id: str, nmax: int, batchsize: int = 1, coef: float = 1.0, static: bool = True, requires_grad: bool = False):
+        super().__init__(num_modes, id, nmax, batchsize, static)
         ## require coef is a scalar
         if not isinstance(coef, float):
             raise ValueError("coef must be a float scalar")

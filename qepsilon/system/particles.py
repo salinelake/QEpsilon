@@ -73,16 +73,6 @@ class OpticalTweezer:
         pot = self.pot_engine(input)
         force = - th.autograd.grad(pot, input)[0]
         return force
-      
-    # def get_force(self, positions: th.Tensor):
-    #     """
-    #     Get the force at a given position.
-    #     """
-    #     input = positions.clone()
-    #     input.requires_grad = True
-    #     pot = self.get_pot(input).sum()
-    #     force = - th.autograd.grad(pot, input)[0]
-    #     return force
 
     def get_info(self):
         return {

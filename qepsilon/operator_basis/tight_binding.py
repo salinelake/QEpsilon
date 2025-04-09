@@ -31,7 +31,8 @@ class TightBinding(th.nn.Module):
             name_sequence: a string of tight binding operator names. Examples: 
                 (1) "XXLXX", meaning |1><2|, the particle on third site hops to the left. 
                 (2) "XXRXX", meaning |3><2|, the particle on third site hops to the right.
-                (3) "XXNXX", meaning |2><2|, identity for the third site.
+                (3) "XXNXX", meaning |2><2|, number operator for the third site.
+                (4) "XXXXX", meaning |1><1|+|2><2|+|3><3|+|4><4|+|5><5|, identity for all sites.
         """
         ## assert there are only "X", "L", "R", "N" in the name_sequence, otherwise raise ValueError
         if not all(c in ["X", "L", "R", "N"] for c in name_sequence):
@@ -41,9 +42,13 @@ class TightBinding(th.nn.Module):
             raise ValueError("The length of the name_sequence must be n_sites")
         ## find the position of the non-X character
         non_X_pos = [i for i, c in enumerate(name_sequence) if c != "X"]
-        ## assert the non-X character is only one
-        if len(non_X_pos) != 1:
-            raise ValueError("There must be exactly one non-X character in the name_sequence")
+        ## assert the non-X character is zero or one
+        if len(non_X_pos) == 0:
+            return th.eye(self.ns, dtype=th.cfloat, device=self.X.device)
+        elif len(non_X_pos) == 1:
+            op = name_sequence[non_X_pos[0]]
+        else:
+            raise ValueError("There must be exactly zero or one non-X character in the name_sequence")
         ## get the position of the site to be acted on
         idx = non_X_pos[0]
         op = name_sequence[idx]

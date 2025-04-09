@@ -33,6 +33,34 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
         self._oscillator_dict = {}
         self.cls_dt = cls_dt
 
+    ############################################################
+    # Getters and setters 
+    ############################################################
+
+    def get_oscilator_by_id(self, id: str):
+        if id in self._oscillator_dict:
+            return self._oscillator_dict[id]
+        else:
+            raise ValueError(f"The oscillator with id {id} does not exist.")
+        
+    def get_all_oscillators(self):
+        return [self.get_oscilator_by_id(id) for id in self._oscillator_dict]
+
+    def reset(self, temp: float = None):
+        """
+        Reset the system. 
+        In addition to the reset of the quantum system, the center-of-mass positions and momenta of the particles are also reset to arbitrary thermal states.
+        """
+        for operator_group in self._hamiltonian_operator_group_dict.values():
+            operator_group.reset()
+        for oscillator in self.get_all_oscillators():
+            oscillator['particles'].reset(temp=temp) 
+        return
+        
+    ############################################################
+    # Methods for adding classical oscillators to the system and binding them to the tight-binding system.
+    ############################################################
+    
     def add_classical_oscillators(self, id: str, nmodes: int, freqs: th.Tensor, masses: th.Tensor, couplings: th.Tensor, x0: th.Tensor = None, init_temp: float = None, tau: float = None, unit: str = 'pm_ps'):
         """
         Add onsite classical oscillators to the system. 
@@ -76,13 +104,7 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
         logging.info(f"It has not been bound to any qubit yet. Use the method `bind_oscillators_to_qubit` to bind it to a qubit.")
         return
 
-    def get_oscilator_by_id(self, id: str):
-        if id in self._oscillator_dict:
-            return self._oscillator_dict[id]
-        else:
-            raise ValueError(f"The oscillator with id {id} does not exist.")
-        
-    def bind_oscillators_to_qubit(self, qubit_idx: int, oscillators_id: str):
+    def bind_oscillators_to_qubit(self, qubit_idx: int, oscillators_id: str, requires_grad: bool = False):
         """
         Bind the oscillators to a qubit.
         Each oscillator is coupled to the qubit with interaction $g \omega \sqrt{2M\omega} x \hat{N}$. 
@@ -94,7 +116,7 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
             raise ValueError(f"The qubit index {qubit_idx} is negative.")
         oscillators = self._oscillator_dict[oscillators_id]
         ## get the interaction operator
-        epc_op = spin_oscillators_interaction(self.nq, id=f"site-{qubit_idx}_{oscillators_id}_epc", batchsize=self.nb, particles=oscillators['particles'], coef=oscillators['coefs'], requires_grad=False)
+        epc_op = spin_oscillators_interaction(self.nq, id=f"site-{qubit_idx}_{oscillators_id}_epc", batchsize=self.nb, particles=oscillators['particles'], coef=oscillators['coefs'], requires_grad=requires_grad)
         pauli_sequence = ["I"] * self.nq
         pauli_sequence[qubit_idx] = "N"
         pauli_sequence = "".join(pauli_sequence)
@@ -111,23 +133,11 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
         logging.info(f"The oscillator with id {oscillators_id} is bound to site-{qubit_idx}.")
         return
 
-
-    def get_all_oscillators(self):
-        return [self.get_oscilator_by_id(id) for id in self._oscillator_dict]
-
-    def reset(self, temp: float = None):
-        """
-        Reset the system. 
-        In addition to the reset of the quantum system, the center-of-mass positions and momenta of the particles are also reset to arbitrary thermal states.
-        """
-        for operator_group in self._hamiltonian_operator_group_dict.values():
-            operator_group.reset()
-        for oscillator in self.get_all_oscillators():
-            oscillator['particles'].reset(temp=temp) 
-        return
+    ############################################################
+    # Integration of the system
+    ############################################################
 
     def step_particles(self, temp: float = None):
-        ## TODO: make th.no_grad() for all operations that do not require gradient computation
         """
         This function steps the thermal motino of the particles for a time step.
         There are two types of forces on the particles:
@@ -136,34 +146,39 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
         """
         dt = self.cls_dt
         all_oscillators = self.get_all_oscillators()
-        for oscillator in all_oscillators:
-            omegas = oscillator['freqs'].reshape(oscillator['nmodes'],1)
-            ## zero the forces
-            particles = oscillator['particles']
-            particle_dim = particles.ndim
-            if particle_dim > 1:
-                raise NotImplementedError(f"The Ehrenfest force is currently only implemented for one-dimensional classical oscillators.")
-            particles.zero_forces()
-            ## compute the harmonic force
-            particles.modify_forces_by_harmonic_trap(omega=omegas)
-            ## compute the non-adiabatic force from classical-quantum coupling
-            if oscillator['binding_interaction'].op_static is None:
-                ehrenfest_op, _ = oscillator['binding_interaction'].sample(dt=None)
-            else:
-                ehrenfest_op = oscillator['binding_interaction'].op_static
-            ehrenfest_op_exp = self.pure_ensemble.get_expectation(ehrenfest_op)
-            if ehrenfest_op_exp.shape != (self.nb,):
-                raise ValueError(f"The shape of the expectation value of the Ehrenfest operator must be (batchsize,).")
-            ehrenfest_op_exp = ehrenfest_op_exp.to(device=particles.positions.device)
-            exp_real = ehrenfest_op_exp.real
-            exp_imag = ehrenfest_op_exp.imag
-            with th.no_grad():
-                if th.sum(th.abs(exp_imag)) > th.sum(th.abs(exp_real)) * 1e-3:
-                    raise ValueError(f"The imaginary part of the expectation value of the Ehrenfest operator is not negligible.")
-            ehrenfest_force = - oscillator['coefs'][None, :, None] * exp_real[:, None, None]
-            particles.modify_forces(ehrenfest_force)
-            ## step the particles
-            particles.step_langevin(record_traj=True, temp=temp)
+        with th.no_grad():
+            for oscillator in all_oscillators:
+                qubit_idx = oscillator['binding_qubit']
+                omegas = oscillator['freqs'].reshape(oscillator['nmodes'],1)
+                ## zero the forces
+                particles = oscillator['particles']
+                particle_dim = particles.ndim
+                if particle_dim > 1:
+                    raise NotImplementedError(f"The Ehrenfest force is currently only implemented for one-dimensional classical oscillators.")
+                particles.zero_forces()
+                ## compute the harmonic force
+                particles.modify_forces_by_harmonic_trap(omega=omegas)
+                ## compute the non-adiabatic force from classical-quantum coupling
+                if oscillator['binding_interaction'].op_static is None:
+                    ehrenfest_op, _ = oscillator['binding_interaction'].sample(dt=None)
+                else:
+                    ehrenfest_op = oscillator['binding_interaction'].op_static
+                ehrenfest_op_exp = self.pure_ensemble.get_expectation(ehrenfest_op)
+                if ehrenfest_op_exp.shape != (self.nb,):
+                    raise ValueError(f"The shape of the expectation value of the Ehrenfest operator must be (batchsize,).")
+                ehrenfest_op_exp = ehrenfest_op_exp.to(device=particles.positions.device)
+                exp_real = ehrenfest_op_exp.real
+                exp_imag = ehrenfest_op_exp.imag
+                # with th.no_grad():
+                #     if th.sum(th.abs(exp_imag)) > th.sum(th.abs(exp_real)) * 1e-3:
+                #         raise ValueError(f"The imaginary part of the expectation value of the Ehrenfest operator is not negligible.")
+                ehrenfest_force = - oscillator['coefs'][None, :, None] * exp_real[:, None, None]
+                particles.modify_forces(ehrenfest_force)
+                ## step the particles
+                if temp is not None:
+                    particles.step_langevin(record_traj=False, temp=temp)
+                else:
+                    particles.step_adiabatic(record_traj=False)
         return
 
     def step(self, dt: float, temp: float = None, set_buffer: bool = False, profile: bool = False):
@@ -249,7 +264,7 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
             freqs: th.Tensor, the frequencies of the oscillators. shape: (nmodes,)
             masses: th.Tensor, the masses of the oscillators. shape: (nmodes,)
             couplings: th.Tensor, the couplings between the oscillators and the tight-binding sites. shape: (nmodes,)
-            x0: th.Tensor, the initial positions of the oscillators. shape: (nmodes, ndim)
+            x0: th.Tensor, the initial positions of the oscillators. shape: (batchsize, nmodes, ndim) or (nmodes, ndim)
             tau: float, the relaxation time of the oscillators.
             unit: str, the unit of the oscillator motion.
         """
@@ -283,7 +298,7 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
         logging.info(f"It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.")
         return
 
-    def bind_oscillators_to_tb(self, site_idx: int, oscillators_id: str):
+    def bind_oscillators_to_tb(self, site_idx: int, oscillators_id: str, requires_grad: bool = False):
         """
         Bind the oscillators to a tight-binding site.
         Each oscillator is coupled to the tight-binding site with interaction $g \omega \sqrt{2M\omega} x \hat{N}$. 
@@ -295,7 +310,7 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
             raise ValueError(f"The tight-binding site index {site_idx} is negative.")
         oscillators = self._oscillator_dict[oscillators_id]
         ## get the interaction operator
-        epc_op = tb_oscillators_interaction(self.ns, id=f"site-{site_idx}_{oscillators_id}_epc", batchsize=self.nb, particles=oscillators['particles'], coef=oscillators['coefs'], requires_grad=False)
+        epc_op = tb_oscillators_interaction(self.ns, id=f"site-{site_idx}_{oscillators_id}_epc", batchsize=self.nb, particles=oscillators['particles'], coef=oscillators['coefs'], requires_grad=requires_grad)
         tb_sequence = ["X"] * self.ns
         tb_sequence[site_idx] = "N"
         tb_sequence = "".join(tb_sequence)
@@ -354,7 +369,10 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
             ehrenfest_force = - oscillator['coefs'][None, :, None] * ehrenfest_op_exp[:, None, None]
             particles.modify_forces(ehrenfest_force)
             ## step the particles
-            particles.step_langevin(record_traj=True, temp=temp)
+            if temp is not None:
+                particles.step_langevin(record_traj=False, temp=temp)
+            else:
+                particles.step_adiabatic(record_traj=False)
         return
 
     def step(self, dt: float, temp: float = None, set_buffer: bool = False, profile: bool = False):

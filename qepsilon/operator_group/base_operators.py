@@ -92,6 +92,8 @@ class ComposedOperatorGroups(OperatorGroup):
 
     def _sample(self, dt: float):
         ops_composed, coef_composed = self.OP_list[0].sample(dt)
+        ops_composed = ops_composed.clone()
+        coef_composed = coef_composed.clone()
         for OP in self.OP_list[1:]:
             ops, coef = OP.sample(dt)
             ops_composed = th.kron(ops_composed, ops)

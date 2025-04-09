@@ -44,6 +44,21 @@ class TightBindingOperatorGroup(OperatorGroup):
         return total_ops
 
 
+class IdentityTightBindingOperatorGroup(TightBindingOperatorGroup):
+    def __init__(self, n_sites: int, id: str, batchsize: int = 1, static: bool = True):
+        super().__init__(n_sites, id, batchsize, static)
+        self.add_operator("X"*n_sites)
+    def _sample(self, dt: float = 1.0):
+        """
+        This function sum up the operators in the group.
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+        """
+        ops = self.sum_operators()
+        return ops, th.ones(self.nb, dtype=ops.dtype, device=ops.device)
+
 class StaticTightBindingOperatorGroup(TightBindingOperatorGroup):
     """
     This class deals with a group of operators (composite Tight Binding operators on n-site systems) and a static coefficient. 

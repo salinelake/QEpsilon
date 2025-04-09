@@ -217,11 +217,11 @@ class UnitarySystem(th.nn.Module):
             raise ValueError("The coefficients sampled from an operator group should be a 1D tensor of length equal to the batchsize.")
         ## no broadcasting if the operators is already batched
         if ops.shape == (self.nb, self.ns, self.ns):
-            ops = ops * coefs[:, None, None]
+            ops_batched = ops * coefs[:, None, None]
         ## broadcast if the operators is not already batched
         elif ops.shape == (self.ns, self.ns):
-            ops = ops[None, :, :] * coefs[:, None, None]
-        return expectation_pse(self.pse, ops)
+            ops_batched = ops[None, :, :] * coefs[:, None, None]
+        return expectation_pse(self.pse, ops_batched)
         
     
 class TightBindingUnitarySystem(UnitarySystem):
