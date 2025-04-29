@@ -30,7 +30,6 @@ nsteps = int(0.2 * Constants.ps / dt)
 
 ## boson bath parameters
 nmax = np.array([8, 3, 1, 1, 1, 1, 1, 1, 1])
-# nmax = np.array([12, 4, 1, 1, 1, 1, 1, 1, 1])
 keep_modes = 9
 omega_in_cm = omega_in_cm[:keep_modes]
 lambda_in_cm = lambda_in_cm[:keep_modes]

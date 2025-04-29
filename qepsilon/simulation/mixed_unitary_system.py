@@ -172,7 +172,8 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
                 # with th.no_grad():
                 #     if th.sum(th.abs(exp_imag)) > th.sum(th.abs(exp_real)) * 1e-3:
                 #         raise ValueError(f"The imaginary part of the expectation value of the Ehrenfest operator is not negligible.")
-                ehrenfest_force = - oscillator['coefs'][None, :, None] * exp_real[:, None, None]
+                epc_coef = oscillator['binding_interaction'].coef.detach().to(device=particles.positions.device)
+                ehrenfest_force = - epc_coef[None, :, None] * exp_real[:, None, None]
                 particles.modify_forces(ehrenfest_force)
                 ## step the particles
                 if temp is not None:
@@ -341,6 +342,8 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
         dt = self.cls_dt
         all_oscillators = self.get_all_oscillators()
         self.normalize()
+        pse_site_prob = th.abs(self.pse)**2
+        pse_site_prob = pse_site_prob.to(device=all_oscillators[0]['particles'].positions.device)
         for oscillator in all_oscillators:
             site_idx = oscillator['binding_site']
             omegas = oscillator['freqs'].reshape(oscillator['nmodes'],1)
@@ -363,10 +366,11 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
             #     raise ValueError(f"The shape of the expectation value of the Ehrenfest operator must be (batchsize,).")
             # ehrenfest_op_exp = ehrenfest_op_exp.to(device=particles.positions.device).real
             # this is a hack to speed up the computation; works only for the case that the quantum operator is the onsite number operator
-            ehrenfest_op_exp = th.abs(self.pse[:, site_idx])**2
-            ehrenfest_op_exp = ehrenfest_op_exp.to(device=particles.positions.device)
+            # ehrenfest_op_exp = th.abs(self.pse[:, site_idx])**2
+            # ehrenfest_op_exp = ehrenfest_op_exp.to(device=particles.positions.device)
             #################### HACK end ####################
-            ehrenfest_force = - oscillator['coefs'][None, :, None] * ehrenfest_op_exp[:, None, None]
+            # ehrenfest_force = - oscillator['coefs'][None, :, None] * ehrenfest_op_exp[:, None, None]
+            ehrenfest_force = - oscillator['coefs'][None, :, None] * pse_site_prob[:, [site_idx], None]
             particles.modify_forces(ehrenfest_force)
             ## step the particles
             if temp is not None:

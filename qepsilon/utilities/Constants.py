@@ -83,6 +83,7 @@ class Constants_Metal(object):
     bohr_radius = 0.52917721092 * Angstrom 
     
     ## time units in ps
+    s = 1e12
     ms = 1e9
     us = 1e6
     ns = 1e3
