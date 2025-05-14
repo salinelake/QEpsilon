@@ -137,7 +137,7 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
     # Integration of the system
     ############################################################
 
-    def step_particles(self, temp: float = None):
+    def step_particles(self, temp: float = None, feedback: bool = True):
         """
         This function steps the thermal motino of the particles for a time step.
         There are two types of forces on the particles:
@@ -158,23 +158,21 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
                 particles.zero_forces()
                 ## compute the harmonic force
                 particles.modify_forces_by_harmonic_trap(omega=omegas)
-                ## compute the non-adiabatic force from classical-quantum coupling
-                if oscillator['binding_interaction'].op_static is None:
-                    ehrenfest_op, _ = oscillator['binding_interaction'].sample(dt=None)
-                else:
-                    ehrenfest_op = oscillator['binding_interaction'].op_static
-                ehrenfest_op_exp = self.pure_ensemble.get_expectation(ehrenfest_op)
-                if ehrenfest_op_exp.shape != (self.nb,):
-                    raise ValueError(f"The shape of the expectation value of the Ehrenfest operator must be (batchsize,).")
-                ehrenfest_op_exp = ehrenfest_op_exp.to(device=particles.positions.device)
-                exp_real = ehrenfest_op_exp.real
-                exp_imag = ehrenfest_op_exp.imag
-                # with th.no_grad():
-                #     if th.sum(th.abs(exp_imag)) > th.sum(th.abs(exp_real)) * 1e-3:
-                #         raise ValueError(f"The imaginary part of the expectation value of the Ehrenfest operator is not negligible.")
-                epc_coef = oscillator['binding_interaction'].coef.detach().to(device=particles.positions.device)
-                ehrenfest_force = - epc_coef[None, :, None] * exp_real[:, None, None]
-                particles.modify_forces(ehrenfest_force)
+                if feedback:
+                    ## compute the non-adiabatic force from classical-quantum coupling
+                    if oscillator['binding_interaction'].op_static is None:
+                        ehrenfest_op, _ = oscillator['binding_interaction'].sample(dt=None)
+                    else:
+                        ehrenfest_op = oscillator['binding_interaction'].op_static
+                    ehrenfest_op_exp = self.pure_ensemble.get_expectation(ehrenfest_op)
+                    if ehrenfest_op_exp.shape != (self.nb,):
+                        raise ValueError(f"The shape of the expectation value of the Ehrenfest operator must be (batchsize,).")
+                    ehrenfest_op_exp = ehrenfest_op_exp.to(device=particles.positions.device)
+                    exp_real = ehrenfest_op_exp.real
+                    exp_imag = ehrenfest_op_exp.imag
+                    epc_coef = oscillator['binding_interaction'].coef.detach().to(device=particles.positions.device)
+                    ehrenfest_force = - epc_coef[None, :, None] * exp_real[:, None, None]
+                    particles.modify_forces(ehrenfest_force)
                 ## step the particles
                 if temp is not None:
                     particles.step_langevin(record_traj=False, temp=temp)
@@ -182,7 +180,7 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
                     particles.step_adiabatic(record_traj=False)
         return
 
-    def step(self, dt: float, temp: float = None, set_buffer: bool = False, profile: bool = False):
+    def step(self, dt: float, temp: float = None, set_buffer: bool = False, profile: bool = False, feedback: bool = True):
         """
         This function steps the system for a time step dt. Overrides the step function in the QubitUnitarySystem class.
         """
@@ -191,7 +189,7 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
         if profile:
             t0 = timer()
             th.cuda.synchronize()
-        self.step_particles(temp=temp)
+        self.step_particles(temp=temp, feedback=feedback)
         if profile:
             th.cuda.synchronize()
             t1 = timer()
