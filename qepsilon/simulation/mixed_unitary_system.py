@@ -83,6 +83,7 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
             raise ValueError(f"The number of couplings must be equal to the number of modes.")
         
         ## add classical oscillators as approximate bosonic modes
+        oscillator = Particles(nmodes, batchsize=self.nb, ndim=1, mass=masses, dt=self.cls_dt, tau=tau, unit=unit)
         self._oscillator_dict[id] = {
             'nmodes': nmodes,
             'freqs': freqs,
@@ -91,13 +92,13 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
             'coefs': couplings * freqs * th.sqrt(2 * masses * freqs),
             'binding_qubit':None,
             'binding_interaction':None,
-            'particles': Particles(nmodes, batchsize=self.nb, ndim=1, mass=masses, dt=self.cls_dt, tau=tau, unit=unit)
+            'particles': oscillator
         }
         if x0 is not None:
-            self._oscillator_dict[id]['particles'].set_positions(x0)
+            oscillator.set_positions(x0)
         if init_temp is not None:
             if type(init_temp) == float:
-                self._oscillator_dict[id]['particles'].set_gaussian_velocities(temp=init_temp)
+                oscillator.set_gaussian_velocities(temp=init_temp)
             else:
                 raise ValueError(f"The initial temperature must be a float.")
         logging.info(f"The oscillator with id {id} is added to the system. It has {nmodes} modes, with frequencies {freqs}, masses {masses}, and couplings {couplings}.")
@@ -131,7 +132,7 @@ class OscillatorQubitUnitarySystem(QubitUnitarySystem):
         oscillators['binding_qubit'] = qubit_idx
         oscillators['binding_interaction'] = epc_op
         logging.info(f"The oscillator with id {oscillators_id} is bound to site-{qubit_idx}.")
-        return
+        return epc_op
 
     ############################################################
     # Integration of the system
@@ -276,6 +277,7 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
             raise ValueError(f"The number of couplings must be equal to the number of modes.")
         
         ## add classical oscillators as approximate bosonic modes
+        oscillator = Particles(nmodes, batchsize=self.nb, ndim=1, mass=masses, dt=self.cls_dt, tau=tau, unit=unit)
         self._oscillator_dict[id] = {
             'nmodes': nmodes,
             'freqs': freqs,
@@ -284,18 +286,18 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
             'coefs': couplings * freqs * th.sqrt(2 * masses * freqs),
             'binding_site':None,
             'binding_interaction':None,
-            'particles': Particles(nmodes, batchsize=self.nb, ndim=1, mass=masses, dt=self.cls_dt, tau=tau, unit=unit)
+            'particles': oscillator
         }
         if x0 is not None:
-            self._oscillator_dict[id]['particles'].set_positions(x0)
+            oscillator.set_positions(x0)
         if init_temp is not None:
             if type(init_temp) == float:
-                self._oscillator_dict[id]['particles'].set_gaussian_velocities(temp=init_temp)
+                oscillator.set_gaussian_velocities(temp=init_temp)
             else:
                 raise ValueError(f"The initial temperature must be a float.")
         logging.info(f"The oscillator with id {id} is added to the system. It has {nmodes} modes, with frequencies {freqs}, masses {masses}, and couplings {couplings}.")
         logging.info(f"It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.")
-        return
+        return oscillator
 
     def bind_oscillators_to_tb(self, site_idx: int, oscillators_id: str, requires_grad: bool = False):
         """
@@ -324,13 +326,13 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
         oscillators['binding_site'] = site_idx
         oscillators['binding_interaction'] = epc_op
         logging.info(f"The oscillator with id {oscillators_id} is bound to site-{site_idx}.")
-        return
+        return epc_op
 
     ############################################################
     # Integration of the system
     ############################################################
 
-    def step_particles(self, temp: float = None):
+    def step_particles(self, temp: float = None, feedback: bool = True):
         """
         This function steps the thermal motino of the particles for a time step.
         There are two types of forces on the particles:
@@ -367,9 +369,11 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
             # ehrenfest_op_exp = th.abs(self.pse[:, site_idx])**2
             # ehrenfest_op_exp = ehrenfest_op_exp.to(device=particles.positions.device)
             #################### HACK end ####################
-            # ehrenfest_force = - oscillator['coefs'][None, :, None] * ehrenfest_op_exp[:, None, None]
-            ehrenfest_force = - oscillator['coefs'][None, :, None] * pse_site_prob[:, [site_idx], None]
-            particles.modify_forces(ehrenfest_force)
+            if feedback:
+                # ehrenfest_force = - oscillator['coefs'][None, :, None] * ehrenfest_op_exp[:, None, None]
+                epc_coef = oscillator['binding_interaction'].coef.detach().to(device=particles.positions.device)
+                ehrenfest_force = - epc_coef[None, :, None] * pse_site_prob[:, [site_idx], None]
+                particles.modify_forces(ehrenfest_force)
             ## step the particles
             if temp is not None:
                 particles.step_langevin(record_traj=False, temp=temp)
@@ -377,7 +381,7 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
                 particles.step_adiabatic(record_traj=False)
         return
 
-    def step(self, dt: float, temp: float = None, set_buffer: bool = False, profile: bool = False):
+    def step(self, dt: float, temp: float = None, set_buffer: bool = False, profile: bool = False, feedback: bool = True):
         """
         This function steps the system for a time step dt. Overrides the step function in the TightBindingUnitarySystem class.
         """
@@ -386,7 +390,7 @@ class OscillatorTightBindingUnitarySystem(TightBindingUnitarySystem):
         if profile:
             t0 = timer()
             th.cuda.synchronize()
-        self.step_particles(temp=temp)
+        self.step_particles(temp=temp, feedback=feedback)
         if profile:
             th.cuda.synchronize()
             t1 = timer()
