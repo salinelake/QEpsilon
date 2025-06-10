@@ -83,6 +83,87 @@ class StaticTightBindingOperatorGroup(TightBindingOperatorGroup):
         ops = self.sum_operators() 
         return ops, th.ones(self.nb, dtype=ops.dtype, device=ops.device) * self.coef
 
+
+###########################################################################
+# Operators groups involving simple stochastic processes. 
+###########################################################################
+
+class PeriodicNoiseTightBindingOperatorGroup(TightBindingOperatorGroup):
+    """
+    This class deals with a group of operators (composite Tight Binding operators on n-site systems) and a periodic noise. 
+    """
+    def __init__(self, n_sites: int, id: str, batchsize: int = 1, tau: float = 1, amp: float = 1, requires_grad: bool = False):
+        """
+        Args:
+            tau: float, the period of the noise.
+            amp: float, the amplitude of the noise.
+        """
+        super().__init__(n_sites, id, batchsize)
+        # self.register_buffer("tau", th.tensor(tau, dtype=th.float))
+        self.register_buffer("phase", th.rand(self.nb) * 2 * np.pi )
+        # self.phase = th.rand(self.nb) * 2 * np.pi
+        self.time = 0
+        if amp<0:
+            raise ValueError("amp must be non-negative")
+        logamp = th.log(th.tensor(amp, dtype=th.float))
+        if requires_grad:
+            self.register_parameter("logamp", th.nn.Parameter(logamp))
+            self.register_parameter("logtau", th.nn.Parameter(th.log(th.tensor(tau, dtype=th.float))))
+        else:
+            self.register_buffer("logamp", logamp)
+            self.register_buffer("logtau", th.log(th.tensor(tau, dtype=th.float)))
+    @property
+    def amp(self):
+        return th.exp(self.logamp)
+    @property
+    def tau(self):
+        return th.exp(self.logtau)
+    
+    def reset(self):
+        self.phase = th.rand(self.nb, device=self.phase.device) * 2 * np.pi 
+        self.time = 0
+    
+    def _sample(self, dt: float):
+        """
+        This function steps the periodic noise for a time step dt, then return the total operator.
+        """
+        self.time += dt
+        # self.phase += 2 * np.pi * dt / self.tau
+        phase = self.phase + 2 * np.pi * self.time / self.tau
+        noise = self.amp * th.sin(phase)
+        return self.sum_operators(), noise
+
+class WhiteNoiseTightBindingOperatorGroup(TightBindingOperatorGroup):
+    """
+    This class deals with a group of operators (composite Tight Binding operators on n-site systems) and a white noise coefficient. 
+    """
+    def __init__(self, n_sites: int, id: str, batchsize: int = 1, amp: float = 1, requires_grad: bool = False):
+        super().__init__(n_sites, id, batchsize)
+        if amp<0:
+            raise ValueError("amp must be non-negative")
+        logamp = th.log(th.tensor(amp, dtype=th.float))
+        if requires_grad:
+            self.register_parameter("logamp", th.nn.Parameter(logamp))
+        else:
+            self.register_buffer("logamp", logamp)
+    @property
+    def amp(self):
+        return th.exp(self.logamp)
+
+    def _sample(self, dt: float):
+        """
+        This function sample the average of the total operator for a time step dt. 
+        Note that the accumulation of the white noise is a Wiener process. dW ~ N(0, sqrt(dt)). 
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
+        """
+        noise = np.random.normal(0, 1, self.nb) 
+        noise = th.tensor(noise, dtype=self.logamp.dtype, device=self.logamp.device) * self.amp / np.sqrt(dt)
+        return self.sum_operators(), noise
+
 ###########################################################################
 # Operators groups involving motion of classical particles.
 ###########################################################################

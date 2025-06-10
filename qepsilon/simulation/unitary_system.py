@@ -38,6 +38,8 @@ class UnitarySystem(th.nn.Module):
         self._evo = th.eye(self.ns, dtype=th.cfloat, device=self.pse.device).unsqueeze(0).repeat(self.nb, 1, 1)
 
     def accumulate_evo(self, evo: th.Tensor):
+        if self._evo is None:
+            self._evo = th.eye(self.ns, dtype=th.cfloat, device=evo.device).unsqueeze(0).repeat(self.nb, 1, 1)
         self._evo =  th.matmul(evo, self._evo)
 
     @property
@@ -158,23 +160,23 @@ class UnitarySystem(th.nn.Module):
             self._ham = hamiltonian
         return hamiltonian
 
-    def step_pse(self, dt: float, hamiltonian: th.Tensor, set_buffer=False):
+    def step_pse(self, dt: float, hamiltonian: th.Tensor, set_buffer=False, set_buffer_evo=False):
         """
         This function steps the pure state ensemble for a time step dt.
         """
         identity = th.eye(self.ns, dtype=th.cfloat).to(hamiltonian.device).unsqueeze(0).repeat(self.nb, 1, 1)
         evolution_matrix = identity - 1j * dt * hamiltonian
         ## sparsify tensors if the dimension of the matrix is larger than 2000
-        if self.ns > 2000:
+        if self.ns > 10000:
             evolution_matrix = evolution_matrix.to_sparse()
-        if set_buffer:
+        if set_buffer_evo:
             self.accumulate_evo(evolution_matrix)
         pse_new = apply_to_pse(self.pse, evolution_matrix)
         if pse_new.is_sparse:
             pse_new = pse_new.to_dense()
         return pse_new
 
-    def step(self, dt: float, set_buffer: bool = False, time_independent: bool = False, profile: bool = False):
+    def step(self, dt: float, set_buffer: bool = False, time_independent: bool = False, set_buffer_evo: bool = False, profile: bool = False):
         """
         This function steps the system for a time step dt.
         """
@@ -198,7 +200,7 @@ class UnitarySystem(th.nn.Module):
             th.cuda.synchronize()
             t1 = timer()
             logging.info(f"The time taken for stepping the Hamiltonian is {t1 - t0}s.")
-        self.pse = self.step_pse(dt, hamiltonian, set_buffer)
+        self.pse = self.step_pse(dt, hamiltonian, set_buffer, set_buffer_evo)
         if profile:
             th.cuda.synchronize()
             t2 = timer()

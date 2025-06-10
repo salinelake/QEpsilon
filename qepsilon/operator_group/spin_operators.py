@@ -152,13 +152,18 @@ class PeriodicNoisePauliOperatorGroup(PauliOperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a periodic noise. 
     """
-    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, tau: float = 1, amp: float = 1, requires_grad: bool = False):
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, tau: float = 1, amp: float = 1, requires_grad: bool = False, requires_grad_tau_only: bool = False, requires_grad_amp_only: bool = False):
         """
         Args:
             tau: float, the period of the noise.
             amp: float, the amplitude of the noise.
         """
         super().__init__(n_qubits, id, batchsize)
+        if requires_grad_tau_only and requires_grad_amp_only:
+            raise ValueError("requires_grad_tau_only and requires_grad_amp_only cannot be both True")
+        if requires_grad_tau_only or requires_grad_amp_only:
+            if requires_grad is False:
+                raise ValueError("requires_grad must be True if requires_grad_tau_only or requires_grad_amp_only is True")
         # self.register_buffer("tau", th.tensor(tau, dtype=th.float))
         self.register_buffer("phase", th.rand(self.nb) * 2 * np.pi )
         # self.phase = th.rand(self.nb) * 2 * np.pi
@@ -166,12 +171,20 @@ class PeriodicNoisePauliOperatorGroup(PauliOperatorGroup):
         if amp<0:
             raise ValueError("amp must be non-negative")
         logamp = th.log(th.tensor(amp, dtype=th.float))
+        logtau = th.log(th.tensor(tau, dtype=th.float))
         if requires_grad:
-            self.register_parameter("logamp", th.nn.Parameter(logamp))
-            self.register_parameter("logtau", th.nn.Parameter(th.log(th.tensor(tau, dtype=th.float))))
+            if (requires_grad_tau_only is False) and (requires_grad_amp_only is False):
+                self.register_parameter("logamp", th.nn.Parameter(logamp))
+                self.register_parameter("logtau", th.nn.Parameter(logtau))
+            elif requires_grad_tau_only:
+                self.register_parameter("logtau", th.nn.Parameter(logtau))
+                self.register_buffer("logamp", logamp)
+            elif requires_grad_amp_only:
+                self.register_parameter("logamp", th.nn.Parameter(logamp))
+                self.register_buffer("logtau", logtau)
         else:
             self.register_buffer("logamp", logamp)
-            self.register_buffer("logtau", th.log(th.tensor(tau, dtype=th.float)))
+            self.register_buffer("logtau", logtau)
     @property
     def amp(self):
         return th.exp(self.logamp)
