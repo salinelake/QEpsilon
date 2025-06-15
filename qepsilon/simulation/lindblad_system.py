@@ -279,7 +279,7 @@ class LindbladSystem(th.nn.Module):
             ham_eff = ham_eff.to_sparse()
             # rho = rho.to_sparse()
             jump_operators = [jump_operator.to_sparse() for jump_operator in jump_operators]
-        ## first part: (1-i*dt*H_eff)rho(1+i*dt*H_eff)
+        ## first part: (1-i*dt*H_eff)rho(1+i*dt*H_eff)        
         rho_new = ABAd(identity - 1j * dt * ham_eff, rho)
         if profile:
             th.cuda.synchronize()

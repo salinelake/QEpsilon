@@ -394,6 +394,7 @@ class DipolarInteraction(PauliOperatorGroup):
         self.pair_list = th.nonzero(self.connectivity)
         self.npair = self.pair_list.shape[0]
         ## add XX+YY operator for each connected pair
+        pair_interaction_list = []
         for pair in self.pair_list:
             pauli_seq = ["I"]*self.nq
             pauli_seq[pair[0]] = "X"
@@ -405,10 +406,11 @@ class DipolarInteraction(PauliOperatorGroup):
             pauli_seq[pair[1]] = "Y"
             pauli_seq = "".join(pauli_seq)
             op += self.pauli.get_composite_ops(pauli_seq)
-            self._ops.append(op)
+            pair_interaction_list.append(op)
+        self.register_buffer("pair_interactions", th.stack(pair_interaction_list))
 
     def add_operator(self, prefactor: float = 1):
-        raise ValueError("DipolarInteraction does not support adding operators")
+        raise ValueError("DipolarInteraction does not support custom operators. The operators are sum_ij (X_iX_j+Y_iY_j) for each connected pair.")
 
     def sum_operators(self):
         raise ValueError("DipolarInteraction does not support summing operators")
@@ -420,11 +422,17 @@ class DipolarInteraction(PauliOperatorGroup):
             coef: th.Tensor, the dipole-dipole interaction coefficients of shape (nb, npair).
         """
         particles = self.particles
-        nsteps = self.average_nsteps
         nb = particles.nb
         nq = particles.nq
         axis = self.qaxis / th.norm(self.qaxis)
-        pos = th.stack(particles.traj[-nsteps:])  # shape: (nsteps, nb, nq, 3)
+        if len(particles.traj) == 0:
+            ## if the particles have no trajectory, use the current positions
+            nsteps = 1
+            pos = particles.get_positions()
+        else:
+            ## if the particles have a trajectory, use the last nsteps positions
+            nsteps = self.average_nsteps
+            pos = th.stack(particles.traj[-nsteps:])  # shape: (nsteps, nb, nq, 3)
         distance = pos.reshape(nsteps, nb, nq, 1, 3) - pos.reshape(nsteps, nb, 1, nq, 3)
         separation = th.norm(distance, dim=-1)
         axis = axis.to(device=separation.device)
@@ -437,6 +445,7 @@ class DipolarInteraction(PauliOperatorGroup):
         coef = (1 - 3 * cos_theta**2) / separation**3  # shape: (nsteps, nb, nq, nq)
         coef_select = coef[self.connectivity.repeat(nsteps,nb,1,1)].reshape(nsteps, nb, self.npair)
         coef_avg = th.mean(coef_select, dim=0)
+        coef_avg = coef_avg.to(device=self.prefactor.device)
         return self.prefactor * coef_avg
 
     def _sample(self, dt = None):   
@@ -450,9 +459,10 @@ class DipolarInteraction(PauliOperatorGroup):
         """
         total_ops = 0
         coef = self.get_dipole_dipole_coef()
-        for idx, op in enumerate(self._ops):
-            total_ops += op[None,:,:] * coef[:,idx, None,None]
-        return total_ops, th.ones_like(coef[:,0])
+        # for idx, op in enumerate(self._ops):
+        #     total_ops += op[None,:,:] * coef[:,idx, None,None]
+        total_ops = (self.pair_interactions[None,:,:,:] * coef[:,:,None,None]).sum(dim=1)   # pair interaction (npair, ns, ns) , coef (nb, npair)
+        return total_ops, th.ones_like(coef[:,0], device=total_ops.device)
 
 class spin_oscillators_interaction(PauliOperatorGroup):
     """
@@ -537,7 +547,7 @@ class DepolarizationChannel(PauliOperatorGroup):
     def sum_operators(self):
         raise ValueError("DepolarizationChannel does not support summing operators")
 
-    def _sample(self):
+    def _sample(self, dt=None):
         """
         This function sample the Kraus operators of the depolarizing channel.
         """
@@ -545,6 +555,6 @@ class DepolarizationChannel(PauliOperatorGroup):
                th.sqrt(self.p / 3) * self.pauli.X, 
                th.sqrt(self.p / 3) * self.pauli.Y, 
                th.sqrt(self.p / 3) * self.pauli.Z]
-        return ops
+        return ops, th.ones(4, device=self.pauli.I.device)
 
 

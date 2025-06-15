@@ -220,14 +220,14 @@ class Particles(th.nn.Module):
     ###########################################################################
     # Methods for simulating dynamics
     ###########################################################################    
-    def get_noise(self, temp: float = None):
+    def get_noise(self, temp = None):
         noise = th.randn_like(self.positions)
         _temp = th.ones(self.ndim, dtype=self.positions.dtype, device=self.positions.device) * temp
         noise *= th.sqrt(self.unit.kb * _temp)[None,None,:]
         noise *= th.sqrt(1 / self.masses[None,:,None])
         return noise
 
-    def step_langevin(self, record_traj=False, temp: float = None):
+    def step_langevin(self, record_traj=False, temp = None):
         """
         Isothermal Langevin dynamics. Update the positions and velocities by one time step with mid-point Langevin method.
         """
@@ -370,7 +370,9 @@ class ParticlesInTweezers(Particles):
     ###########################################################################
     # Methods for simulating dynamics
     ###########################################################################    
-    def get_noise(self):
+    def get_noise(self, temp=None):
+        if temp is not None:
+            raise ValueError("get_noise in ParticlesInTweezers does not support custom temperature. The temperature is set by the radial and axial temperatures.")
         noise = th.randn_like(self.positions)
         temp = th.tensor([self.radial_temp, self.radial_temp, self.axial_temp], dtype=self.positions.dtype, device=self.positions.device)
         noise *= th.sqrt(self.unit.kb * temp)[None,None,:]

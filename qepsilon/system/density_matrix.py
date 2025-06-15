@@ -156,6 +156,7 @@ class QubitDensityMatrix(DensityMatrix):
         ## apply the rotation
         theta = th.tensor(theta).to(u.device)
         M = self.pauli.SU2_rotation(u, theta)
+        M = M.to(device=rho.device)
         one_body_ops = [M if config[i] else self.pauli.I for i in range(self.nq)]
         ops = compose(one_body_ops).unsqueeze(0)
         rho_new = ABAd(A=ops, B=rho)
