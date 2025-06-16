@@ -1,5 +1,4 @@
 import warnings
-import logging
 import numpy as np
 import torch as th
 from qepsilon.utilities import XY8
@@ -59,18 +58,12 @@ def RamseyScan_XY8_TwoQubits(system, dt: float, T: float, cycle_time: float, obs
             ## check if any particle is lost
             tweezers_center = [x.center for x in system.particles._traps_dict.values()]
             pos = system.particles.get_positions()
-            d0 = pos[:,0,0] - tweezers_center[0][0]
-            d1 = pos[:,1,0] - tweezers_center[1][0]
+            d0 =  pos[:,0,0] - tweezers_center[0][0] 
+            d1 =  pos[:,1,0] - tweezers_center[1][0] 
             alive_flag = alive_flag & (th.abs(d0) < loss_radius) & (th.abs(d1) < loss_radius)
             alive_flag = alive_flag & th.isfinite(prob_00.to(device=alive_flag.device))
             n_dead = system.nb - alive_flag.sum()
             loss_list.append(n_dead/system.nb)
-            # logging.info(f"At time {i*dt/1000}ms. the total number of lost system is {n_dead}, the number of NaN density matrix is {system.nb - th.isfinite(prob_00).sum()}")
             P00_list.append((prob_00[alive_flag]).sum() / system.nb)
-            # logging.info(f"The probability of |00> is {P00_list[-1]}")
             print("observe t={}ms, wall_time={:.2f}s, P00={}, molecular loss={}%".format(i*dt/1000, time()-t0, P00_list[-1], loss_list[-1]*100))
-            # dm_two_terms = system.rho[:, 1, 2] + system.rho[:, 2, 1]
-            # logging.info(f"The coherance of the density matrix is {dm_two_terms}")
-            # logging.info("Probability of |00> is {}".format(prob_00.numpy()))
-            # logging.info("density matrix is {}".format(system.rho.numpy()))
     return th.stack(P00_list), th.stack(loss_list)
