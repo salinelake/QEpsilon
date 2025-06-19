@@ -1,5 +1,3 @@
-import logging
-import time
 import numpy as np
 import torch as th
 from matplotlib import pyplot as plt
@@ -10,68 +8,55 @@ from qepsilon.operator_group.tb_operators import PeriodicNoiseTightBindingOperat
 from qepsilon.utilities import Constants_Metal as Constants
 import os
 import argparse
+
 dev = 'cuda' if th.cuda.is_available() else 'cpu'
 th.set_printoptions(sci_mode=False, precision=5)
 np.set_printoptions(suppress=True, precision=5)
 
-## parse arguments
+##
 parser = argparse.ArgumentParser()
-parser.add_argument('--nsites', type=int, default=40)
-parser.add_argument('--temperature', type=float, default=300.0)
-parser.add_argument('--hopping_in_meV', type=float, default=83.0)
-parser.add_argument('--dt', type=float, default=0.01, help='time step in fs')
+parser.add_argument('--nsites', type=int, default=40, help='number of sites')
+parser.add_argument('--temperature', type=float, default=300, help='temperature in K')
+parser.add_argument('--timestep_in_fs', type=float, default=0.02, help='time step in fs')
 parser.add_argument('--batchsize', type=int, default=512, help='batch size')
-parser.add_argument('--sim_time', type=float, default=100)
+parser.add_argument('--sample_time', type=float, default=100, help='sampling time in fs')
 args = parser.parse_args()
+
+"""
+Preprocessing
+"""
+## parse arguments
+nsites= args.nsites
 temperature = args.temperature
-hopping_in_meV = args.hopping_in_meV
+hopping_in_meV = 83  # in meV
+timestep_in_fs = args.timestep_in_fs   # in fs
+batchsize = args.batchsize
+sim_time = args.sample_time   # in fs
 
 ## make output folder
-out_folder = 'T{:.0f}_V{:.1f}meV_ns{}'.format(temperature, hopping_in_meV, args.nsites)
+out_folder = 'T{:.0f}_ns{}'.format(temperature, nsites)
 os.makedirs(out_folder, exist_ok=True)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename='{}/log.txt'.format(out_folder), filemode='w')
 
+## load DIQCD model parameters
+data_folder = '../01.train_DIQCD/T{:.0f}_dt{:.3f}fs'.format(temperature, 0.05)
+tau_list = np.loadtxt(os.path.join(data_folder, 'tau_list.txt'))[-1] 
+amp_list = np.loadtxt(os.path.join(data_folder, 'amp_list.txt'))[-1] 
+dephasing = np.loadtxt(os.path.join(data_folder, 'dephasing_list.txt'))[-1] 
 
-## load system parameters
-data_folder = '../train_lindblad/T{:.0f}_epsilon0.1_dt{:.3f}fs'.format(temperature, 0.05)
-with open('{}/train.log'.format(data_folder), 'r') as f:
-    lines = f.readlines()
-    for idx, line in enumerate(lines):
-        if "Epoch=199" in line:
-            start_idx = idx + 1
-            break
-    end_idx = start_idx + 11
-    data_lines = lines[start_idx:end_idx]
-    
-    # Extract tau and amp from first 9 lines
-    tau_list = []
-    amp_list = []
-    for i in range(9):
-        line = data_lines[i]
-        tau = float(line.split('tau=')[1].split('fs')[0])
-        amp = float(line.split('amp=')[1].strip())
-        tau_list.append(tau)
-        amp_list.append(amp)
-    
-    # Extract coef and dephasing from last 2 lines
-    onsite_coef = float(data_lines[-2].split('coef=')[1].strip())
-    dephasing = float(data_lines[-1].split('dephasing=')[1].strip())
-
-################################################
-#  Parameters 
-################################################
-## hamiltonian parameters 
-ns = args.nsites
-nmodes = 9
+print('mode period:', tau_list)
+print('mode amplitude:', amp_list)
+                       
+## process system parameters
+ns = nsites
+nmodes = tau_list.shape[0]
 hopping_coef = hopping_in_meV * Constants.meV
-batchsize = args.batchsize
-total_t = args.sim_time * Constants.fs
-dt = args.dt * Constants.fs
+total_t = sim_time * Constants.fs
+dt = timestep_in_fs * Constants.fs
 nsteps =  int(total_t / dt)
 
-################################################
-# define the simulation (Hamiltonian, classical oscillators, coupling)
-################################################
+"""
+Define the system
+"""
 simulation = LindbladSystem(num_states=ns, batchsize=batchsize)
 
 ## set initial state
@@ -97,8 +82,8 @@ simulation.add_operator_group_to_hamiltonian(op_hop)
 ## add classical harmonic oscillators
 for isite in range(ns):
     for imode in range(nmodes):
-        opg_epc = PeriodicNoiseTightBindingOperatorGroup(n_sites=ns, id=f"site-{isite}_mode-{imode}_epc", batchsize=batchsize, 
-            tau=tau_list[imode], amp=amp_list[imode], requires_grad=False)
+        opg_epc = PeriodicNoiseTightBindingOperatorGroup(
+            n_sites=ns, id=f"site-{isite}_mode-{imode}_epc", batchsize=batchsize,tau=tau_list[imode], amp=amp_list[imode], requires_grad=False)
         epc_seq = ['X'] * ns 
         epc_seq[isite] = 'N'
         opg_epc.add_operator("".join(epc_seq))
@@ -115,15 +100,15 @@ for isite in range(ns):
 ## move to GPU if dev='cuda'
 simulation.to(dev)
 
-################################################
-# Simulation
-################################################
+"""
+Simulate DIQCD
+"""
 t_traj = []
 site_occupation_traj = []
 MSD_traj = []
 for step in range(nsteps):
-    if step % int(Constants.fs / dt) == 0:
-        print('========Equilibration: step-{}, t={}fs========'.format(step, step * dt/Constants.fs))
+    if step % int(1 / timestep_in_fs) == 0:
+        print('======== Step-{}, t={:.0f}fs========'.format(step, step * dt/Constants.fs))
         t_traj.append(step * dt/Constants.fs)
         simulation.normalize()
         density_matrix = simulation.rho
@@ -143,14 +128,15 @@ for step in range(nsteps):
 
     simulation.step(dt, profile=False)
 
-
-################################################
-# Post-processing
-################################################
+"""
+Postprocess
+"""
 nsample = len(t_traj)
+
 ## process the site occupation trajectories
 site_occupation_traj = th.stack(site_occupation_traj, dim=0).cpu().numpy()  # (nsample, batchsize, ns)
 assert site_occupation_traj.shape[1:] == (batchsize, ns)
+
 ## process the MSD trajectory
 MSD_traj = th.stack(MSD_traj, dim=0).cpu().numpy()  # (nsample, batchsize)
 assert MSD_traj.shape == (nsample, batchsize)
@@ -160,19 +146,17 @@ np.save('{}/MSD_traj.npy'.format(out_folder), MSD_traj)
 ## plot site_occupation_traj
 fig, ax = plt.subplots(1, 2, figsize=(8, 3))
 ## plot the site occupation as heatmap
-# ax[0].imshow(site_occupation_traj[:,0,:], aspect='auto', cmap='viridis', origin='lower', extent=[0, ns, 0, t_traj[-1]])
 ax[0].imshow(-np.log(site_occupation_traj.mean(1)+1e-10), aspect='auto', cmap='viridis', origin='lower', extent=[0, ns, 0, t_traj[-1]], vmin=0, vmax=4)
-
 ax[0].set_title('site occupation')
 ax[0].set_xlabel('site')
 ax[0].set_ylabel('time [fs]')
-## plot others
+## plot mean squared displacement
 ax[1].plot(t_traj, MSD_traj.mean(-1), '--')
-ax[1].set_title(r'$Mean Square Displacement$')
+ax[1].fill_between(t_traj, MSD_traj.mean(-1)+MSD_traj.std(-1) ,MSD_traj.mean(-1)-MSD_traj.std(-1) , alpha=0.5)
+ax[1].set_title('Mean Square Displacement$')
 ax[1].set_xlabel('time [fs]')
 ax[1].set_ylabel(r'$MSD(t)$')
 plt.tight_layout()
-plt.savefig('{}/results.png'.format(out_folder), dpi=200)
+plt.savefig(os.path.join(out_folder,'results.png'), dpi=200)
+plt.show()
 plt.close()
-
- 
