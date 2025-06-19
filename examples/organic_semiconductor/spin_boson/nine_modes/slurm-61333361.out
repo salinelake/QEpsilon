@@ -1,4 +1,0 @@
-  File "/scratch/gpfs/pinchenx/QEpsilon/examples/spin_boson/nine_modes/run_multi_mode.py", line 200
-    np.save('sx_tau{:.2f}ps_{:d}modes_dt{:.0f}as.npy'.format(tau_in_ps, num_modes, dt/Constants.as), sx_list)
-                                                                                                ^^
-SyntaxError: invalid syntax
