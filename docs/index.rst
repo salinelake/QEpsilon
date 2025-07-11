@@ -11,6 +11,7 @@ QEpsilon is a Python package for modeling open quantum systems. QEpsilon is desi
 
    installation
    quickstart
+   architecture
    api/index
    examples/index
    theory
