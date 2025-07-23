@@ -27,7 +27,7 @@ Unitary System
 Mixed Unitary System
 --------------------
 
-.. autoclass:: qepsilon.simulation.MixedUnitarySystem
+.. autoclass:: qepsilon.simulation.OscillatorQubitUnitarySystem
    :members:
    :undoc-members:
    :show-inheritance: 

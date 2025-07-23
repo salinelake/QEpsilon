@@ -8,12 +8,9 @@ This section contains detailed examples demonstrating various features of QEpsil
    :caption: Examples:
 
    basic_usage
-   quantum_systems
-   open_systems
-   advanced_features
 
 Available Example Categories
----------------------------
+----------------------------
 
 QEpsilon comes with several categories of examples:
 
@@ -30,7 +27,7 @@ QEpsilon comes with several categories of examples:
    More complex examples showcasing advanced capabilities like GPU acceleration and large system simulations.
 
 Running the Examples
--------------------
+--------------------
 
 All examples can be found in the ``examples/`` directory of the QEpsilon repository. Each example includes:
 

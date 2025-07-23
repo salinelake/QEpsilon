@@ -26,13 +26,7 @@ The recommended way to install QEpsilon is from source:
    .. code-block:: bash
 
       pip install -e .
-
-3. (Optional) Install additional dependencies for development:
-
-   .. code-block:: bash
-
-      pip install sphinx sphinx-rtd-theme myst-parser nbsphinx
-
+ 
 Verifying Installation
 ---------------------
 
@@ -42,28 +36,17 @@ To verify that QEpsilon is installed correctly, you can run:
 
    import qepsilon
    print("QEpsilon installed successfully!")
-
-Development Installation
------------------------
-
-If you plan to contribute to QEpsilon, install the development dependencies:
-
-.. code-block:: bash
-
-   pip install -e .[dev]
-
-This will install additional tools for testing and documentation generation.
-
+ 
 GPU Support
 -----------
 
 QEpsilon leverages PyTorch for GPU acceleration. To use GPU features:
 
 1. Ensure you have a CUDA-compatible GPU
-2. Install PyTorch with CUDA support:
+2. Install PyTorch with CUDA support before you install QEpsilon. For example, if your GPU supports CUDA 12.8, you can run:
 
    .. code-block:: bash
 
-      pip install torch --index-url https://download.pytorch.org/whl/cu118
+      pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 
 For more information on PyTorch installation with CUDA, see the `PyTorch installation guide <https://pytorch.org/get-started/locally/>`_. 

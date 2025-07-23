@@ -19,7 +19,7 @@ Density Matrix
 Pure Ensemble
 -------------
 
-.. autoclass:: qepsilon.system.PureEnsemble
+.. autoclass:: qepsilon.system.PureStatesEnsemble
    :members:
    :undoc-members:
    :show-inheritance:

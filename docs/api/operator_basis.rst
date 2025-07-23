@@ -1,5 +1,5 @@
 Operator Basis Module
-====================
+=====================
 
 The operator_basis module provides fundamental operator definitions for different quantum systems.
 
@@ -11,7 +11,7 @@ The operator_basis module provides fundamental operator definitions for differen
 Two-Level System (TLS)
 ----------------------
 
-.. autoclass:: qepsilon.operator_basis.TLS
+.. autoclass:: qepsilon.operator_basis.Pauli
    :members:
    :undoc-members:
    :show-inheritance:
