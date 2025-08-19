@@ -12,7 +12,8 @@ QEpsilon is a Python package for modeling open quantum systems. QEpsilon is desi
    installation
    tutorial
    api/index
-   examples/index
+   examples/molecular_qubits
+   examples/quantum_transport
 
 Highlighted Features
 --------------------
