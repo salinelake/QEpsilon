@@ -13,17 +13,17 @@ import warnings
 from time import time as timer
 
 class LindbladSystem(th.nn.Module):
-    """
+    r"""
     This class represents a generic open quantum system.
     The states are represented by a density matrix. 
     The evolution of the system is governed by the Lindblad equation, which is a generalization of the Schrodinger equation for open quantum systems.
     Both the Hamiltonian and the jump operators here allows fluctuating coefficients. So technically, we are dealing with a stochastic master equation. 
     
     The Lindblad equation is given as
-    $d\rho(t) / dt = -i [H(t), \rho(t)] + \sum_k \gamma_k L_k(t) \rho(t) L_k(t)^\dagger - 1/2 \{L_k(t)^\dagger L_k(t), \rho(t)\}$
-    where H(t) is the Hamiltonian, L_k(t) is the jump operator. Note that the coefficients of the jump operators are absorbed into L_k(t).
+    :math:`d\rho(t) / dt = -i [H(t), \rho(t)] + \sum_k \gamma_k L_k(t) \rho(t) L_k(t)^\dagger - 1/2 \{L_k(t)^\dagger L_k(t), \rho(t)\}`
+    where :math:`H(t)` is the Hamiltonian, :math:`L_k(t)` is the jump operator. Note that the coefficients of the jump operators are absorbed into :math:`L_k(t)`.
 
-    In this class, each component of the Hamiltonian $H(t)$, and each jump operator $L_k(t)$, is represented by a OperatorGroup object. 
+    In this class, each component of the Hamiltonian :math:`H(t)`, and each jump operator :math:`L_k(t)`, is represented by a OperatorGroup object. 
     Each OperatorGroup object contains a group of operators and the corresponding coefficients. 
     The operators themselves are time-independent, like a Pauli operator. But the coefficients can be time-dependent stochastic processes. 
     This corresponds to the case where the qubits are coupled to noisy environments such as inhomogeneous, fluctuating magnetic fields. 

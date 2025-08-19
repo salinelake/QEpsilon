@@ -223,11 +223,35 @@ It updates the positions and velocities of the particles by one time step with l
 How to simulate a physical system? (the real deal)
 --------------------------------------------------
 
-The 
-Eventually, we would like to simulate the dynamics of the states of a physical system. 
-The dynamics are governed by a set of equation of motion, which is a master equation for open quantum systems, 
-a Schrödinger equation for closed quantum systems, or a classical molecular dynamics for classical particles.
+A physical system is described by its quantum/classical state, its Hamiltonian, and an equation of motion governing the dynamics of the state.
 
+We have learned how to define a quantum/classical state, and how to define operators in the previous section.
+
+Here, we will learn how to assemble these components into a physical system, and how to simulate the dynamics of the system with chosen equation of motions.
+
+In QEpsilon, we can simulate two types of physical systems:
+
+(1) An open quantum system. 
+The system state is described by a density matrix, and the equation of motion is a Lindblad equation with time-independent or time-dependent Hamiltonian.
+The coefficient of the time-dependent terms in the Hamiltonian is decided by classical processes. The classical processes can be related to a classical particle system.
+
+(2) A closed quantum system. 
+The system state is described by a pure state, and the equation of motion is a Schrodinger equation with time-independent or time-dependent Hamiltonian.
+The coefficient of the time-dependent terms in the Hamiltonian is decided by classical processes. The classical processes can be related to a classical particle system.
+
+The simulation of these systems are implemented in the `simulation` module.
+
+** Lindblad-based simulation**
+
+
+** Schrodinger-based simulation**
+
+
+
+
+
+
+ 
 
 
 

@@ -7,10 +7,10 @@ This section contains the complete API reference for QEpsilon.
    :maxdepth: 2
    :caption: API Documentation:
 
-   system
-   simulation
    operator_basis
    operator_group
+   system
+   simulation
    utilities
 
 Overview
@@ -18,10 +18,10 @@ Overview
 
 QEpsilon's API is organized into several modules:
 
+* :doc:`operator_basis` - Basic operator definitions (two level systems, bosons, tight-binding)
+* :doc:`operator_group` - Collections of operators (spins, fermions, bosons)
 * :doc:`system` - Physical quantum systems (density matrices, pure states, particles)
 * :doc:`simulation` - Time evolution engines (Lindblad, unitary, mixed systems)
-* :doc:`operator_basis` - Basic operator definitions (TLS, bosons, tight-binding)
-* :doc:`operator_group` - Collections of operators (spins, fermions, bosons)
 * :doc:`utilities` - Helper functions and utilities
 
 Quick Access

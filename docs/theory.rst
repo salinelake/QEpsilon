@@ -29,44 +29,29 @@ Where:
 
 The first term describes unitary evolution, while the second term represents dissipative dynamics.
 
-Unitary Evolution
------------------
-
-For closed quantum systems, the master equation reduces to the von Neumann equation:
-
-.. math::
-
-   \frac{d\rho}{dt} = -i[H(t), \rho]
-
-With solution:
-
-.. math::
-
-   \rho(t) = U(t) \rho(0) U^\dagger(t)
-
-Where :math:`U(t)` is the time evolution operator satisfying:
-
-.. math::
-
-   i\hbar \frac{dU}{dt} = H(t) U(t)
-
-Time-Dependent Hamiltonians
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For time-dependent Hamiltonians, the evolution operator is:
-
-.. math::
-
-   U(t) = \mathcal{T} \exp\left(-\frac{i}{\hbar} \int_0^t H(t') dt' \right)
-
-Where :math:`\mathcal{T}` is the time-ordering operator.
-
-Numerical Implementation
-------------------------
  
 Integration Methods
 ~~~~~~~~~~~~~~~~~~~
 
  
+
+The Schrodinger Equation
+----------------------------
  
  
+
+Integration Methods
+~~~~~~~~~~~~~~~~~~~
+
+
+
+Classical Molecular Dynamics
+----------------------------
+
+
+Integration Methods
+~~~~~~~~~~~~~~~~~~~
+
+
+
+

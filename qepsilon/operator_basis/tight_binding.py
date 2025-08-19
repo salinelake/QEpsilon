@@ -25,24 +25,32 @@ class TightBinding(th.nn.Module):
         self.register_buffer("N", None)
 
     def get_composite_ops(self, name_sequence: str):
-        """
+        r"""
         Returns a composite tight binding operator as a matrix.
 
         Args:
             name_sequence (str): A string of tight binding operator names, one per site.
                 Allowed characters are:
-                    - "X": identity operator on the site
-                    - "L": hopping to the left (from site i to site i-1)
-                    - "R": hopping to the right (from site i to site i+1)
-                    - "N": number operator on the site
+
+                - "X": identity operator on the site
+                
+                - "L": hopping to the left (from site i to site i-1)
+                
+                - "R": hopping to the right (from site i to site i+1)
+                
+                - "N": number operator on the site
 
                 The string must have length equal to the number of sites, and contain at most one non-"X" character.
 
                 Examples:
-                    (1) "XXLXX": |2⟩⟨3|, the particle on the third site hops to the left.
-                    (2) "XXRXX": |4⟩⟨3|, the particle on the third site hops to the right.
-                    (3) "XXNXX": |3⟩⟨3|, number operator for the third site.
-                    (4) "XXXXX": Identity operator for all sites (sum of projectors onto each site).
+                
+                (1) "XXLXX": :math:`| 2\rangle\langle 3 |`, the particle on the third site hops to the left.
+                
+                (2) "XXRXX": :math:`| 4\rangle\langle 3 |`, the particle on the third site hops to the right.
+                
+                (3) "XXNXX": :math:`| 3\rangle\langle 3 |`, number operator for the third site.
+                
+                (4) "XXXXX": Identity operator for all sites (sum of projectors onto each site).
 
         Returns:
             torch.Tensor: The operator matrix of shape (n_sites, n_sites).
