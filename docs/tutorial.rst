@@ -396,8 +396,6 @@ For large systems, use GPU acceleration:
 Next Steps
 -----------
 
-* Explore the :doc:`examples/index` section for more detailed examples
+* Explore the :doc:`examples/molecular_qubits` and :doc:`examples/quantum_transport` sections for more detailed examples
 * Check the :doc:`api/index` for complete API reference
 * Read about the :doc:`theory` behind QEpsilon
-
-For more advanced usage, see the examples in the ``examples/`` directory of the repository. 

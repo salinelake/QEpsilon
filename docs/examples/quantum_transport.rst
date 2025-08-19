@@ -1,7 +1,5 @@
-Basic Usage Examples
-===================
-
-This section covers fundamental examples to get you started with QEpsilon.
+Example 2: Quantum Transport
+============================
 
 Two-Level System Decay
 ----------------------
