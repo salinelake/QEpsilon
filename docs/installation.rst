@@ -28,7 +28,7 @@ The recommended way to install QEpsilon is from source:
       pip install -e .
  
 Verifying Installation
----------------------
+----------------------
 
 To verify that QEpsilon is installed correctly, you can run:
 

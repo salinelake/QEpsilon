@@ -21,25 +21,7 @@ make html
 ```
 
 The documentation will be built in `_build/html/`. You can open `_build/html/index.html` in your browser to view it.
-
-### Building PDF Documentation
-
-To build PDF documentation:
-
-```bash
-make latexpdf
-```
-
-### Live Reload During Development
-
-For live reloading during development:
-
-```bash
-make livehtml
-```
-
-This will start a local server and automatically rebuild the documentation when files change.
-
+ 
 ### Serving the Documentation
 
 To serve the built documentation locally:
