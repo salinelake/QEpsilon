@@ -16,6 +16,16 @@ Lindblad System
    :undoc-members:
    :show-inheritance:
 
+.. autoclass:: qepsilon.simulation.QubitLindbladSystem
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.simulation.ParticleLindbladSystem
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Unitary System
 --------------
 
@@ -24,10 +34,25 @@ Unitary System
    :undoc-members:
    :show-inheritance:
 
+.. autoclass:: qepsilon.simulation.TightBindingUnitarySystem
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.simulation.QubitUnitarySystem
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Mixed Unitary System
 --------------------
 
 .. autoclass:: qepsilon.simulation.OscillatorQubitUnitarySystem
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.simulation.OscillatorTightBindingUnitarySystem
    :members:
    :undoc-members:
    :show-inheritance: 

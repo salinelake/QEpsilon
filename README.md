@@ -9,16 +9,31 @@ QEpsilon is a Python package for modeling open quantum system. QEpsilon is desig
 - **highly modularized**, easy to implement many-body operators. 
 
 ## Installation
-Clone the repository and 
-pip install -e .
+See the installation guide in the documentation.
 
 ## QEpsilon in a nutshell
-The quantum master equation modelled by QEpsilon writes as
+The quantum master equation modeled by QEpsilon is:
+
 $$
-\frac{d}{dt} \rho(t) = -i[H(t), \rho(t)] + \sum_{k} \left( L_k \rho(t) L_k^\dagger - \frac{1}{2} \{L_k^\dagger L_k, \rho(t)\}\right)
+\frac{d}{dt} \rho(t) = -i[H_{\epsilon}(t), \rho(t)] + \sum_{k} \gamma_k \left( L_k \rho(t) L_k^\dagger - \frac{1}{2} \{L_k^\dagger L_k, \rho(t)\}\right)
 $$
 
-## Quick start
+Where:
+
+- $\rho(t)$ is the density matrix of the system
+- $H(t)$ is the time-dependent system Hamiltonian
+- $L_k$ are the Lindblad operators describing the system-environment coupling
+
+$H_{\epsilon}(t) = H_0 + H_c(t) + \sum_{j=1}^{M} f_j(\epsilon(t)) S_j$ is a linear combination of the static system Hamiltonian $H_0$, the external control $H_c(t)$, and perturbing Hermitian operators $S_j$.
+
+$f_j(\epsilon(t))$ is a scalar function of the multidimensional, classical dynamical processes $\epsilon(t)$ that encodes information about the environment.
+
+The classical dynamics of $\epsilon(t)$, described by parameterized Markovian equations of motion, can be optimized together with other system parameters (such as $\gamma_k$) through chain rules, and the behavior of $\rho_{\epsilon}(t)$ can match time-series data of the system.
+
+QEpsilon provides a flexible framework to do such optimization.
+
+## Tutorials
+See the tutorials in the documentation.
 
 ## Examples
-
+See the examples in the documentation.

@@ -10,10 +10,12 @@ QEpsilon is a Python package for modeling open quantum systems. QEpsilon is desi
    :caption: Contents:
 
    installation
-   tutorial
+   tutorial_basics
+   tutorial_simulation
+   tutorial_training
    api/index
-   examples/molecular_qubits
-   examples/quantum_transport
+   examples
+   units
 
 Highlighted Features
 --------------------
@@ -38,10 +40,15 @@ Where:
 - :math:`L_k` are the Lindblad operators describing the system-environment coupling
 
 :math:`H_{\epsilon}(t) = H_0 + H_c(t) + \sum_{j=1}^{M} f_j(\epsilon(t)) S_j` is a linear combination of the
-static system Hamiltonian :math:`H_0`, the external control :math:`H_c(t)`, and perturbing Hermitian operators :math:`S_j`. :math:`f_j(\epsilon(t))` is a
+static system Hamiltonian :math:`H_0`, the external control :math:`H_c(t)`, and perturbing Hermitian operators :math:`S_j`. 
+
+:math:`f_j(\epsilon(t))` is a
 scalar function of the multidimensional, classical dynamical processes :math:`\epsilon(t)` that encodes information about the environment. 
+
 The classical dynamics of :math:`\epsilon(t)`, described by parameterized Markovian equations of motion, can be optimized together with other system parameters (such as :math:`\gamma_k`) through chain rules, and the behavior of :math:`\rho_{\epsilon}(t)` can match time-series data of
-the system. QEpsilon provides a flexible framework to do such optimization.
+the system. 
+
+QEpsilon provides a flexible framework to do such optimization.
 
 
 

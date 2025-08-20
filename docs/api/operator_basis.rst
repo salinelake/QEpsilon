@@ -16,6 +16,11 @@ Two-Level System (TLS)
    :undoc-members:
    :show-inheritance:
 
+.. autoclass:: qepsilon.operator_basis.Kraus
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Bosonic Operators
 -----------------
 

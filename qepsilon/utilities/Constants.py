@@ -4,11 +4,16 @@ import numpy as np
 
 
 class Constants(object):
-    """Class whose members are fundamental constants.
-    Inner Unit:
-        Length: um
-        Time: us
-        Energy: hbar \times MHz
+    r"""
+        Class whose members are fundamental constants.
+        
+        Inner Unit:
+
+        - Length: :math:`\mu m`
+        
+        - Time: :math:`\mu s`
+        
+        - Energy: :math:`\hbar \times \text{MHz}`
     """
     ## energy units in hbar*MHz
     hbar_MHz = 1.0
@@ -46,11 +51,16 @@ class Constants(object):
 
 
 class Constants_Metal(object):
-    """Class whose members are fundamental constants.
-    Inner Unit:
-        Length: pm
-        Time: ps
-        Energy: hbar \times THz
+    r"""
+        Class whose members are fundamental constants.
+
+        Inner Unit:
+
+        - Length: :math:`\text{pm}`
+        
+        - Time: :math:`\text{ps}`
+        
+        - Energy: :math:`\hbar \times \text{THz}`
     """
     ## energy units in hbar*THz
     hbar = 1.0 # hbar = hbar_THz * ps = 1.0

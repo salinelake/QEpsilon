@@ -81,6 +81,9 @@ class ComposedOperatorGroups(OperatorGroup):
             OP.reset()
 
     def to(self, device='cuda'):
+        """
+        This overrides the method of PyTorch Module. It is used to move all operator groups in the composed operator group to a specific device.
+        """
         for OP in self.OP_list:
             OP.to(device=device)
 

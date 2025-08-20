@@ -32,6 +32,36 @@ Bosonic Operators
    :undoc-members:
    :show-inheritance:
 
+.. autoclass:: qepsilon.operator_group.IdentityBosonOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.StaticBosonOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.HarmonicOscillatorBosonOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.WhiteNoiseBosonOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.LangevinNoiseBosonOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.ColorNoiseBosonOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Tight-Binding Operators
 -----------------------
 
@@ -40,10 +70,85 @@ Tight-Binding Operators
    :undoc-members:
    :show-inheritance:
 
+.. autoclass:: qepsilon.operator_group.IdentityTightBindingOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.StaticTightBindingOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.PeriodicNoiseTightBindingOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.WhiteNoiseTightBindingOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.tb_oscillators_interaction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Spin Operators
 --------------
 
 .. autoclass:: qepsilon.operator_group.PauliOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.IdentityPauliOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.StaticPauliOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.ShotbyShotNoisePauliOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.WhiteNoisePauliOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.PeriodicNoisePauliOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.LangevinNoisePauliOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.ColorNoisePauliOperatorGroup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.DipolarInteraction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.spin_oscillators_interaction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: qepsilon.operator_group.DepolarizationChannel
    :members:
    :undoc-members:
    :show-inheritance:

@@ -42,6 +42,9 @@ class LindbladSystem(th.nn.Module):
         self._ham_eff = None
     
     def to(self, device='cuda'):
+        """
+        This overrides the ``to`` method of PyTorch Module. It is used to move all relevant components of the system to a specific device.
+        """
         self.density_matrix.to(device=device)
         for operator_group in self._hamiltonian_operator_group_dict.values():
             operator_group.to(device=device)
@@ -365,17 +368,17 @@ class LindbladSystem(th.nn.Module):
         
     
 class QubitLindbladSystem(LindbladSystem):
-    """
+    r"""
     This class represents the states of n physical qubits as a open quantum system.
     The states are represented by a density matrix. 
     The evolution of the system is governed by the Lindblad equation, which is a generalization of the Schrodinger equation for open quantum systems.
     Both the Hamiltonian and the jump operators in the Lindblad equation allows fluctuating coefficients. So technically, we are dealing with a stochastic master equation. 
     
     The Lindblad equation is given as
-    $d\rho(t) / dt = -i [H(t), \rho(t)] + \sum_k L_k(t) \rho(t) L_k(t)^\dagger - 1/2 \{L_k(t)^\dagger L_k(t), \rho(t)\}$
-    where H(t) is the Hamiltonian, L_k(t) is the jump operator. Note that the coefficients of the jump operators are absorbed into L_k(t).
+    :math:`d\rho(t) / dt = -i [H(t), \rho(t)] + \sum_k L_k(t) \rho(t) L_k(t)^\dagger - 1/2 \{L_k(t)^\dagger L_k(t), \rho(t)\}`
+    where :math:`H(t)` is the Hamiltonian, :math:`L_k(t)` is the jump operator. Note that the coefficients of the jump operators are absorbed into :math:`L_k(t)`.
 
-    In this class, each component of the Hamiltonian $H(t)$, and each jump operator $L_k(t)$, is represented by a OperatorGroup object. 
+    In this class, each component of the Hamiltonian :math:`H(t)`, and each jump operator :math:`L_k(t)`, is represented by a OperatorGroup object. 
     Each OperatorGroup object contains a group of operators and the corresponding coefficients. 
     The operators themselves are time-independent, like a Pauli operator. But the coefficients can be time-dependent stochastic processes. 
     This corresponds to the case where the qubits are coupled to noisy environments such as inhomogeneous, fluctuating magnetic fields. 

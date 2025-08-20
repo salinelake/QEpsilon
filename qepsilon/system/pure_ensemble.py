@@ -146,10 +146,10 @@ class QubitPureStatesEnsemble(PureStatesEnsemble):
     # Getters and setters for the density matrix
     ############################################################
     def set_pse_by_config(self, config: th.Tensor):
-        """
-        This function sets all pure states as |config>.
+        r"""
+        This function sets all pure states as :math:`| \text{config} \rangle`.
         Args:
-            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means |01>.
+            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means :math:`| 01 \rangle`.
         """
         if config.shape != (self.nq,):
             raise ValueError("Config must have shape (#qubits).")
@@ -241,11 +241,11 @@ class QubitPureStatesEnsemble(PureStatesEnsemble):
         return self.observe_one_qubit(pse, self.pauli.Z, idx)
     
     def observe_prob_by_config(self, pse: th.Tensor, config: th.Tensor):
-        """
+        r"""
         This function observes the probability of the spin configuration specified by config.
         Args:
             pse: the pure states. Shape: (batchsize, ns). 
-            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means |01>.
+            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means :math:`| 01 \rangle`.
         Returns:
             prob: the probability of the spin configuration. Shape: (batchsize).
         """

@@ -50,6 +50,9 @@ class UnitarySystem(th.nn.Module):
     ## methods for moving the system to GPU, overiding the .to() method of th.nn.Module
     ############################################################
     def to(self, device='cuda'):
+        """
+        This overrides the ``to`` method of PyTorch Module. It is used to move all relevant components of the system to a specific device.
+        """
         self.pure_ensemble.to(device=device)
         for operator_group in self._hamiltonian_operator_group_dict.values():
             operator_group.to(device=device)

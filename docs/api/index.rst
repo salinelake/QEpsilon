@@ -29,7 +29,5 @@ Quick Access
 
 Most commonly used classes:
 
-* :class:`qepsilon.system.DensityMatrix` - Density matrix representation
-* :class:`qepsilon.system.PureEnsemble` - Pure state ensemble
 * :class:`qepsilon.simulation.LindbladSystem` - Lindblad master equation evolution
 * :class:`qepsilon.simulation.UnitarySystem` - Unitary time evolution

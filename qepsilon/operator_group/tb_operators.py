@@ -62,9 +62,9 @@ class IdentityTightBindingOperatorGroup(TightBindingOperatorGroup):
         return ops, th.ones(self.nb, dtype=ops.dtype, device=ops.device)
 
 class StaticTightBindingOperatorGroup(TightBindingOperatorGroup):
-    """
+    r"""
     This class deals with a group of operators (composite Tight Binding operators on n-site systems) and a static coefficient. 
-    Each operator in this group is specified by a string of Tight Binding operator names.  For example, "XXLXX" is the hopping operator |1><2|.
+    Each operator in this group is specified by a string of Tight Binding operator names.  For example, "XXLXX" is the hopping operator :math:`| 1\rangle\langle 2 |`.
     """
     def __init__(self, n_sites: int, id: str, batchsize: int = 1, coef: float = 1, static: bool = True, requires_grad: bool = False):
         super().__init__(n_sites, id, batchsize, static)

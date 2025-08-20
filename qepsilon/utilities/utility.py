@@ -98,11 +98,11 @@ def trace(rho: th.Tensor):
         raise ValueError("Density matrix must have shape (dim, dim) or (batchsize, dim, dim).")
 
 def qubitconf2idx(config: th.Tensor):
-    """
+    r"""
     This function converts a binary qubit/spin configuration to an index.
     Args:
-        config: a 0 or 1 tensor that specifies the qubit/spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means |01>. 
-        By our convention of Pauli-operator composition, the all-qubit-up configuration (|11...1>) is the first configuration. So the index is 0.
+        config: a 0 or 1 tensor that specifies the qubit/spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means :math:`| 01 \rangle`. 
+        By our convention of Pauli-operator composition, the all-qubit-up configuration (:math:`| 11...1 \rangle`) is the first configuration. So the index is 0.
     Returns:
         idx: an integer, the index of the configuration.
     """

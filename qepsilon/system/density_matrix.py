@@ -77,10 +77,10 @@ class QubitDensityMatrix(DensityMatrix):
     # Getters and setters for the density matrix
     ############################################################
     def set_rho_by_config(self, config: th.Tensor):
-        """
-        This function sets the density matrix as |config><config|.
+        r"""
+        This function sets the density matrix as :math:`| \text{config} \rangle \langle \text{config} |`.
         Args:
-            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means |01>.
+            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means :math:`| 01 \rangle`.
         """
         if config.shape != (self.nq,):
             raise ValueError("Config must have shape (#qubits).")
@@ -103,7 +103,7 @@ class QubitDensityMatrix(DensityMatrix):
         """
         This function traces out the qubits specified in config.
         Args:
-            rho: the (2^n x 2^n) density matrix to be traced out.
+            rho: the (:math:`2^n \times 2^n`) density matrix to be traced out.
             config: a boolean tensor that specifies the qubits to be kept. config[i]==False means the i-th qubit will be traced out. Shape: (#qubits).
         """
         if config.shape != (self.nq,):
@@ -202,11 +202,11 @@ class QubitDensityMatrix(DensityMatrix):
         return self.observe_one_qubit(rho, self.pauli.Z, idx)
 
     def get_diagonal_by_config(self, rho: th.Tensor, config: th.Tensor):
-        """
+        r"""
         This function gets the diagonal elements of the density matrix specified by config.
         Args:
             rho: the density matrix.
-            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means |01>.
+            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means :math:`| 01 \rangle`.
         """
         if config.shape != (self.nq,):
             raise ValueError("Config must have shape (#qubits).")
@@ -216,11 +216,11 @@ class QubitDensityMatrix(DensityMatrix):
         return rho[:, idx, idx]
     
     def observe_prob_by_config(self, rho: th.Tensor, config: th.Tensor):
-        """
+        r"""
         This function observes the probability of the spin configuration specified by config.
         Args:
             rho: the density matrix.
-            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means |01>.
+            config: a 0 or 1 tensor that specifies the spin configuration. Shape: (#qubits). Example for 2-qubit system: [0, 1] means :math:`| 01 \rangle`.
         Returns:
             prob: the probability of the spin configuration. Shape: (batchsize).
         """
