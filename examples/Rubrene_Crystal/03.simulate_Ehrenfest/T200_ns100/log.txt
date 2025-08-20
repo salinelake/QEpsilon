@@ -1,0 +1,1211 @@
+2025-06-17 01:04:13,637 - INFO - 9 bosonic modes with frequency tensor([  84.00000,  214.13300,  631.69202, 1002.14099, 1205.56702, 1351.17798,
+        1364.02600, 1535.33203, 1594.00000]) cm^-1
+2025-06-17 01:04:13,637 - INFO - kbT/hw: tensor([1.65484, 0.64916, 0.22005, 0.13871, 0.11530, 0.10288, 0.10191, 0.09054,
+        0.08721]), < 1 means large quantum effect
+2025-06-17 01:04:13,638 - INFO - g factor is tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]), binding energy: 72.94065 meV, hopping energy: 83.00000 meV
+2025-06-17 01:04:13,638 - INFO - mass: tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394])
+2025-06-17 01:04:13,639 - INFO - polaron trap depth of classical mode is tensor([-5.45331, -1.31712, -0.51777, -0.32637, -0.22574, -0.44109, -0.18414,
+        -0.26968, -0.40641]) pm, std of initial position is tensor([5.15445, 2.02198, 0.68542, 0.43205, 0.35915, 0.32044, 0.31742, 0.28201,
+        0.27163]) pm
+2025-06-17 01:04:13,644 - INFO - The oscillator with id osc_0 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,644 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,644 - INFO - The oscillator with id osc_0 is bound to site-0.
+2025-06-17 01:04:13,645 - INFO - The oscillator with id osc_1 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,646 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,646 - INFO - The oscillator with id osc_1 is bound to site-1.
+2025-06-17 01:04:13,647 - INFO - The oscillator with id osc_2 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,647 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,647 - INFO - The oscillator with id osc_2 is bound to site-2.
+2025-06-17 01:04:13,649 - INFO - The oscillator with id osc_3 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,649 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,649 - INFO - The oscillator with id osc_3 is bound to site-3.
+2025-06-17 01:04:13,650 - INFO - The oscillator with id osc_4 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,662 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,663 - INFO - The oscillator with id osc_4 is bound to site-4.
+2025-06-17 01:04:13,664 - INFO - The oscillator with id osc_5 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,664 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,665 - INFO - The oscillator with id osc_5 is bound to site-5.
+2025-06-17 01:04:13,666 - INFO - The oscillator with id osc_6 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,666 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,666 - INFO - The oscillator with id osc_6 is bound to site-6.
+2025-06-17 01:04:13,667 - INFO - The oscillator with id osc_7 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,667 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,668 - INFO - The oscillator with id osc_7 is bound to site-7.
+2025-06-17 01:04:13,669 - INFO - The oscillator with id osc_8 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,669 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,669 - INFO - The oscillator with id osc_8 is bound to site-8.
+2025-06-17 01:04:13,670 - INFO - The oscillator with id osc_9 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,671 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,671 - INFO - The oscillator with id osc_9 is bound to site-9.
+2025-06-17 01:04:13,672 - INFO - The oscillator with id osc_10 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,672 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,673 - INFO - The oscillator with id osc_10 is bound to site-10.
+2025-06-17 01:04:13,674 - INFO - The oscillator with id osc_11 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,674 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,674 - INFO - The oscillator with id osc_11 is bound to site-11.
+2025-06-17 01:04:13,675 - INFO - The oscillator with id osc_12 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,676 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,676 - INFO - The oscillator with id osc_12 is bound to site-12.
+2025-06-17 01:04:13,677 - INFO - The oscillator with id osc_13 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,677 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,678 - INFO - The oscillator with id osc_13 is bound to site-13.
+2025-06-17 01:04:13,679 - INFO - The oscillator with id osc_14 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,679 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,679 - INFO - The oscillator with id osc_14 is bound to site-14.
+2025-06-17 01:04:13,680 - INFO - The oscillator with id osc_15 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,680 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,681 - INFO - The oscillator with id osc_15 is bound to site-15.
+2025-06-17 01:04:13,682 - INFO - The oscillator with id osc_16 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,682 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,682 - INFO - The oscillator with id osc_16 is bound to site-16.
+2025-06-17 01:04:13,683 - INFO - The oscillator with id osc_17 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,684 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,684 - INFO - The oscillator with id osc_17 is bound to site-17.
+2025-06-17 01:04:13,685 - INFO - The oscillator with id osc_18 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,685 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,686 - INFO - The oscillator with id osc_18 is bound to site-18.
+2025-06-17 01:04:13,687 - INFO - The oscillator with id osc_19 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,687 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,687 - INFO - The oscillator with id osc_19 is bound to site-19.
+2025-06-17 01:04:13,688 - INFO - The oscillator with id osc_20 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,689 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,689 - INFO - The oscillator with id osc_20 is bound to site-20.
+2025-06-17 01:04:13,690 - INFO - The oscillator with id osc_21 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,690 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,690 - INFO - The oscillator with id osc_21 is bound to site-21.
+2025-06-17 01:04:13,691 - INFO - The oscillator with id osc_22 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,692 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,692 - INFO - The oscillator with id osc_22 is bound to site-22.
+2025-06-17 01:04:13,693 - INFO - The oscillator with id osc_23 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,693 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,694 - INFO - The oscillator with id osc_23 is bound to site-23.
+2025-06-17 01:04:13,695 - INFO - The oscillator with id osc_24 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,695 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,696 - INFO - The oscillator with id osc_24 is bound to site-24.
+2025-06-17 01:04:13,697 - INFO - The oscillator with id osc_25 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,697 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,698 - INFO - The oscillator with id osc_25 is bound to site-25.
+2025-06-17 01:04:13,699 - INFO - The oscillator with id osc_26 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,699 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,699 - INFO - The oscillator with id osc_26 is bound to site-26.
+2025-06-17 01:04:13,700 - INFO - The oscillator with id osc_27 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,701 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,701 - INFO - The oscillator with id osc_27 is bound to site-27.
+2025-06-17 01:04:13,702 - INFO - The oscillator with id osc_28 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,702 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,703 - INFO - The oscillator with id osc_28 is bound to site-28.
+2025-06-17 01:04:13,704 - INFO - The oscillator with id osc_29 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,704 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,704 - INFO - The oscillator with id osc_29 is bound to site-29.
+2025-06-17 01:04:13,705 - INFO - The oscillator with id osc_30 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,705 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,706 - INFO - The oscillator with id osc_30 is bound to site-30.
+2025-06-17 01:04:13,707 - INFO - The oscillator with id osc_31 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,707 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,707 - INFO - The oscillator with id osc_31 is bound to site-31.
+2025-06-17 01:04:13,709 - INFO - The oscillator with id osc_32 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,709 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,709 - INFO - The oscillator with id osc_32 is bound to site-32.
+2025-06-17 01:04:13,710 - INFO - The oscillator with id osc_33 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,710 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,711 - INFO - The oscillator with id osc_33 is bound to site-33.
+2025-06-17 01:04:13,712 - INFO - The oscillator with id osc_34 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,712 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,712 - INFO - The oscillator with id osc_34 is bound to site-34.
+2025-06-17 01:04:13,713 - INFO - The oscillator with id osc_35 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,714 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,714 - INFO - The oscillator with id osc_35 is bound to site-35.
+2025-06-17 01:04:13,715 - INFO - The oscillator with id osc_36 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,715 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,716 - INFO - The oscillator with id osc_36 is bound to site-36.
+2025-06-17 01:04:13,717 - INFO - The oscillator with id osc_37 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,717 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,717 - INFO - The oscillator with id osc_37 is bound to site-37.
+2025-06-17 01:04:13,718 - INFO - The oscillator with id osc_38 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,719 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,719 - INFO - The oscillator with id osc_38 is bound to site-38.
+2025-06-17 01:04:13,720 - INFO - The oscillator with id osc_39 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,720 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,721 - INFO - The oscillator with id osc_39 is bound to site-39.
+2025-06-17 01:04:13,722 - INFO - The oscillator with id osc_40 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,722 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,723 - INFO - The oscillator with id osc_40 is bound to site-40.
+2025-06-17 01:04:13,724 - INFO - The oscillator with id osc_41 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,724 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,724 - INFO - The oscillator with id osc_41 is bound to site-41.
+2025-06-17 01:04:13,725 - INFO - The oscillator with id osc_42 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,726 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,726 - INFO - The oscillator with id osc_42 is bound to site-42.
+2025-06-17 01:04:13,727 - INFO - The oscillator with id osc_43 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,727 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,728 - INFO - The oscillator with id osc_43 is bound to site-43.
+2025-06-17 01:04:13,729 - INFO - The oscillator with id osc_44 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,729 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,729 - INFO - The oscillator with id osc_44 is bound to site-44.
+2025-06-17 01:04:13,730 - INFO - The oscillator with id osc_45 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,731 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,731 - INFO - The oscillator with id osc_45 is bound to site-45.
+2025-06-17 01:04:13,732 - INFO - The oscillator with id osc_46 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,732 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,733 - INFO - The oscillator with id osc_46 is bound to site-46.
+2025-06-17 01:04:13,734 - INFO - The oscillator with id osc_47 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,734 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,734 - INFO - The oscillator with id osc_47 is bound to site-47.
+2025-06-17 01:04:13,735 - INFO - The oscillator with id osc_48 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,735 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,736 - INFO - The oscillator with id osc_48 is bound to site-48.
+2025-06-17 01:04:13,737 - INFO - The oscillator with id osc_49 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,737 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,737 - INFO - The oscillator with id osc_49 is bound to site-49.
+2025-06-17 01:04:13,738 - INFO - The oscillator with id osc_50 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,739 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,739 - INFO - The oscillator with id osc_50 is bound to site-50.
+2025-06-17 01:04:13,740 - INFO - The oscillator with id osc_51 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,740 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,741 - INFO - The oscillator with id osc_51 is bound to site-51.
+2025-06-17 01:04:13,742 - INFO - The oscillator with id osc_52 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,742 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,742 - INFO - The oscillator with id osc_52 is bound to site-52.
+2025-06-17 01:04:13,743 - INFO - The oscillator with id osc_53 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,743 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,744 - INFO - The oscillator with id osc_53 is bound to site-53.
+2025-06-17 01:04:13,745 - INFO - The oscillator with id osc_54 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,745 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,745 - INFO - The oscillator with id osc_54 is bound to site-54.
+2025-06-17 01:04:13,746 - INFO - The oscillator with id osc_55 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,747 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,747 - INFO - The oscillator with id osc_55 is bound to site-55.
+2025-06-17 01:04:13,748 - INFO - The oscillator with id osc_56 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,748 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,749 - INFO - The oscillator with id osc_56 is bound to site-56.
+2025-06-17 01:04:13,750 - INFO - The oscillator with id osc_57 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,750 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,750 - INFO - The oscillator with id osc_57 is bound to site-57.
+2025-06-17 01:04:13,751 - INFO - The oscillator with id osc_58 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,751 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,752 - INFO - The oscillator with id osc_58 is bound to site-58.
+2025-06-17 01:04:13,753 - INFO - The oscillator with id osc_59 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,753 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,753 - INFO - The oscillator with id osc_59 is bound to site-59.
+2025-06-17 01:04:13,754 - INFO - The oscillator with id osc_60 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,755 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,755 - INFO - The oscillator with id osc_60 is bound to site-60.
+2025-06-17 01:04:13,756 - INFO - The oscillator with id osc_61 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,756 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,757 - INFO - The oscillator with id osc_61 is bound to site-61.
+2025-06-17 01:04:13,758 - INFO - The oscillator with id osc_62 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,758 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,758 - INFO - The oscillator with id osc_62 is bound to site-62.
+2025-06-17 01:04:13,759 - INFO - The oscillator with id osc_63 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,760 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,760 - INFO - The oscillator with id osc_63 is bound to site-63.
+2025-06-17 01:04:13,761 - INFO - The oscillator with id osc_64 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,761 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,761 - INFO - The oscillator with id osc_64 is bound to site-64.
+2025-06-17 01:04:13,763 - INFO - The oscillator with id osc_65 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,763 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,763 - INFO - The oscillator with id osc_65 is bound to site-65.
+2025-06-17 01:04:13,764 - INFO - The oscillator with id osc_66 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,764 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,765 - INFO - The oscillator with id osc_66 is bound to site-66.
+2025-06-17 01:04:13,766 - INFO - The oscillator with id osc_67 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,766 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,766 - INFO - The oscillator with id osc_67 is bound to site-67.
+2025-06-17 01:04:13,767 - INFO - The oscillator with id osc_68 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,767 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,768 - INFO - The oscillator with id osc_68 is bound to site-68.
+2025-06-17 01:04:13,769 - INFO - The oscillator with id osc_69 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,769 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,769 - INFO - The oscillator with id osc_69 is bound to site-69.
+2025-06-17 01:04:13,770 - INFO - The oscillator with id osc_70 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,771 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,771 - INFO - The oscillator with id osc_70 is bound to site-70.
+2025-06-17 01:04:13,772 - INFO - The oscillator with id osc_71 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,772 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,773 - INFO - The oscillator with id osc_71 is bound to site-71.
+2025-06-17 01:04:13,774 - INFO - The oscillator with id osc_72 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,774 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,774 - INFO - The oscillator with id osc_72 is bound to site-72.
+2025-06-17 01:04:13,775 - INFO - The oscillator with id osc_73 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,775 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,776 - INFO - The oscillator with id osc_73 is bound to site-73.
+2025-06-17 01:04:13,777 - INFO - The oscillator with id osc_74 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,777 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,777 - INFO - The oscillator with id osc_74 is bound to site-74.
+2025-06-17 01:04:13,778 - INFO - The oscillator with id osc_75 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,779 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,779 - INFO - The oscillator with id osc_75 is bound to site-75.
+2025-06-17 01:04:13,780 - INFO - The oscillator with id osc_76 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,780 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,780 - INFO - The oscillator with id osc_76 is bound to site-76.
+2025-06-17 01:04:13,781 - INFO - The oscillator with id osc_77 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,782 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,782 - INFO - The oscillator with id osc_77 is bound to site-77.
+2025-06-17 01:04:13,783 - INFO - The oscillator with id osc_78 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,783 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,783 - INFO - The oscillator with id osc_78 is bound to site-78.
+2025-06-17 01:04:13,784 - INFO - The oscillator with id osc_79 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,785 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,785 - INFO - The oscillator with id osc_79 is bound to site-79.
+2025-06-17 01:04:13,786 - INFO - The oscillator with id osc_80 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,786 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,786 - INFO - The oscillator with id osc_80 is bound to site-80.
+2025-06-17 01:04:13,787 - INFO - The oscillator with id osc_81 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,787 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,788 - INFO - The oscillator with id osc_81 is bound to site-81.
+2025-06-17 01:04:13,789 - INFO - The oscillator with id osc_82 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,789 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,789 - INFO - The oscillator with id osc_82 is bound to site-82.
+2025-06-17 01:04:13,790 - INFO - The oscillator with id osc_83 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,790 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,791 - INFO - The oscillator with id osc_83 is bound to site-83.
+2025-06-17 01:04:13,792 - INFO - The oscillator with id osc_84 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,792 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,792 - INFO - The oscillator with id osc_84 is bound to site-84.
+2025-06-17 01:04:13,793 - INFO - The oscillator with id osc_85 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,793 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,794 - INFO - The oscillator with id osc_85 is bound to site-85.
+2025-06-17 01:04:13,795 - INFO - The oscillator with id osc_86 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,795 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,795 - INFO - The oscillator with id osc_86 is bound to site-86.
+2025-06-17 01:04:13,796 - INFO - The oscillator with id osc_87 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,796 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,797 - INFO - The oscillator with id osc_87 is bound to site-87.
+2025-06-17 01:04:13,798 - INFO - The oscillator with id osc_88 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,798 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,798 - INFO - The oscillator with id osc_88 is bound to site-88.
+2025-06-17 01:04:13,799 - INFO - The oscillator with id osc_89 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,799 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,800 - INFO - The oscillator with id osc_89 is bound to site-89.
+2025-06-17 01:04:13,801 - INFO - The oscillator with id osc_90 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,801 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,801 - INFO - The oscillator with id osc_90 is bound to site-90.
+2025-06-17 01:04:13,802 - INFO - The oscillator with id osc_91 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,802 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,802 - INFO - The oscillator with id osc_91 is bound to site-91.
+2025-06-17 01:04:13,803 - INFO - The oscillator with id osc_92 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,804 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,804 - INFO - The oscillator with id osc_92 is bound to site-92.
+2025-06-17 01:04:13,805 - INFO - The oscillator with id osc_93 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,805 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,805 - INFO - The oscillator with id osc_93 is bound to site-93.
+2025-06-17 01:04:13,806 - INFO - The oscillator with id osc_94 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,807 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,807 - INFO - The oscillator with id osc_94 is bound to site-94.
+2025-06-17 01:04:13,808 - INFO - The oscillator with id osc_95 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,808 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,808 - INFO - The oscillator with id osc_95 is bound to site-95.
+2025-06-17 01:04:13,809 - INFO - The oscillator with id osc_96 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,810 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,810 - INFO - The oscillator with id osc_96 is bound to site-96.
+2025-06-17 01:04:13,811 - INFO - The oscillator with id osc_97 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,811 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,811 - INFO - The oscillator with id osc_97 is bound to site-97.
+2025-06-17 01:04:13,812 - INFO - The oscillator with id osc_98 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,812 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,813 - INFO - The oscillator with id osc_98 is bound to site-98.
+2025-06-17 01:04:13,814 - INFO - The oscillator with id osc_99 is added to the system. It has 9 modes, with frequencies tensor([ 15.82267,  40.33520, 118.98877, 188.76845, 227.08682, 254.51486,
+        256.93497, 289.20306, 300.25406]), masses tensor([0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394, 0.00394,
+        0.00394]), and couplings tensor([0.96237, 0.37112, 0.25057, 0.19894, 0.15092, 0.31220, 0.13095, 0.20346,
+        0.31243]).
+2025-06-17 01:04:13,814 - INFO - It has not been bound to any quantum degrees of freedom yet. Use the method `bind_oscillators_to_tb` to bind it to a tight-binding system.
+2025-06-17 01:04:13,814 - INFO - The oscillator with id osc_99 is bound to site-99.
+2025-06-17 01:04:16,102 - INFO - ========Equilibration: step-0, t=0.0fs========
+2025-06-17 01:04:16,108 - INFO - osc_temps_batchavg: 198.79066467285156K
+2025-06-17 01:04:19,771 - INFO - Average MSD=0.000244140625
+2025-06-17 01:04:22,123 - INFO - ========Equilibration: step-50, t=1.0fs========
+2025-06-17 01:04:22,127 - INFO - osc_temps_batchavg: 198.6540985107422K
+2025-06-17 01:04:22,129 - INFO - Average MSD=0.03183746337890625
+2025-06-17 01:04:24,383 - INFO - ========Equilibration: step-100, t=2.0fs========
+2025-06-17 01:04:24,388 - INFO - osc_temps_batchavg: 198.7015838623047K
+2025-06-17 01:04:24,389 - INFO - Average MSD=0.12483024597167969
+2025-06-17 01:04:26,651 - INFO - ========Equilibration: step-150, t=3.0fs========
+2025-06-17 01:04:26,656 - INFO - osc_temps_batchavg: 198.88404846191406K
+2025-06-17 01:04:26,657 - INFO - Average MSD=0.2744407653808594
+2025-06-17 01:04:28,926 - INFO - ========Equilibration: step-200, t=4.0fs========
+2025-06-17 01:04:28,930 - INFO - osc_temps_batchavg: 199.13597106933594K
+2025-06-17 01:04:28,931 - INFO - Average MSD=0.4733428955078125
+2025-06-17 01:04:31,190 - INFO - ========Equilibration: step-250, t=5.0fs========
+2025-06-17 01:04:31,194 - INFO - osc_temps_batchavg: 199.40318298339844K
+2025-06-17 01:04:31,195 - INFO - Average MSD=0.7137088775634766
+2025-06-17 01:04:33,444 - INFO - ========Equilibration: step-300, t=6.0fs========
+2025-06-17 01:04:33,448 - INFO - osc_temps_batchavg: 199.6519317626953K
+2025-06-17 01:04:33,449 - INFO - Average MSD=0.9883880615234375
+2025-06-17 01:04:35,699 - INFO - ========Equilibration: step-350, t=7.0fs========
+2025-06-17 01:04:35,703 - INFO - osc_temps_batchavg: 199.86216735839844K
+2025-06-17 01:04:35,704 - INFO - Average MSD=1.2928028106689453
+2025-06-17 01:04:37,956 - INFO - ========Equilibration: step-400, t=8.0fs========
+2025-06-17 01:04:37,961 - INFO - osc_temps_batchavg: 200.0185546875K
+2025-06-17 01:04:37,962 - INFO - Average MSD=1.624298095703125
+2025-06-17 01:04:40,224 - INFO - ========Equilibration: step-450, t=9.0fs========
+2025-06-17 01:04:40,228 - INFO - osc_temps_batchavg: 200.10968017578125K
+2025-06-17 01:04:40,229 - INFO - Average MSD=1.9822425842285156
+2025-06-17 01:04:42,498 - INFO - ========Equilibration: step-500, t=10.0fs========
+2025-06-17 01:04:42,503 - INFO - osc_temps_batchavg: 200.13314819335938K
+2025-06-17 01:04:42,504 - INFO - Average MSD=2.366556167602539
+2025-06-17 01:04:44,767 - INFO - ========Equilibration: step-550, t=11.0fs========
+2025-06-17 01:04:44,771 - INFO - osc_temps_batchavg: 200.0980682373047K
+2025-06-17 01:04:44,772 - INFO - Average MSD=2.776813507080078
+2025-06-17 01:04:47,030 - INFO - ========Equilibration: step-600, t=12.0fs========
+2025-06-17 01:04:47,034 - INFO - osc_temps_batchavg: 200.0209197998047K
+2025-06-17 01:04:47,035 - INFO - Average MSD=3.213104248046875
+2025-06-17 01:04:49,296 - INFO - ========Equilibration: step-650, t=13.0fs========
+2025-06-17 01:04:49,300 - INFO - osc_temps_batchavg: 199.9165496826172K
+2025-06-17 01:04:49,301 - INFO - Average MSD=3.6755714416503906
+2025-06-17 01:04:51,569 - INFO - ========Equilibration: step-700, t=14.0fs========
+2025-06-17 01:04:51,573 - INFO - osc_temps_batchavg: 199.7928466796875K
+2025-06-17 01:04:51,574 - INFO - Average MSD=4.1649322509765625
+2025-06-17 01:04:53,844 - INFO - ========Equilibration: step-750, t=15.0fs========
+2025-06-17 01:04:53,849 - INFO - osc_temps_batchavg: 199.65345764160156K
+2025-06-17 01:04:53,850 - INFO - Average MSD=4.68092155456543
+2025-06-17 01:04:56,115 - INFO - ========Equilibration: step-800, t=16.0fs========
+2025-06-17 01:04:56,119 - INFO - osc_temps_batchavg: 199.50746154785156K
+2025-06-17 01:04:56,120 - INFO - Average MSD=5.2230224609375
+2025-06-17 01:04:58,383 - INFO - ========Equilibration: step-850, t=17.0fs========
+2025-06-17 01:04:58,387 - INFO - osc_temps_batchavg: 199.3789520263672K
+2025-06-17 01:04:58,388 - INFO - Average MSD=5.789752960205078
+2025-06-17 01:05:00,645 - INFO - ========Equilibration: step-900, t=18.0fs========
+2025-06-17 01:05:00,650 - INFO - osc_temps_batchavg: 199.3075714111328K
+2025-06-17 01:05:00,651 - INFO - Average MSD=6.379310607910156
+2025-06-17 01:05:02,935 - INFO - ========Equilibration: step-950, t=19.000000000000004fs========
+2025-06-17 01:05:02,939 - INFO - osc_temps_batchavg: 199.3373260498047K
+2025-06-17 01:05:02,940 - INFO - Average MSD=6.990535736083984
+2025-06-17 01:05:05,196 - INFO - ========Equilibration: step-1000, t=20.0fs========
+2025-06-17 01:05:05,201 - INFO - osc_temps_batchavg: 199.49632263183594K
+2025-06-17 01:05:05,202 - INFO - Average MSD=7.622406005859375
+2025-06-17 01:05:07,512 - INFO - ========Equilibration: step-1050, t=21.0fs========
+2025-06-17 01:05:07,517 - INFO - osc_temps_batchavg: 199.7772674560547K
+2025-06-17 01:05:07,518 - INFO - Average MSD=8.274957656860352
+2025-06-17 01:05:09,773 - INFO - ========Equilibration: step-1100, t=22.0fs========
+2025-06-17 01:05:09,778 - INFO - osc_temps_batchavg: 200.1280059814453K
+2025-06-17 01:05:09,779 - INFO - Average MSD=8.94820785522461
+2025-06-17 01:05:12,029 - INFO - ========Equilibration: step-1150, t=23.000000000000004fs========
+2025-06-17 01:05:12,033 - INFO - osc_temps_batchavg: 200.45899963378906K
+2025-06-17 01:05:12,034 - INFO - Average MSD=9.64232063293457
+2025-06-17 01:05:14,282 - INFO - ========Equilibration: step-1200, t=24.0fs========
+2025-06-17 01:05:14,286 - INFO - osc_temps_batchavg: 200.66676330566406K
+2025-06-17 01:05:14,287 - INFO - Average MSD=10.357547760009766
+2025-06-17 01:05:16,562 - INFO - ========Equilibration: step-1250, t=25.0fs========
+2025-06-17 01:05:16,566 - INFO - osc_temps_batchavg: 200.66636657714844K
+2025-06-17 01:05:16,568 - INFO - Average MSD=11.094034194946289
+2025-06-17 01:05:18,822 - INFO - ========Equilibration: step-1300, t=26.0fs========
+2025-06-17 01:05:18,827 - INFO - osc_temps_batchavg: 200.42218017578125K
+2025-06-17 01:05:18,828 - INFO - Average MSD=11.851600646972656
+2025-06-17 01:05:21,077 - INFO - ========Equilibration: step-1350, t=27.000000000000004fs========
+2025-06-17 01:05:21,081 - INFO - osc_temps_batchavg: 199.96490478515625K
+2025-06-17 01:05:21,083 - INFO - Average MSD=12.630043029785156
+2025-06-17 01:05:23,334 - INFO - ========Equilibration: step-1400, t=28.0fs========
+2025-06-17 01:05:23,338 - INFO - osc_temps_batchavg: 199.38795471191406K
+2025-06-17 01:05:23,339 - INFO - Average MSD=13.428068161010742
+2025-06-17 01:05:25,601 - INFO - ========Equilibration: step-1450, t=29.0fs========
+2025-06-17 01:05:25,606 - INFO - osc_temps_batchavg: 198.82281494140625K
+2025-06-17 01:05:25,607 - INFO - Average MSD=14.24477767944336
+2025-06-17 01:05:27,887 - INFO - ========Equilibration: step-1500, t=30.0fs========
+2025-06-17 01:05:27,892 - INFO - osc_temps_batchavg: 198.4003448486328K
+2025-06-17 01:05:27,893 - INFO - Average MSD=15.078475952148438
+2025-06-17 01:05:30,163 - INFO - ========Equilibration: step-1550, t=31.000000000000004fs========
+2025-06-17 01:05:30,167 - INFO - osc_temps_batchavg: 198.2110137939453K
+2025-06-17 01:05:30,169 - INFO - Average MSD=15.928525924682617
+2025-06-17 01:05:32,419 - INFO - ========Equilibration: step-1600, t=32.0fs========
+2025-06-17 01:05:32,423 - INFO - osc_temps_batchavg: 198.27749633789062K
+2025-06-17 01:05:32,424 - INFO - Average MSD=16.79483413696289
+2025-06-17 01:05:34,676 - INFO - ========Equilibration: step-1650, t=33.0fs========
+2025-06-17 01:05:34,680 - INFO - osc_temps_batchavg: 198.54922485351562K
+2025-06-17 01:05:34,681 - INFO - Average MSD=17.677709579467773
+2025-06-17 01:05:36,930 - INFO - ========Equilibration: step-1700, t=34.0fs========
+2025-06-17 01:05:36,935 - INFO - osc_temps_batchavg: 198.9199676513672K
+2025-06-17 01:05:36,936 - INFO - Average MSD=18.577865600585938
+2025-06-17 01:05:39,176 - INFO - ========Equilibration: step-1750, t=35.0fs========
+2025-06-17 01:05:39,181 - INFO - osc_temps_batchavg: 199.2631072998047K
+2025-06-17 01:05:39,182 - INFO - Average MSD=19.49513053894043
+2025-06-17 01:05:41,509 - INFO - ========Equilibration: step-1800, t=36.0fs========
+2025-06-17 01:05:41,514 - INFO - osc_temps_batchavg: 199.4718780517578K
+2025-06-17 01:05:41,515 - INFO - Average MSD=20.42862319946289
+2025-06-17 01:05:43,778 - INFO - ========Equilibration: step-1850, t=37.00000000000001fs========
+2025-06-17 01:05:43,783 - INFO - osc_temps_batchavg: 199.49220275878906K
+2025-06-17 01:05:43,784 - INFO - Average MSD=21.37697410583496
+2025-06-17 01:05:46,036 - INFO - ========Equilibration: step-1900, t=38.00000000000001fs========
+2025-06-17 01:05:46,040 - INFO - osc_temps_batchavg: 199.33712768554688K
+2025-06-17 01:05:46,041 - INFO - Average MSD=22.33936309814453
+2025-06-17 01:05:48,292 - INFO - ========Equilibration: step-1950, t=39.0fs========
+2025-06-17 01:05:48,297 - INFO - osc_temps_batchavg: 199.07931518554688K
+2025-06-17 01:05:48,298 - INFO - Average MSD=23.315486907958984
+2025-06-17 01:05:50,577 - INFO - ========Equilibration: step-2000, t=40.0fs========
+2025-06-17 01:05:50,581 - INFO - osc_temps_batchavg: 198.82415771484375K
+2025-06-17 01:05:50,582 - INFO - Average MSD=24.306236267089844
+2025-06-17 01:05:52,846 - INFO - ========Equilibration: step-2050, t=41.0fs========
+2025-06-17 01:05:52,851 - INFO - osc_temps_batchavg: 198.67242431640625K
+2025-06-17 01:05:52,851 - INFO - Average MSD=25.312686920166016
+2025-06-17 01:05:55,116 - INFO - ========Equilibration: step-2100, t=42.0fs========
+2025-06-17 01:05:55,121 - INFO - osc_temps_batchavg: 198.68515014648438K
+2025-06-17 01:05:55,122 - INFO - Average MSD=26.3355770111084
+2025-06-17 01:05:57,378 - INFO - ========Equilibration: step-2150, t=43.0fs========
+2025-06-17 01:05:57,383 - INFO - osc_temps_batchavg: 198.86203002929688K
+2025-06-17 01:05:57,384 - INFO - Average MSD=27.3753719329834
+2025-06-17 01:05:59,657 - INFO - ========Equilibration: step-2200, t=44.0fs========
+2025-06-17 01:05:59,662 - INFO - osc_temps_batchavg: 199.1408233642578K
+2025-06-17 01:05:59,663 - INFO - Average MSD=28.431798934936523
+2025-06-17 01:06:01,919 - INFO - ========Equilibration: step-2250, t=45.00000000000001fs========
+2025-06-17 01:06:01,924 - INFO - osc_temps_batchavg: 199.41847229003906K
+2025-06-17 01:06:01,925 - INFO - Average MSD=29.503520965576172
+2025-06-17 01:06:04,182 - INFO - ========Equilibration: step-2300, t=46.00000000000001fs========
+2025-06-17 01:06:04,187 - INFO - osc_temps_batchavg: 199.58677673339844K
+2025-06-17 01:06:04,188 - INFO - Average MSD=30.58893394470215
+2025-06-17 01:06:06,455 - INFO - ========Equilibration: step-2350, t=47.00000000000001fs========
+2025-06-17 01:06:06,459 - INFO - osc_temps_batchavg: 199.5711669921875K
+2025-06-17 01:06:06,460 - INFO - Average MSD=31.685699462890625
+2025-06-17 01:06:08,724 - INFO - ========Equilibration: step-2400, t=48.0fs========
+2025-06-17 01:06:08,728 - INFO - osc_temps_batchavg: 199.3589630126953K
+2025-06-17 01:06:08,729 - INFO - Average MSD=32.791587829589844
+2025-06-17 01:06:10,986 - INFO - ========Equilibration: step-2450, t=49.0fs========
+2025-06-17 01:06:10,990 - INFO - osc_temps_batchavg: 199.00726318359375K
+2025-06-17 01:06:10,991 - INFO - Average MSD=33.904693603515625
+2025-06-17 01:06:13,247 - INFO - ========Equilibration: step-2500, t=50.0fs========
+2025-06-17 01:06:13,251 - INFO - osc_temps_batchavg: 198.6259307861328K
+2025-06-17 01:06:13,252 - INFO - Average MSD=35.024024963378906
+2025-06-17 01:06:15,509 - INFO - ========Equilibration: step-2550, t=51.0fs========
+2025-06-17 01:06:15,513 - INFO - osc_temps_batchavg: 198.34034729003906K
+2025-06-17 01:06:15,514 - INFO - Average MSD=36.149574279785156
+2025-06-17 01:06:17,767 - INFO - ========Equilibration: step-2600, t=52.0fs========
+2025-06-17 01:06:17,772 - INFO - osc_temps_batchavg: 198.24658203125K
+2025-06-17 01:06:17,773 - INFO - Average MSD=37.28181457519531
+2025-06-17 01:06:20,045 - INFO - ========Equilibration: step-2650, t=53.00000000000001fs========
+2025-06-17 01:06:20,050 - INFO - osc_temps_batchavg: 198.37464904785156K
+2025-06-17 01:06:20,051 - INFO - Average MSD=38.42176818847656
+2025-06-17 01:06:22,404 - INFO - ========Equilibration: step-2700, t=54.00000000000001fs========
+2025-06-17 01:06:22,409 - INFO - osc_temps_batchavg: 198.67376708984375K
+2025-06-17 01:06:22,410 - INFO - Average MSD=39.570465087890625
+2025-06-17 01:06:24,993 - INFO - ========Equilibration: step-2750, t=55.00000000000001fs========
+2025-06-17 01:06:24,999 - INFO - osc_temps_batchavg: 199.02638244628906K
+2025-06-17 01:06:25,000 - INFO - Average MSD=40.7281494140625
+2025-06-17 01:06:27,440 - INFO - ========Equilibration: step-2800, t=56.0fs========
+2025-06-17 01:06:27,483 - INFO - osc_temps_batchavg: 199.2870330810547K
+2025-06-17 01:06:27,484 - INFO - Average MSD=41.894805908203125
+2025-06-17 01:06:29,751 - INFO - ========Equilibration: step-2850, t=57.0fs========
+2025-06-17 01:06:29,755 - INFO - osc_temps_batchavg: 199.33331298828125K
+2025-06-17 01:06:29,756 - INFO - Average MSD=43.069602966308594
+2025-06-17 01:06:32,025 - INFO - ========Equilibration: step-2900, t=58.0fs========
+2025-06-17 01:06:32,030 - INFO - osc_temps_batchavg: 199.11141967773438K
+2025-06-17 01:06:32,031 - INFO - Average MSD=44.25151443481445
+2025-06-17 01:06:34,496 - INFO - ========Equilibration: step-2950, t=59.0fs========
+2025-06-17 01:06:34,502 - INFO - osc_temps_batchavg: 198.65968322753906K
+2025-06-17 01:06:34,503 - INFO - Average MSD=45.439361572265625
+2025-06-17 01:06:37,087 - INFO - ========Equilibration: step-3000, t=60.0fs========
+2025-06-17 01:06:37,092 - INFO - osc_temps_batchavg: 198.10089111328125K
+2025-06-17 01:06:37,093 - INFO - Average MSD=46.632171630859375
+2025-06-17 01:06:39,680 - INFO - ========Equilibration: step-3050, t=61.00000000000001fs========
+2025-06-17 01:06:39,685 - INFO - osc_temps_batchavg: 197.60574340820312K
+2025-06-17 01:06:39,686 - INFO - Average MSD=47.82927703857422
+2025-06-17 01:06:42,281 - INFO - ========Equilibration: step-3100, t=62.00000000000001fs========
+2025-06-17 01:06:42,286 - INFO - osc_temps_batchavg: 197.33773803710938K
+2025-06-17 01:06:42,287 - INFO - Average MSD=49.03032684326172
+2025-06-17 01:06:44,837 - INFO - ========Equilibration: step-3150, t=63.0fs========
+2025-06-17 01:06:44,841 - INFO - osc_temps_batchavg: 197.3986358642578K
+2025-06-17 01:06:44,842 - INFO - Average MSD=50.235191345214844
+2025-06-17 01:06:47,105 - INFO - ========Equilibration: step-3200, t=64.0fs========
+2025-06-17 01:06:47,109 - INFO - osc_temps_batchavg: 197.7919921875K
+2025-06-17 01:06:47,110 - INFO - Average MSD=51.44394302368164
+2025-06-17 01:06:49,373 - INFO - ========Equilibration: step-3250, t=65.0fs========
+2025-06-17 01:06:49,378 - INFO - osc_temps_batchavg: 198.41775512695312K
+2025-06-17 01:06:49,379 - INFO - Average MSD=52.656494140625
+2025-06-17 01:06:51,638 - INFO - ========Equilibration: step-3300, t=66.0fs========
+2025-06-17 01:06:51,642 - INFO - osc_temps_batchavg: 199.10076904296875K
+2025-06-17 01:06:51,643 - INFO - Average MSD=53.872711181640625
+2025-06-17 01:06:53,900 - INFO - ========Equilibration: step-3350, t=67.0fs========
+2025-06-17 01:06:53,904 - INFO - osc_temps_batchavg: 199.6445770263672K
+2025-06-17 01:06:53,905 - INFO - Average MSD=55.09242248535156
+2025-06-17 01:06:56,172 - INFO - ========Equilibration: step-3400, t=68.0fs========
+2025-06-17 01:06:56,176 - INFO - osc_temps_batchavg: 199.89385986328125K
+2025-06-17 01:06:56,178 - INFO - Average MSD=56.315513610839844
+2025-06-17 01:06:58,440 - INFO - ========Equilibration: step-3450, t=69.0fs========
+2025-06-17 01:06:58,445 - INFO - osc_temps_batchavg: 199.78460693359375K
+2025-06-17 01:06:58,446 - INFO - Average MSD=57.54225158691406
+2025-06-17 01:07:00,697 - INFO - ========Equilibration: step-3500, t=70.0fs========
+2025-06-17 01:07:00,702 - INFO - osc_temps_batchavg: 199.36585998535156K
+2025-06-17 01:07:00,703 - INFO - Average MSD=58.773433685302734
+2025-06-17 01:07:02,956 - INFO - ========Equilibration: step-3550, t=71.0fs========
+2025-06-17 01:07:02,961 - INFO - osc_temps_batchavg: 198.7850341796875K
+2025-06-17 01:07:02,962 - INFO - Average MSD=60.009307861328125
+2025-06-17 01:07:05,229 - INFO - ========Equilibration: step-3600, t=72.0fs========
+2025-06-17 01:07:05,234 - INFO - osc_temps_batchavg: 198.24179077148438K
+2025-06-17 01:07:05,235 - INFO - Average MSD=61.25028991699219
+2025-06-17 01:07:07,514 - INFO - ========Equilibration: step-3650, t=73.00000000000001fs========
+2025-06-17 01:07:07,519 - INFO - osc_temps_batchavg: 197.92440795898438K
+2025-06-17 01:07:07,520 - INFO - Average MSD=62.496307373046875
+2025-06-17 01:07:09,842 - INFO - ========Equilibration: step-3700, t=74.00000000000001fs========
+2025-06-17 01:07:09,846 - INFO - osc_temps_batchavg: 197.94940185546875K
+2025-06-17 01:07:09,848 - INFO - Average MSD=63.74745178222656
+2025-06-17 01:07:12,185 - INFO - ========Equilibration: step-3750, t=75.00000000000001fs========
+2025-06-17 01:07:12,189 - INFO - osc_temps_batchavg: 198.32395935058594K
+2025-06-17 01:07:12,190 - INFO - Average MSD=65.00428771972656
+2025-06-17 01:07:14,651 - INFO - ========Equilibration: step-3800, t=76.00000000000001fs========
+2025-06-17 01:07:14,656 - INFO - osc_temps_batchavg: 198.94314575195312K
+2025-06-17 01:07:14,659 - INFO - Average MSD=66.26771545410156
+2025-06-17 01:07:16,921 - INFO - ========Equilibration: step-3850, t=77.00000000000001fs========
+2025-06-17 01:07:16,925 - INFO - osc_temps_batchavg: 199.6226348876953K
+2025-06-17 01:07:16,926 - INFO - Average MSD=67.53878784179688
+2025-06-17 01:07:19,187 - INFO - ========Equilibration: step-3900, t=78.0fs========
+2025-06-17 01:07:19,191 - INFO - osc_temps_batchavg: 200.1566925048828K
+2025-06-17 01:07:19,193 - INFO - Average MSD=68.8177261352539
+2025-06-17 01:07:21,608 - INFO - ========Equilibration: step-3950, t=79.0fs========
+2025-06-17 01:07:21,613 - INFO - osc_temps_batchavg: 200.3819580078125K
+2025-06-17 01:07:21,614 - INFO - Average MSD=70.10348510742188
+2025-06-17 01:07:23,871 - INFO - ========Equilibration: step-4000, t=80.0fs========
+2025-06-17 01:07:23,875 - INFO - osc_temps_batchavg: 200.22752380371094K
+2025-06-17 01:07:23,890 - INFO - Average MSD=71.3939208984375
+2025-06-17 01:07:26,155 - INFO - ========Equilibration: step-4050, t=81.0fs========
+2025-06-17 01:07:26,159 - INFO - osc_temps_batchavg: 199.73519897460938K
+2025-06-17 01:07:26,160 - INFO - Average MSD=72.68641662597656
+2025-06-17 01:07:28,418 - INFO - ========Equilibration: step-4100, t=82.0fs========
+2025-06-17 01:07:28,422 - INFO - osc_temps_batchavg: 199.04476928710938K
+2025-06-17 01:07:28,423 - INFO - Average MSD=73.97872924804688
+2025-06-17 01:07:30,694 - INFO - ========Equilibration: step-4150, t=83.0fs========
+2025-06-17 01:07:30,698 - INFO - osc_temps_batchavg: 198.34918212890625K
+2025-06-17 01:07:30,700 - INFO - Average MSD=75.27012634277344
+2025-06-17 01:07:32,966 - INFO - ========Equilibration: step-4200, t=84.0fs========
+2025-06-17 01:07:32,971 - INFO - osc_temps_batchavg: 197.83509826660156K
+2025-06-17 01:07:32,972 - INFO - Average MSD=76.56095886230469
+2025-06-17 01:07:35,241 - INFO - ========Equilibration: step-4250, t=85.0fs========
+2025-06-17 01:07:35,246 - INFO - osc_temps_batchavg: 197.62750244140625K
+2025-06-17 01:07:35,247 - INFO - Average MSD=77.85203552246094
+2025-06-17 01:07:37,518 - INFO - ========Equilibration: step-4300, t=86.0fs========
+2025-06-17 01:07:37,522 - INFO - osc_temps_batchavg: 197.75599670410156K
+2025-06-17 01:07:37,523 - INFO - Average MSD=79.14422607421875
+2025-06-17 01:07:39,796 - INFO - ========Equilibration: step-4350, t=87.0fs========
+2025-06-17 01:07:39,800 - INFO - osc_temps_batchavg: 198.15234375K
+2025-06-17 01:07:39,801 - INFO - Average MSD=80.43782043457031
+2025-06-17 01:07:42,065 - INFO - ========Equilibration: step-4400, t=88.0fs========
+2025-06-17 01:07:42,069 - INFO - osc_temps_batchavg: 198.67950439453125K
+2025-06-17 01:07:42,070 - INFO - Average MSD=81.7330322265625
+2025-06-17 01:07:44,343 - INFO - ========Equilibration: step-4450, t=89.00000000000001fs========
+2025-06-17 01:07:44,348 - INFO - osc_temps_batchavg: 199.18011474609375K
+2025-06-17 01:07:44,349 - INFO - Average MSD=83.02983093261719
+2025-06-17 01:07:46,613 - INFO - ========Equilibration: step-4500, t=90.00000000000001fs========
+2025-06-17 01:07:46,617 - INFO - osc_temps_batchavg: 199.52830505371094K
+2025-06-17 01:07:46,618 - INFO - Average MSD=84.32862854003906
+2025-06-17 01:07:48,885 - INFO - ========Equilibration: step-4550, t=91.00000000000001fs========
+2025-06-17 01:07:48,890 - INFO - osc_temps_batchavg: 199.66650390625K
+2025-06-17 01:07:48,891 - INFO - Average MSD=85.6298828125
+2025-06-17 01:07:51,174 - INFO - ========Equilibration: step-4600, t=92.00000000000001fs========
+2025-06-17 01:07:51,179 - INFO - osc_temps_batchavg: 199.61602783203125K
+2025-06-17 01:07:51,180 - INFO - Average MSD=86.93475341796875
+2025-06-17 01:07:53,451 - INFO - ========Equilibration: step-4650, t=93.00000000000001fs========
+2025-06-17 01:07:53,455 - INFO - osc_temps_batchavg: 199.4591064453125K
+2025-06-17 01:07:53,456 - INFO - Average MSD=88.24431610107422
+2025-06-17 01:07:55,726 - INFO - ========Equilibration: step-4700, t=94.00000000000001fs========
+2025-06-17 01:07:55,731 - INFO - osc_temps_batchavg: 199.30030822753906K
+2025-06-17 01:07:55,732 - INFO - Average MSD=89.55990600585938
+2025-06-17 01:07:57,996 - INFO - ========Equilibration: step-4750, t=95.0fs========
+2025-06-17 01:07:58,000 - INFO - osc_temps_batchavg: 199.2236328125K
+2025-06-17 01:07:58,001 - INFO - Average MSD=90.88214111328125
+2025-06-17 01:08:00,268 - INFO - ========Equilibration: step-4800, t=96.0fs========
+2025-06-17 01:08:00,272 - INFO - osc_temps_batchavg: 199.26058959960938K
+2025-06-17 01:08:00,273 - INFO - Average MSD=92.2104263305664
+2025-06-17 01:08:02,541 - INFO - ========Equilibration: step-4850, t=97.0fs========
+2025-06-17 01:08:02,546 - INFO - osc_temps_batchavg: 199.38157653808594K
+2025-06-17 01:08:02,547 - INFO - Average MSD=93.54275512695312
+2025-06-17 01:08:04,821 - INFO - ========Equilibration: step-4900, t=98.0fs========
+2025-06-17 01:08:04,825 - INFO - osc_temps_batchavg: 199.5124053955078K
+2025-06-17 01:08:04,826 - INFO - Average MSD=94.87612915039062
+2025-06-17 01:08:07,110 - INFO - ========Equilibration: step-4950, t=99.0fs========
+2025-06-17 01:08:07,114 - INFO - osc_temps_batchavg: 199.5687255859375K
+2025-06-17 01:08:07,115 - INFO - Average MSD=96.2079086303711
+2025-06-17 01:08:09,381 - INFO - ========Equilibration: step-5000, t=100.0fs========
+2025-06-17 01:08:09,385 - INFO - osc_temps_batchavg: 199.4947509765625K
+2025-06-17 01:08:09,386 - INFO - Average MSD=97.53710174560547
+2025-06-17 01:08:11,653 - INFO - ========Equilibration: step-5050, t=101.0fs========
+2025-06-17 01:08:11,657 - INFO - osc_temps_batchavg: 199.29058837890625K
+2025-06-17 01:08:11,658 - INFO - Average MSD=98.8643798828125
+2025-06-17 01:08:13,941 - INFO - ========Equilibration: step-5100, t=102.0fs========
+2025-06-17 01:08:13,946 - INFO - osc_temps_batchavg: 199.01734924316406K
+2025-06-17 01:08:13,947 - INFO - Average MSD=100.19194030761719
+2025-06-17 01:08:16,250 - INFO - ========Equilibration: step-5150, t=103.0fs========
+2025-06-17 01:08:16,254 - INFO - osc_temps_batchavg: 198.77725219726562K
+2025-06-17 01:08:16,255 - INFO - Average MSD=101.5224838256836
+2025-06-17 01:08:18,524 - INFO - ========Equilibration: step-5200, t=104.0fs========
+2025-06-17 01:08:18,528 - INFO - osc_temps_batchavg: 198.67538452148438K
+2025-06-17 01:08:18,529 - INFO - Average MSD=102.85712432861328
+2025-06-17 01:08:20,807 - INFO - ========Equilibration: step-5250, t=105.00000000000001fs========
+2025-06-17 01:08:20,811 - INFO - osc_temps_batchavg: 198.77706909179688K
+2025-06-17 01:08:20,812 - INFO - Average MSD=104.19568634033203
+2025-06-17 01:08:23,082 - INFO - ========Equilibration: step-5300, t=106.00000000000001fs========
+2025-06-17 01:08:23,087 - INFO - osc_temps_batchavg: 199.0765380859375K
+2025-06-17 01:08:23,088 - INFO - Average MSD=105.53599548339844
+2025-06-17 01:08:25,413 - INFO - ========Equilibration: step-5350, t=107.00000000000001fs========
+2025-06-17 01:08:25,417 - INFO - osc_temps_batchavg: 199.4901123046875K
+2025-06-17 01:08:25,418 - INFO - Average MSD=106.87516784667969
+2025-06-17 01:08:27,703 - INFO - ========Equilibration: step-5400, t=108.00000000000001fs========
+2025-06-17 01:08:27,707 - INFO - osc_temps_batchavg: 199.87725830078125K
+2025-06-17 01:08:27,708 - INFO - Average MSD=108.21078491210938
+2025-06-17 01:08:29,977 - INFO - ========Equilibration: step-5450, t=109.00000000000001fs========
+2025-06-17 01:08:29,981 - INFO - osc_temps_batchavg: 200.0845489501953K
+2025-06-17 01:08:29,983 - INFO - Average MSD=109.54230499267578
+2025-06-17 01:08:32,250 - INFO - ========Equilibration: step-5500, t=110.00000000000001fs========
+2025-06-17 01:08:32,254 - INFO - osc_temps_batchavg: 199.9979705810547K
+2025-06-17 01:08:32,255 - INFO - Average MSD=110.87127685546875
+2025-06-17 01:08:34,511 - INFO - ========Equilibration: step-5550, t=111.00000000000001fs========
+2025-06-17 01:08:34,516 - INFO - osc_temps_batchavg: 199.58641052246094K
+2025-06-17 01:08:34,517 - INFO - Average MSD=112.20044708251953
+2025-06-17 01:08:36,855 - INFO - ========Equilibration: step-5600, t=112.0fs========
+2025-06-17 01:08:36,860 - INFO - osc_temps_batchavg: 198.92031860351562K
+2025-06-17 01:08:36,861 - INFO - Average MSD=113.5326156616211
+2025-06-17 01:08:39,124 - INFO - ========Equilibration: step-5650, t=113.0fs========
+2025-06-17 01:08:39,128 - INFO - osc_temps_batchavg: 198.158203125K
+2025-06-17 01:08:39,129 - INFO - Average MSD=114.86965942382812
+2025-06-17 01:08:41,401 - INFO - ========Equilibration: step-5700, t=114.0fs========
+2025-06-17 01:08:41,406 - INFO - osc_temps_batchavg: 197.50343322753906K
+2025-06-17 01:08:41,407 - INFO - Average MSD=116.21283721923828
+2025-06-17 01:08:43,675 - INFO - ========Equilibration: step-5750, t=115.0fs========
+2025-06-17 01:08:43,680 - INFO - osc_temps_batchavg: 197.14324951171875K
+2025-06-17 01:08:43,681 - INFO - Average MSD=117.56304931640625
+2025-06-17 01:08:45,946 - INFO - ========Equilibration: step-5800, t=116.0fs========
+2025-06-17 01:08:45,951 - INFO - osc_temps_batchavg: 197.1897430419922K
+2025-06-17 01:08:45,952 - INFO - Average MSD=118.921875
+2025-06-17 01:08:48,208 - INFO - ========Equilibration: step-5850, t=117.0fs========
+2025-06-17 01:08:48,213 - INFO - osc_temps_batchavg: 197.64199829101562K
+2025-06-17 01:08:48,214 - INFO - Average MSD=120.29115295410156
+2025-06-17 01:08:50,469 - INFO - ========Equilibration: step-5900, t=118.0fs========
+2025-06-17 01:08:50,474 - INFO - osc_temps_batchavg: 198.38165283203125K
+2025-06-17 01:08:50,475 - INFO - Average MSD=121.67280578613281
+2025-06-17 01:08:52,739 - INFO - ========Equilibration: step-5950, t=119.0fs========
+2025-06-17 01:08:52,743 - INFO - osc_temps_batchavg: 199.20603942871094K
+2025-06-17 01:08:52,744 - INFO - Average MSD=123.06825256347656
+2025-06-17 01:08:55,002 - INFO - ========Equilibration: step-6000, t=120.0fs========
+2025-06-17 01:08:55,006 - INFO - osc_temps_batchavg: 199.8876495361328K
+2025-06-17 01:08:55,007 - INFO - Average MSD=124.47794342041016
+2025-06-17 01:08:57,263 - INFO - ========Equilibration: step-6050, t=121.00000000000001fs========
+2025-06-17 01:08:57,267 - INFO - osc_temps_batchavg: 200.24293518066406K
+2025-06-17 01:08:57,268 - INFO - Average MSD=125.90167236328125
+2025-06-17 01:08:59,526 - INFO - ========Equilibration: step-6100, t=122.00000000000001fs========
+2025-06-17 01:08:59,531 - INFO - osc_temps_batchavg: 200.1871337890625K
+2025-06-17 01:08:59,532 - INFO - Average MSD=127.33878326416016
+2025-06-17 01:09:01,793 - INFO - ========Equilibration: step-6150, t=123.00000000000001fs========
+2025-06-17 01:09:01,798 - INFO - osc_temps_batchavg: 199.75897216796875K
+2025-06-17 01:09:01,799 - INFO - Average MSD=128.78770446777344
+2025-06-17 01:09:04,063 - INFO - ========Equilibration: step-6200, t=124.00000000000001fs========
+2025-06-17 01:09:04,067 - INFO - osc_temps_batchavg: 199.10614013671875K
+2025-06-17 01:09:04,068 - INFO - Average MSD=130.24600219726562
+2025-06-17 01:09:06,340 - INFO - ========Equilibration: step-6250, t=125.0fs========
+2025-06-17 01:09:06,344 - INFO - osc_temps_batchavg: 198.43716430664062K
+2025-06-17 01:09:06,345 - INFO - Average MSD=131.71066284179688
+2025-06-17 01:09:08,604 - INFO - ========Equilibration: step-6300, t=126.0fs========
+2025-06-17 01:09:08,608 - INFO - osc_temps_batchavg: 197.95521545410156K
+2025-06-17 01:09:08,609 - INFO - Average MSD=133.17813110351562
+2025-06-17 01:09:10,873 - INFO - ========Equilibration: step-6350, t=127.0fs========
+2025-06-17 01:09:10,878 - INFO - osc_temps_batchavg: 197.79478454589844K
+2025-06-17 01:09:10,879 - INFO - Average MSD=134.64590454101562
+2025-06-17 01:09:13,142 - INFO - ========Equilibration: step-6400, t=128.0fs========
+2025-06-17 01:09:13,147 - INFO - osc_temps_batchavg: 197.98223876953125K
+2025-06-17 01:09:13,148 - INFO - Average MSD=136.11248779296875
+2025-06-17 01:09:15,414 - INFO - ========Equilibration: step-6450, t=129.0fs========
+2025-06-17 01:09:15,418 - INFO - osc_temps_batchavg: 198.43115234375K
+2025-06-17 01:09:15,419 - INFO - Average MSD=137.57801818847656
+2025-06-17 01:09:17,690 - INFO - ========Equilibration: step-6500, t=130.0fs========
+2025-06-17 01:09:17,695 - INFO - osc_temps_batchavg: 198.97393798828125K
+2025-06-17 01:09:17,696 - INFO - Average MSD=139.04339599609375
+2025-06-17 01:09:19,966 - INFO - ========Equilibration: step-6550, t=131.0fs========
+2025-06-17 01:09:19,972 - INFO - osc_temps_batchavg: 199.41867065429688K
+2025-06-17 01:09:19,973 - INFO - Average MSD=140.5095672607422
+2025-06-17 01:09:22,244 - INFO - ========Equilibration: step-6600, t=132.0fs========
+2025-06-17 01:09:22,249 - INFO - osc_temps_batchavg: 199.61154174804688K
+2025-06-17 01:09:22,250 - INFO - Average MSD=141.97674560546875
+2025-06-17 01:09:24,515 - INFO - ========Equilibration: step-6650, t=133.0fs========
+2025-06-17 01:09:24,519 - INFO - osc_temps_batchavg: 199.4853973388672K
+2025-06-17 01:09:24,520 - INFO - Average MSD=143.44480895996094
+2025-06-17 01:09:26,783 - INFO - ========Equilibration: step-6700, t=134.0fs========
+2025-06-17 01:09:26,788 - INFO - osc_temps_batchavg: 199.0781707763672K
+2025-06-17 01:09:26,789 - INFO - Average MSD=144.91348266601562
+2025-06-17 01:09:29,051 - INFO - ========Equilibration: step-6750, t=135.0fs========
+2025-06-17 01:09:29,055 - INFO - osc_temps_batchavg: 198.51675415039062K
+2025-06-17 01:09:29,057 - INFO - Average MSD=146.3818817138672
+2025-06-17 01:09:31,331 - INFO - ========Equilibration: step-6800, t=136.0fs========
+2025-06-17 01:09:31,335 - INFO - osc_temps_batchavg: 197.9725799560547K
+2025-06-17 01:09:31,336 - INFO - Average MSD=147.8492431640625
+2025-06-17 01:09:33,601 - INFO - ========Equilibration: step-6850, t=137.0fs========
+2025-06-17 01:09:33,605 - INFO - osc_temps_batchavg: 197.60443115234375K
+2025-06-17 01:09:33,606 - INFO - Average MSD=149.31442260742188
+2025-06-17 01:09:35,870 - INFO - ========Equilibration: step-6900, t=138.0fs========
+2025-06-17 01:09:35,874 - INFO - osc_temps_batchavg: 197.50790405273438K
+2025-06-17 01:09:35,875 - INFO - Average MSD=150.77647399902344
+2025-06-17 01:09:38,142 - INFO - ========Equilibration: step-6950, t=139.0fs========
+2025-06-17 01:09:38,146 - INFO - osc_temps_batchavg: 197.68751525878906K
+2025-06-17 01:09:38,147 - INFO - Average MSD=152.23538208007812
+2025-06-17 01:09:40,418 - INFO - ========Equilibration: step-7000, t=140.0fs========
+2025-06-17 01:09:40,422 - INFO - osc_temps_batchavg: 198.05979919433594K
+2025-06-17 01:09:40,423 - INFO - Average MSD=153.6923828125
+2025-06-17 01:09:42,689 - INFO - ========Equilibration: step-7050, t=141.0fs========
+2025-06-17 01:09:42,693 - INFO - osc_temps_batchavg: 198.48582458496094K
+2025-06-17 01:09:42,695 - INFO - Average MSD=155.1495361328125
+2025-06-17 01:09:44,961 - INFO - ========Equilibration: step-7100, t=142.0fs========
+2025-06-17 01:09:44,966 - INFO - osc_temps_batchavg: 198.82093811035156K
+2025-06-17 01:09:44,967 - INFO - Average MSD=156.60894775390625
+2025-06-17 01:09:47,234 - INFO - ========Equilibration: step-7150, t=143.0fs========
+2025-06-17 01:09:47,238 - INFO - osc_temps_batchavg: 198.9647979736328K
+2025-06-17 01:09:47,239 - INFO - Average MSD=158.07220458984375
+2025-06-17 01:09:49,503 - INFO - ========Equilibration: step-7200, t=144.0fs========
+2025-06-17 01:09:49,507 - INFO - osc_temps_batchavg: 198.89413452148438K
+2025-06-17 01:09:49,508 - INFO - Average MSD=159.53897094726562
+2025-06-17 01:09:51,783 - INFO - ========Equilibration: step-7250, t=145.00000000000003fs========
+2025-06-17 01:09:51,787 - INFO - osc_temps_batchavg: 198.6676788330078K
+2025-06-17 01:09:51,788 - INFO - Average MSD=161.0080108642578
+2025-06-17 01:09:54,055 - INFO - ========Equilibration: step-7300, t=146.00000000000003fs========
+2025-06-17 01:09:54,059 - INFO - osc_temps_batchavg: 198.40164184570312K
+2025-06-17 01:09:54,060 - INFO - Average MSD=162.47752380371094
+2025-06-17 01:09:56,347 - INFO - ========Equilibration: step-7350, t=147.00000000000003fs========
+2025-06-17 01:09:56,353 - INFO - osc_temps_batchavg: 198.22528076171875K
+2025-06-17 01:09:56,354 - INFO - Average MSD=163.94598388671875
+2025-06-17 01:09:58,628 - INFO - ========Equilibration: step-7400, t=148.00000000000003fs========
+2025-06-17 01:09:58,633 - INFO - osc_temps_batchavg: 198.23265075683594K
+2025-06-17 01:09:58,634 - INFO - Average MSD=165.41241455078125
+2025-06-17 01:10:00,904 - INFO - ========Equilibration: step-7450, t=149.00000000000003fs========
+2025-06-17 01:10:00,909 - INFO - osc_temps_batchavg: 198.44784545898438K
+2025-06-17 01:10:00,910 - INFO - Average MSD=166.87698364257812
+2025-06-17 01:10:03,172 - INFO - ========Equilibration: step-7500, t=150.00000000000003fs========
+2025-06-17 01:10:03,176 - INFO - osc_temps_batchavg: 198.81607055664062K
+2025-06-17 01:10:03,177 - INFO - Average MSD=168.34048461914062
+2025-06-17 01:10:05,442 - INFO - ========Equilibration: step-7550, t=151.00000000000003fs========
+2025-06-17 01:10:05,447 - INFO - osc_temps_batchavg: 199.22300720214844K
+2025-06-17 01:10:05,448 - INFO - Average MSD=169.80404663085938
+2025-06-17 01:10:07,715 - INFO - ========Equilibration: step-7600, t=152.00000000000003fs========
+2025-06-17 01:10:07,719 - INFO - osc_temps_batchavg: 199.53599548339844K
+2025-06-17 01:10:07,720 - INFO - Average MSD=171.2685546875
+2025-06-17 01:10:09,984 - INFO - ========Equilibration: step-7650, t=153.00000000000003fs========
+2025-06-17 01:10:09,988 - INFO - osc_temps_batchavg: 199.6511688232422K
+2025-06-17 01:10:09,989 - INFO - Average MSD=172.7340545654297
+2025-06-17 01:10:12,254 - INFO - ========Equilibration: step-7700, t=154.00000000000003fs========
+2025-06-17 01:10:12,258 - INFO - osc_temps_batchavg: 199.53077697753906K
+2025-06-17 01:10:12,259 - INFO - Average MSD=174.19992065429688
+2025-06-17 01:10:14,526 - INFO - ========Equilibration: step-7750, t=155.0fs========
+2025-06-17 01:10:14,530 - INFO - osc_temps_batchavg: 199.2172088623047K
+2025-06-17 01:10:14,531 - INFO - Average MSD=175.66494750976562
+2025-06-17 01:10:16,794 - INFO - ========Equilibration: step-7800, t=156.0fs========
+2025-06-17 01:10:16,798 - INFO - osc_temps_batchavg: 198.81886291503906K
+2025-06-17 01:10:16,799 - INFO - Average MSD=177.12750244140625
+2025-06-17 01:10:19,075 - INFO - ========Equilibration: step-7850, t=157.0fs========
+2025-06-17 01:10:19,079 - INFO - osc_temps_batchavg: 198.4730224609375K
+2025-06-17 01:10:19,080 - INFO - Average MSD=178.58692932128906
+2025-06-17 01:10:21,347 - INFO - ========Equilibration: step-7900, t=158.0fs========
+2025-06-17 01:10:21,352 - INFO - osc_temps_batchavg: 198.29913330078125K
+2025-06-17 01:10:21,353 - INFO - Average MSD=180.04348754882812
+2025-06-17 01:10:23,610 - INFO - ========Equilibration: step-7950, t=159.0fs========
+2025-06-17 01:10:23,615 - INFO - osc_temps_batchavg: 198.3577117919922K
+2025-06-17 01:10:23,616 - INFO - Average MSD=181.49879455566406
+2025-06-17 01:10:25,882 - INFO - ========Equilibration: step-8000, t=160.0fs========
+2025-06-17 01:10:25,887 - INFO - osc_temps_batchavg: 198.62948608398438K
+2025-06-17 01:10:25,888 - INFO - Average MSD=182.95529174804688
+2025-06-17 01:10:28,154 - INFO - ========Equilibration: step-8050, t=161.0fs========
+2025-06-17 01:10:28,158 - INFO - osc_temps_batchavg: 199.02108764648438K
+2025-06-17 01:10:28,159 - INFO - Average MSD=184.4153289794922
+2025-06-17 01:10:30,427 - INFO - ========Equilibration: step-8100, t=162.0fs========
+2025-06-17 01:10:30,431 - INFO - osc_temps_batchavg: 199.3953094482422K
+2025-06-17 01:10:30,432 - INFO - Average MSD=185.88055419921875
+2025-06-17 01:10:32,706 - INFO - ========Equilibration: step-8150, t=163.0fs========
+2025-06-17 01:10:32,710 - INFO - osc_temps_batchavg: 199.61598205566406K
+2025-06-17 01:10:32,711 - INFO - Average MSD=187.35125732421875
+2025-06-17 01:10:34,982 - INFO - ========Equilibration: step-8200, t=164.0fs========
+2025-06-17 01:10:34,987 - INFO - osc_temps_batchavg: 199.59283447265625K
+2025-06-17 01:10:34,988 - INFO - Average MSD=188.82669067382812
+2025-06-17 01:10:37,254 - INFO - ========Equilibration: step-8250, t=165.0fs========
+2025-06-17 01:10:37,258 - INFO - osc_temps_batchavg: 199.31202697753906K
+2025-06-17 01:10:37,259 - INFO - Average MSD=190.30564880371094
+2025-06-17 01:10:39,530 - INFO - ========Equilibration: step-8300, t=166.0fs========
+2025-06-17 01:10:39,535 - INFO - osc_temps_batchavg: 198.84271240234375K
+2025-06-17 01:10:39,536 - INFO - Average MSD=191.78707885742188
+2025-06-17 01:10:41,809 - INFO - ========Equilibration: step-8350, t=167.0fs========
+2025-06-17 01:10:41,814 - INFO - osc_temps_batchavg: 198.3173828125K
+2025-06-17 01:10:41,815 - INFO - Average MSD=193.2708740234375
+2025-06-17 01:10:44,091 - INFO - ========Equilibration: step-8400, t=168.0fs========
+2025-06-17 01:10:44,095 - INFO - osc_temps_batchavg: 197.8916015625K
+2025-06-17 01:10:44,096 - INFO - Average MSD=194.7574005126953
+2025-06-17 01:10:46,363 - INFO - ========Equilibration: step-8450, t=169.0fs========
+2025-06-17 01:10:46,368 - INFO - osc_temps_batchavg: 197.6963653564453K
+2025-06-17 01:10:46,369 - INFO - Average MSD=196.247314453125
+2025-06-17 01:10:48,635 - INFO - ========Equilibration: step-8500, t=170.0fs========
+2025-06-17 01:10:48,640 - INFO - osc_temps_batchavg: 197.79776000976562K
+2025-06-17 01:10:48,641 - INFO - Average MSD=197.74102783203125
+2025-06-17 01:10:50,907 - INFO - ========Equilibration: step-8550, t=171.0fs========
+2025-06-17 01:10:50,912 - INFO - osc_temps_batchavg: 198.1766815185547K
+2025-06-17 01:10:50,913 - INFO - Average MSD=199.23825073242188
+2025-06-17 01:10:53,174 - INFO - ========Equilibration: step-8600, t=172.0fs========
+2025-06-17 01:10:53,178 - INFO - osc_temps_batchavg: 198.73585510253906K
+2025-06-17 01:10:53,179 - INFO - Average MSD=200.73760986328125
+2025-06-17 01:10:55,454 - INFO - ========Equilibration: step-8650, t=173.0fs========
+2025-06-17 01:10:55,458 - INFO - osc_temps_batchavg: 199.33065795898438K
+2025-06-17 01:10:55,459 - INFO - Average MSD=202.2372283935547
+2025-06-17 01:10:57,716 - INFO - ========Equilibration: step-8700, t=174.0fs========
+2025-06-17 01:10:57,720 - INFO - osc_temps_batchavg: 199.81430053710938K
+2025-06-17 01:10:57,721 - INFO - Average MSD=203.73410034179688
+2025-06-17 01:10:59,995 - INFO - ========Equilibration: step-8750, t=175.0fs========
+2025-06-17 01:11:00,000 - INFO - osc_temps_batchavg: 200.08096313476562K
+2025-06-17 01:11:00,001 - INFO - Average MSD=205.2257843017578
+2025-06-17 01:11:02,266 - INFO - ========Equilibration: step-8800, t=176.0fs========
+2025-06-17 01:11:02,271 - INFO - osc_temps_batchavg: 200.09449768066406K
+2025-06-17 01:11:02,272 - INFO - Average MSD=206.71121215820312
+2025-06-17 01:11:04,539 - INFO - ========Equilibration: step-8850, t=177.00000000000003fs========
+2025-06-17 01:11:04,543 - INFO - osc_temps_batchavg: 199.89215087890625K
+2025-06-17 01:11:04,544 - INFO - Average MSD=208.19100952148438
+2025-06-17 01:11:06,821 - INFO - ========Equilibration: step-8900, t=178.00000000000003fs========
+2025-06-17 01:11:06,826 - INFO - osc_temps_batchavg: 199.56507873535156K
+2025-06-17 01:11:06,827 - INFO - Average MSD=209.6671142578125
+2025-06-17 01:11:09,088 - INFO - ========Equilibration: step-8950, t=179.00000000000003fs========
+2025-06-17 01:11:09,092 - INFO - osc_temps_batchavg: 199.22300720214844K
+2025-06-17 01:11:09,093 - INFO - Average MSD=211.14218139648438
+2025-06-17 01:11:11,368 - INFO - ========Equilibration: step-9000, t=180.00000000000003fs========
+2025-06-17 01:11:11,373 - INFO - osc_temps_batchavg: 198.9569549560547K
+2025-06-17 01:11:11,374 - INFO - Average MSD=212.61807250976562
+2025-06-17 01:11:13,643 - INFO - ========Equilibration: step-9050, t=181.00000000000003fs========
+2025-06-17 01:11:13,648 - INFO - osc_temps_batchavg: 198.81275939941406K
+2025-06-17 01:11:13,649 - INFO - Average MSD=214.09548950195312
+2025-06-17 01:11:15,908 - INFO - ========Equilibration: step-9100, t=182.00000000000003fs========
+2025-06-17 01:11:15,913 - INFO - osc_temps_batchavg: 198.78353881835938K
+2025-06-17 01:11:15,914 - INFO - Average MSD=215.57476806640625
+2025-06-17 01:11:18,172 - INFO - ========Equilibration: step-9150, t=183.00000000000003fs========
+2025-06-17 01:11:18,177 - INFO - osc_temps_batchavg: 198.82186889648438K
+2025-06-17 01:11:18,178 - INFO - Average MSD=217.0562744140625
+2025-06-17 01:11:20,435 - INFO - ========Equilibration: step-9200, t=184.00000000000003fs========
+2025-06-17 01:11:20,439 - INFO - osc_temps_batchavg: 198.8648681640625K
+2025-06-17 01:11:20,440 - INFO - Average MSD=218.54071044921875
+2025-06-17 01:11:22,695 - INFO - ========Equilibration: step-9250, t=185.00000000000003fs========
+2025-06-17 01:11:22,699 - INFO - osc_temps_batchavg: 198.86207580566406K
+2025-06-17 01:11:22,700 - INFO - Average MSD=220.02919006347656
+2025-06-17 01:11:25,031 - INFO - ========Equilibration: step-9300, t=186.00000000000003fs========
+2025-06-17 01:11:25,035 - INFO - osc_temps_batchavg: 198.79542541503906K
+2025-06-17 01:11:25,036 - INFO - Average MSD=221.5224609375
+2025-06-17 01:11:27,310 - INFO - ========Equilibration: step-9350, t=187.00000000000003fs========
+2025-06-17 01:11:27,315 - INFO - osc_temps_batchavg: 198.68426513671875K
+2025-06-17 01:11:27,316 - INFO - Average MSD=223.02072143554688
+2025-06-17 01:11:29,594 - INFO - ========Equilibration: step-9400, t=188.00000000000003fs========
+2025-06-17 01:11:29,598 - INFO - osc_temps_batchavg: 198.57447814941406K
+2025-06-17 01:11:29,599 - INFO - Average MSD=224.52316284179688
+2025-06-17 01:11:31,878 - INFO - ========Equilibration: step-9450, t=189.00000000000003fs========
+2025-06-17 01:11:31,883 - INFO - osc_temps_batchavg: 198.5165557861328K
+2025-06-17 01:11:31,884 - INFO - Average MSD=226.0286102294922
+2025-06-17 01:11:34,157 - INFO - ========Equilibration: step-9500, t=190.0fs========
+2025-06-17 01:11:34,161 - INFO - osc_temps_batchavg: 198.54156494140625K
+2025-06-17 01:11:34,162 - INFO - Average MSD=227.5352020263672
+2025-06-17 01:11:36,472 - INFO - ========Equilibration: step-9550, t=191.0fs========
+2025-06-17 01:11:36,476 - INFO - osc_temps_batchavg: 198.64439392089844K
+2025-06-17 01:11:36,477 - INFO - Average MSD=229.04168701171875
+2025-06-17 01:11:38,743 - INFO - ========Equilibration: step-9600, t=192.0fs========
+2025-06-17 01:11:38,747 - INFO - osc_temps_batchavg: 198.78118896484375K
+2025-06-17 01:11:38,748 - INFO - Average MSD=230.54696655273438
+2025-06-17 01:11:41,030 - INFO - ========Equilibration: step-9650, t=193.0fs========
+2025-06-17 01:11:41,034 - INFO - osc_temps_batchavg: 198.8828582763672K
+2025-06-17 01:11:41,035 - INFO - Average MSD=232.05093383789062
+2025-06-17 01:11:43,309 - INFO - ========Equilibration: step-9700, t=194.0fs========
+2025-06-17 01:11:43,313 - INFO - osc_temps_batchavg: 198.87994384765625K
+2025-06-17 01:11:43,314 - INFO - Average MSD=233.55429077148438
+2025-06-17 01:11:45,588 - INFO - ========Equilibration: step-9750, t=195.0fs========
+2025-06-17 01:11:45,593 - INFO - osc_temps_batchavg: 198.73101806640625K
+2025-06-17 01:11:45,594 - INFO - Average MSD=235.05929565429688
+2025-06-17 01:11:47,868 - INFO - ========Equilibration: step-9800, t=196.0fs========
+2025-06-17 01:11:47,873 - INFO - osc_temps_batchavg: 198.44302368164062K
+2025-06-17 01:11:47,874 - INFO - Average MSD=236.5687713623047
+2025-06-17 01:11:50,139 - INFO - ========Equilibration: step-9850, t=197.0fs========
+2025-06-17 01:11:50,143 - INFO - osc_temps_batchavg: 198.076171875K
+2025-06-17 01:11:50,145 - INFO - Average MSD=238.08551025390625
+2025-06-17 01:11:52,413 - INFO - ========Equilibration: step-9900, t=198.0fs========
+2025-06-17 01:11:52,417 - INFO - osc_temps_batchavg: 197.7300567626953K
+2025-06-17 01:11:52,418 - INFO - Average MSD=239.61148071289062
+2025-06-17 01:11:54,684 - INFO - ========Equilibration: step-9950, t=199.0fs========
+2025-06-17 01:11:54,688 - INFO - osc_temps_batchavg: 197.51451110839844K
+2025-06-17 01:11:54,689 - INFO - Average MSD=241.14755249023438
