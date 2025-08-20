@@ -1,5 +1,5 @@
-Example 1: Molecular Qubits
-===========================
+Example 1: Single Qubit dynamics
+================================
 
 Two-Level System Decay
 ----------------------

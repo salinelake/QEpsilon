@@ -1,5 +1,5 @@
-Example 2: Quantum Transport
-============================
+Example 2: Quantum Transport dynamics
+=====================================
 
 Two-Level System Decay
 ----------------------

@@ -158,7 +158,7 @@ The density matrix is a complex tensor of shape (batchsize, num_states, num_stat
 `DensityMatrix` has a property `trace` to get the trace of the density matrix.
 `DensityMatrix` has a method `normalize` to normalize a given density matrix (it does not update the stored density matrix automatically).
 
-*Subclass of `DensityMatrix`*
+*Subclass of DensityMatrix*
 
 A subclass of `DensityMatrix` is `QubitDensityMatrix`. It is initialized with the number of qubits and the batchsize. 
 It is used to represent the density matrix of a finite number of 2-level qubits. 
@@ -185,7 +185,7 @@ The pure states ensemble is a complex tensor of shape (batchsize, num_states).
 `PureStatesEnsemble` has a method `normalize` to normalize a given pure states ensemble (it does not update the stored pure states ensemble automatically).
 `PureStatesEnsemble` has a method `get_expectation` to get the expectation of an operator (a plain square matrix, not an `OperatorGroup`) on the pure states ensemble.
 
-*Subclass of `DensityMatrix`*
+*Subclass of PureStatesEnsemble*
 
 So far, there are two subclasses of `PureStatesEnsemble`: `TightBindingPureStatesEnsemble` and `QubitPureStatesEnsemble`.
 
@@ -241,7 +241,64 @@ The coefficient of the time-dependent terms in the Hamiltonian is decided by cla
 
 The simulation of these systems are implemented in the `simulation` module.
 
-** Lindblad-based simulation**
+**Lindblad-based simulation**
+
+The Lindblad-based simulation is implemented in the `LindbladSystem` class.
+It is initialized with the number of states of the system, and the batchsize.
+Upon initialization, a `DensityMatrix` object is created to store the density matrix of the system.
+
+`LindbladSystem` has a few subclasses implemented with a few helper functions for convenience.
+For example, `QubitLindbladSystem` is a subclass of `LindbladSystem` that is initialized with the number of qubits and the batchsize.
+It has a method `set_rho_by_config` to set the density matrix by a configuration vector, 
+`rotate` to apply a unitary rotation on a selected subset of qubits, 
+
+For example, a two level system can be initialized as (the next three code blocks should be run in sequence):
+
+.. code-block:: python
+
+   from qepsilon import LindbladSystem
+   tls_lindblad = LindbladSystem(num_states=2, batchsize=1)
+
+The `LindbladSystem` has a method `add_operator_group_to_hamiltonian` to add an `OperatorGroup` to the Hamiltonian of the system.
+The `LindbladSystem` has a method `add_operator_group_to_jumping` to add an `OperatorGroup` to the set of jumping operators of the system.
+
+For example, we can add a static sigma-x operator to the Hamiltonian of the two-level system, and a static sigma-z operator to the jumping operators of the system.
+
+.. code-block:: python
+
+   from qepsilon import StaticPauliOperatorGroup
+   ## add a static sigma-x operator to the Hamiltonian of the two-level system
+   ham_0 = StaticPauliOperatorGroup(n_qubits=1, id="sigma_x", batchsize=1, coef=1.0, requires_grad=False)
+   ham_0.add_operator('X')
+   tls_lindblad.add_operator_group_to_hamiltonian(ham_0)  
+
+   ## add a static sigma-z operator to the jumping operators of the system
+   jump_0 = StaticPauliOperatorGroup(n_qubits=1, id="jump_0", batchsize=1, coef=2.0, requires_grad=False)
+   jump_0.add_operator('Z')
+   tls_lindblad.add_operator_group_to_jumping(jump_0)
+
+Note that, the damping coefficient of the jumping operators has been absorbed into the coefficient of the OperatorGroup.
+In the example above, `coef=2` is specified for the `jump_0` OperatorGroup, which is associated with the one-body operator :math:`L_0=2\sigma^z`.
+This addes to the Lindblad equation the dissipator :math:`(L_0 \rho L_0^\dagger -\frac{1}{2}\{ L_0^\dagger L_0, \rho \})`, 
+which is equivalent to :math:`4(\sigma^z \rho \sigma^z  -\frac{1}{2}\{ \sigma^z \sigma^z, \rho \})` in the standard Lindblad form.
+This convention adopted by QEpsilon should be kept in mind when adding jumping operators to the system.
+
+Now, we have defined the Hamiltonian and the jumping operators of the system. It is time to simulate the dynamics of the system.
+
+.. code-block:: python
+      
+      ## set the initial state
+      system.set_rho_by_config([0])
+      # first pi/2 rotation along x
+      system.rotate(direction=th.tensor([1.0,0,0]), angle=np.pi/2)
+      # free evolution
+      for i in range(nsteps):
+         system.step(dt=dt)
+      rho_t = dm.apply_unitary_rotation(system.rho, u, np.pi/2)
+
+
+
+
 
 
 ** Schrodinger-based simulation**
@@ -261,148 +318,9 @@ The simulation of these systems are implemented in the `simulation` module.
  
 
 
-
-Here's a simple example to get you started with a two-level system (TLS):
-
-.. code-block:: python
-
-   import qepsilon as qe
-   import numpy as np
-
-   # Create a two-level system
-   tls = qe.TLS()
-   
-   # Define the system parameters
-   omega = 1.0  # Energy splitting
-   gamma = 0.1  # Decay rate
-   
-   # Create operators
-   H = omega * tls.sigma_z()  # Hamiltonian
-   L = np.sqrt(gamma) * tls.sigma_minus()  # Lindblad operator
-   
-   # Set up the simulation
-   sim = qe.LindbladSystem(hamiltonian=H, lindblad_operators=[L])
-   
-   # Define initial state (excited state)
-   rho_0 = tls.excited_state()
-   
-   # Time evolution
-   times = np.linspace(0, 10, 100)
-   results = sim.evolve(rho_0, times)
-   
-   print("Simulation completed!")
-
-Working with Different Systems
--------------------------------
-
-Spin Systems
-~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   # Create a spin-1/2 system
-   spin = qe.SpinSystem(n_sites=2, spin=0.5)
-   
-   # Heisenberg interaction
-   J = 1.0
-   H = J * (spin.Sx(0) @ spin.Sx(1) + 
-            spin.Sy(0) @ spin.Sy(1) + 
-            spin.Sz(0) @ spin.Sz(1))
-
-Bosonic Systems
-~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   # Create a bosonic mode
-   boson = qe.BosonSystem(n_modes=1, max_occupation=10)
-   
-   # Harmonic oscillator
-   omega = 1.0
-   H = omega * boson.number_operator(0)
-
-Tight-Binding Systems
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   # Create a tight-binding chain
-   tb = qe.TightBindingSystem(n_sites=4)
-   
-   # Hopping Hamiltonian
-   t = 1.0
-   H = -t * sum(tb.c_dag(i) @ tb.c(i+1) + tb.c_dag(i+1) @ tb.c(i) 
-                for i in range(3))
-
-Setting Up Master Equations
-----------------------------
-
-Lindblad Master Equation
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For open quantum systems with Markovian dynamics:
-
-.. code-block:: python
-
-   # Define system and environment
-   system = qe.TLS()
-   
-   # Hamiltonian
-   H = omega * system.sigma_z()
-   
-   # Lindblad operators for different processes
-   L_decay = np.sqrt(gamma) * system.sigma_minus()  # Spontaneous emission
-   L_dephasing = np.sqrt(gamma_phi) * system.sigma_z()  # Pure dephasing
-   
-   # Create the master equation
-   sim = qe.LindbladSystem(
-       hamiltonian=H,
-       lindblad_operators=[L_decay, L_dephasing]
-   )
-
-Unitary Evolution
-~~~~~~~~~~~~~~~~~~
-
-For closed quantum systems:
-
-.. code-block:: python
-
-   # Unitary evolution (no decoherence)
-   sim = qe.UnitarySystem(hamiltonian=H)
-
-Time-Dependent Hamiltonians
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   # Time-dependent driving
-   def H_t(t):
-       return omega * system.sigma_z() + A * np.cos(omega_drive * t) * system.sigma_x()
-   
-   sim = qe.LindbladSystem(hamiltonian=H_t, lindblad_operators=[L_decay])
-
-Running Simulations
---------------------
-
-Basic Time Evolution
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   # Initial state
-   rho_0 = system.ground_state()
-   
-   # Time points
-   times = np.linspace(0, 10, 1000)
-   
-   # Evolve
-   results = sim.evolve(rho_0, times)
-   
-   # Extract observables
-   population = [np.real(np.trace(rho @ system.sigma_z())) for rho in results]
-
+    
 GPU Acceleration
-~~~~~~~~~~~~~~~~~
+-----------------
 
 For large systems, use GPU acceleration:
 
