@@ -3,14 +3,6 @@
 ## About QEpsilon
 QEpsilon is a Python package for modeling open quantum system. QEpsilon is designed to minimize the effort required to build data-driven quantum master equation of an open quantum system and to perform time evolution of the master equation. Applications of QEpsilon span from artificial quantum systems (qubits) to molecular systems. 
 
-## Highlighted features
-- **General and flexible**, supporting the parameterization and simulation of spin, fermionic, bosonic  systems and their combinations. 
-- **GPU and sparse linear algebra supports**, making it efficient to simulate relatively large quantum systems (~20 spins or several bosonic modes). 
-- **highly modularized**, easy to implement many-body operators. 
-
-## Installation
-See the installation guide in the documentation.
-
 ## QEpsilon in a nutshell
 The quantum master equation modeled by QEpsilon is:
 
@@ -30,10 +22,19 @@ $f_j(\epsilon(t))$ is a scalar function of the multidimensional, classical dynam
 
 The classical dynamics of $\epsilon(t)$, described by parameterized Markovian equations of motion, can be optimized together with other system parameters (such as $\gamma_k$) through chain rules, and the behavior of $\rho_{\epsilon}(t)$ can match time-series data of the system.
 
-QEpsilon provides a flexible framework to do such optimization.
+QEpsilon provides a flexible framework to do such optimization and to perform time evolution of the master equation.
+
+
+## Highlighted features
+- **General and flexible**, supporting the parameterization and simulation of spin, fermionic, bosonic  systems and their combinations. 
+- **GPU and sparse linear algebra supports**, making it efficient to simulate relatively large quantum systems (~20 spins or several bosonic modes). 
+- **highly modularized**, easy to implement many-body operators. 
+
+## Installation
+See the installation guide in the documentation.
 
 ## Tutorials
 See the tutorials in the documentation.
 
 ## Examples
-See the examples in the documentation.
+See `examples` folder in the repository.

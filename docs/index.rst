@@ -48,8 +48,7 @@ scalar function of the multidimensional, classical dynamical processes :math:`\e
 The classical dynamics of :math:`\epsilon(t)`, described by parameterized Markovian equations of motion, can be optimized together with other system parameters (such as :math:`\gamma_k`) through chain rules, and the behavior of :math:`\rho_{\epsilon}(t)` can match time-series data of
 the system. 
 
-QEpsilon provides a flexible framework to do such optimization.
-
+QEpsilon provides a flexible framework to do such optimization and to perform time evolution of the master equation.
 
 
 Indices and Tables
