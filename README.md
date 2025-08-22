@@ -22,7 +22,13 @@ $f_j(\epsilon(t))$ is a scalar function of the multidimensional, classical dynam
 
 The classical dynamics of $\epsilon(t)$, described by parameterized Markovian equations of motion, can be optimized together with other system parameters (such as $\gamma_k$) through chain rules, and the behavior of $\rho_{\epsilon}(t)$ can match time-series data of the system.
 
-QEpsilon provides a flexible framework to do such optimization and to perform time evolution of the master equation.
+QEpsilon provides a flexible framework to do such optimization and to perform time evolution of the master equation. See the figure below for a high-level overview of the architecture of QEpsilon.
+
+
+<p align="center">
+  <img src="docs/_static/qepsilon.png" alt="Architecture of QEpsilon" width="80%">
+</p>
+
 
 
 ## Highlighted features
