@@ -410,20 +410,27 @@ class QubitLindbladSystem(LindbladSystem):
             raise ValueError("Config must be a sequence of 0/1 integers. Example for 2-qubit system: [0, 1] means |01>.")
         self.density_matrix.set_rho_by_config(_c)
 
-    def rotate(self, direction: th.Tensor, angle: float, config=None):
+    def rotate(self, direction: th.Tensor, angle: float, config=None, inplace: bool = True):
         """
         Apply a rotation operator about the Cartesian axes in the Bloch Basis.
         """
         rho_new = self.density_matrix.apply_unitary_rotation(self.rho, direction, angle, config)
-        self.rho = rho_new
-        return self.rho
+        if inplace:
+            self.rho = rho_new
+            return self.rho
+        else:
+            return rho_new
 
-    def kraus_operate(self, kraus_operators: list[th.Tensor], config=None):
+    def kraus_operate(self, kraus_operators: list[th.Tensor], config=None, inplace: bool = True):
         """
         Apply a Kraus operation.
         """
-        self.rho = self.density_matrix.apply_kraus_operation(self.rho, kraus_operators, config)
-        return self.rho
+        rho_new = self.density_matrix.apply_kraus_operation(self.rho, kraus_operators, config)
+        if inplace:
+            self.rho = rho_new
+            return self.rho
+        else:
+            return rho_new
     
 class ParticleLindbladSystem(QubitLindbladSystem):
     """

@@ -296,12 +296,15 @@ class QubitUnitarySystem(UnitarySystem):
             raise ValueError("Config must be a sequence of 0/1 integers. Example for 2-qubit system: [0, 1] means |01>.")
         self.pure_ensemble.set_pse_by_config(_c)
 
-    def rotate(self, direction: th.Tensor, angle: float, config=None):
+    def rotate(self, direction: th.Tensor, angle: float, config=None, inplace: bool = True):
         """
         Apply a rotation operator about the Cartesian axes in the Bloch Basis.
         """
         pse_new = self.pure_ensemble.apply_unitary_rotation(self.pse, direction, angle, config)
-        self.pse = pse_new
-        return self.pse
+        if inplace:
+            self.pse = pse_new
+            return self.pse
+        else:
+            return pse_new
 
     
