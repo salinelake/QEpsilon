@@ -47,9 +47,7 @@ See `examples` folder in the repository.
 
 ## Credits
 
-There will be a paper in the near future for QEpsilon. Before that, please cite this repository for any use of QEpsilon.
-
-The initial development of QEpsilon is done by Pinchen Xie with support from LBNL.
+Please cite <a href="https://arxiv.org/abs/2508.17170">[arXiv:2508.17170]</a> for any use of QEpsilon.
 
 ## Copyright
 QEpsilon Copyright (c) 2025, The Regents of the University of California,
