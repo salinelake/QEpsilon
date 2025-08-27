@@ -138,7 +138,7 @@ with CUDA and a GPU-enabled PyTorch installed.
 
 In QEpsilon, enabling GPU acceleration is as simple as moving the system to the GPU.
 
-First, let us test how long it takes to simulate the dynamics of a 10-qubit system for 100 time steps.
+First, let us test how long it takes to simulate the dynamics of a 12-qubit system for 10 time steps.
 
 .. code-block:: python
 
