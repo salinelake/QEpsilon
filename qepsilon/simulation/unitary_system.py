@@ -124,6 +124,14 @@ class UnitarySystem(th.nn.Module):
             raise ValueError(f"The dimension of the operator group {operator_group.id} does not match the number of states of the system.")
         self._hamiltonian_operator_group_dict[operator_group.id] = operator_group
 
+    def remove_operator_group_from_hamiltonian(self, id: str):
+        """
+        This function removes an operator group from the Hamiltonian part of the system.
+        """
+        if id not in self._hamiltonian_operator_group_dict:
+            raise ValueError(f"The ID {id} does not exist in the Hamiltonian operator group dictionary.")
+        del self._hamiltonian_operator_group_dict[id]
+        
     ############################################################
     # Methods for evolving the system
     ############################################################

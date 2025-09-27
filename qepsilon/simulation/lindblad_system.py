@@ -193,6 +193,30 @@ class LindbladSystem(th.nn.Module):
         ## TODO: check if self.ns=operator_group.ns; check also if self.nb=operator_group.nb
         self._channel_group_dict[operator_group.id] = operator_group
 
+    def remove_operator_group_from_hamiltonian(self, id: str):
+        """
+        This function removes an operator group from the Hamiltonian part of the system.
+        """
+        if id not in self._hamiltonian_operator_group_dict:
+            raise ValueError(f"The ID {id} does not exist in the Hamiltonian operator group dictionary.")
+        del self._hamiltonian_operator_group_dict[id]
+
+    def remove_operator_group_from_jumping(self, id: str):
+        """
+        This function removes an operator group from the jumping part of the system.
+        """
+        if id not in self._jumping_group_dict:
+            raise ValueError(f"The ID {id} does not exist in the jumping operator group dictionary.")
+        del self._jumping_group_dict[id]
+    
+    def remove_operator_group_from_channel(self, id: str):
+        """
+        This function removes an operator group from the channel part of the system.
+        """
+        if id not in self._channel_group_dict:
+            raise ValueError(f"The ID {id} does not exist in the channel operator group dictionary.")
+        del self._channel_group_dict[id]
+
     ############################################################
     # Methods for evolving the system
     ############################################################
