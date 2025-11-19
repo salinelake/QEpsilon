@@ -5,11 +5,10 @@ from qepsilon.utilities import compose
 from qepsilon.system.particles import Particles
 from qepsilon.operator_group.base_operators import OperatorGroup
 import warnings
-
+from typing import Callable
 ###########################################################################
 # Base class for Pauli operator groups.
 ###########################################################################
-
 class PauliOperatorGroup(OperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems). 
@@ -20,7 +19,21 @@ class PauliOperatorGroup(OperatorGroup):
         ns = 2**n_qubits
         super().__init__(id, ns, batchsize, static)
         self.pauli = Pauli(n_qubits)
-    
+
+    def set_batch_rescaling(self, batch_rescaling: th.Tensor):
+        """
+        Set the batch rescaling of the operator group. The final coefficiant will be multiplied by the batch rescaling.
+        Args:
+            batch_rescaling: th.Tensor, the batch rescaling of shape (self.nb,).
+        """
+        if batch_rescaling.shape[0] != self.nb:
+            raise ValueError("The shape of batch_rescaling must be (self.nb,).")
+        ## check if the batch_rescaling is already a registered buffer
+        if hasattr(self, "batch_rescaling"):
+            raise ValueError("batch_rescaling is already set. If you want to change the batch rescaling, you need to create a new operator group.")
+        else:
+            self.register_buffer("batch_rescaling", batch_rescaling)
+
     def add_operator(self, PauliSequence: str, prefactor: float = 1):
         """
         Add an operator to the group. Stored as a string of Pauli operator names. 
@@ -43,6 +56,7 @@ class PauliOperatorGroup(OperatorGroup):
         for op, prefactor in zip(self._ops, self._prefactors):
             total_ops += self.pauli.get_composite_ops(op) * prefactor
         return total_ops
+
 
 class IdentityPauliOperatorGroup(PauliOperatorGroup):
     def __init__(self, n_qubits: int, id: str, batchsize: int = 1):
@@ -75,8 +89,113 @@ class StaticPauliOperatorGroup(PauliOperatorGroup):
             coef: th.Tensor, the coefficient of shape (self.nb,).
         """
         ops = self.sum_operators() 
-        return ops, th.ones(self.nb, dtype=ops.dtype, device=ops.device) * self.coef
+        coef_scalar = self.coef
+        if hasattr(self, "batch_rescaling"):
+            coef = coef_scalar * self.batch_rescaling
+        else:
+            coef = coef_scalar * th.ones(self.nb, dtype=ops.dtype, device=ops.device)
+        return ops, coef
 
+class ScheduledPauliOperatorGroup(PauliOperatorGroup):
+    """
+    This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a scheduled coefficient as a function of time. 
+    The coefficient will be specified by a python function taking time as input.
+    Each operator is a direct product of Pauli operators. It is specified by a string of Pauli operator names.  For example, "XI" is the 2-body operator X_1 \otimes I_2.
+    """
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, coef_fn: Callable = None, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize)
+        self.time = 0
+        self.coef_fn = coef_fn
+        self.required_grad = requires_grad
+        if requires_grad:
+            raise ValueError("requires_grad must be False for ScheduledPauliOperatorGroup because the schedule function is not required to be differentiable")
+        if coef_fn is None:
+            raise ValueError("coef_fn must be specified for ScheduledPauliOperatorGroup. It takes time as input and returns the coefficient.")
+    
+
+    def reset(self):
+        self.time = 0
+
+    def _sample(self, dt: float = 1.0):
+        """
+        This function sum up the operators in the group.
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
+        """
+        self.time += dt
+        coef_scalar = self.coef_fn(self.time)
+        ops = self.sum_operators() 
+        if hasattr(self, "batch_rescaling"):
+            coef = coef_scalar * self.batch_rescaling
+        else:
+            coef = coef_scalar * th.ones(self.nb, dtype=ops.dtype, device=ops.device)
+        return ops, coef
+ 
+###########################################################################
+# Operators groups for Rydberg atoms. 
+###########################################################################
+class RydbergCouplingOperatorGroup(PauliOperatorGroup):
+    """
+    This class deals with Rydberg interaction between all pairs of atoms. Static positional disorder is considered. 
+    The interaction is given by:
+    H = \sum_{i,j} C6 / |r_i - r_j|^6
+    where C6 is the Rydberg coupling constant, and r_i is the position of the i-th atom.
+    """
+    def __init__(self, n_qubits: int, id: str, batchsize: int, atom_centers: th.Tensor, C6_normalized: float = 1, position_std: float = 1, static: bool = False, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize, static)
+        ## set variables
+        if requires_grad:
+            self.register_parameter("log_std", th.nn.Parameter(th.log(th.tensor(position_std, dtype=th.float))))
+        else:
+            self.register_buffer("log_std", th.log(th.tensor(position_std, dtype=th.float)))
+        self.register_buffer("C6_normalized", th.tensor(C6_normalized, dtype=th.float))
+        self.register_buffer("rand_normal", th.randn((n_qubits, batchsize, 3), dtype=th.float))
+        self.register_buffer("atom_centers", atom_centers.reshape(n_qubits, 1, 3).to(dtype=th.float))
+        
+        ## add interaction operators
+        for i in range(n_qubits):
+            for j in range(i+1, n_qubits):
+                op_name = ['I'] * n_qubits
+                op_name[i] = 'N'
+                op_name[j] = 'N'
+                self._ops.append(''.join(op_name))
+
+    def add_operator(self, PauliSequence):
+        raise ValueError("RydbergCouplingOperatorGroup does not support custom operators. The operators are sum_ij (N_iN_j) for each pair of atoms.")
+    
+    def reset(self):
+        self.rand_normal = th.randn((self.nq, self.nb, 3), dtype=self.log_std.dtype, device=self.log_std.device)
+        self.clear_buffer()
+
+    @property
+    def position_std(self):
+        return th.exp(self.log_std)
+    
+    @property
+    def atomic_positions(self):
+        return self.atom_centers + self.position_std * self.rand_normal  # shape: (nq, nb, 3)
+
+    def _sample(self, dt: float):
+        """
+        This function sum up pair-wise Rydberg interaction operators.
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
+        """
+        positions = self.atomic_positions  # shape: (nq, nb, 3)
+        total_ops = 0
+        idx = 0
+        for i in range(self.nq):
+            for j in range(i+1, self.nq):
+                prefactor = self.C6_normalized / th.norm(positions[i] - positions[j], dim=-1)**6  ## shape: (nb,)
+                total_ops += self.pauli.get_composite_ops(self._ops[idx]).reshape(1, self.ns, self.ns) * prefactor.reshape(self.nb, 1, 1)
+                idx += 1
+        return total_ops, th.ones(self.nb, dtype=total_ops.dtype, device=total_ops.device)
 ###########################################################################
 # Operators groups involving simple stochastic processes. 
 ###########################################################################
@@ -85,8 +204,8 @@ class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a shot-by-shot noise coefficient. 
     """
-    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, amp: float = 1, requires_grad: bool = False):
-        super().__init__(n_qubits, id, batchsize)
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, amp: float = 1, static: bool = False, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize, static)
         if amp<0:
             raise ValueError("amp must be non-negative")
         logamp = th.log(th.tensor(amp, dtype=th.float))
@@ -95,7 +214,6 @@ class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
         else:
             self.register_buffer("logamp", logamp)
         self.register_buffer("seed", th.randn(self.nb, dtype=logamp.dtype, device=logamp.device))
-        self.tau = None
 
     @property
     def amp(self):
@@ -103,6 +221,7 @@ class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
     
     def reset(self):
         self.seed = th.randn(self.nb, dtype=self.logamp.dtype, device=self.logamp.device)
+        self.clear_buffer()
 
     def _sample(self, dt: float):
         """
@@ -263,60 +382,7 @@ class LangevinNoisePauliOperatorGroup(PauliOperatorGroup):
         noise_new = self.noise * self.z1(dt) + drive * self.z2(dt)   
         self.noise = noise_new
         return self.sum_operators(), noise_new
-
-# class LangevinNoisePauliOperatorGroup_Conv(PauliOperatorGroup):
-#     """
-#     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a fluctuating coefficient. 
-#     """
-#     def __init__(self, n_qubits: int, id: str, batchsize: int = 1, tau: float = 1, amp: float = 1, requires_grad: bool = False):
-#         super().__init__(n_qubits, id, batchsize)
-#         self.conv_cutoff = 5
-#         self.l0 = 1000
-#         if requires_grad:
-#             self.register_parameter("tau", th.nn.Parameter(th.tensor(tau, dtype=th.float)))
-#             self.register_parameter("amp", th.nn.Parameter(th.tensor(amp, dtype=th.float)))
-#         else:
-#             self.register_buffer("tau", th.tensor(tau, dtype=th.float))
-#             self.register_buffer("amp", th.tensor(amp, dtype=th.float))
-
-#         ##  initialize the noise history, head is the newest
-#         self.register_buffer("noise", th.randn((self.nb, self.l0)))
-
-#     @property
-#     def damping(self):
-#         return 1 / th.abs(self.tau)
-    
-#     def reset(self):
-#         self.noise = th.randn((self.nb, self.l0), device=self.noise.device)
-
-#     def sample(self, dt: float):
-#         """
-#         This function steps the noise for a time step dt, then return the total operator.
-#         c(t) = \sqrt(2*damping) * amp * \int_{-\infty}^t exp(-damping * (t-s)) w(s) ds
-#         where w(s) is a white noise with zero mean and unit variance.
-#         Discretize time with t=n*dt, then
-#         c(n) = \sqrt(2*damping) * amp * sum_{i=0}^{N} exp(-damping * (i+0.5) * dt) * dW(n-i)
-#         where dW(n) is the increment of a Wiener process at time n. standard deviation is sqrt(dt).
-#         Args:
-#             dt: float, the time step.
-#         Returns:
-#             ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
-#             coef: th.Tensor, the coefficient of shape (self.nb,).
-#         """
-#         l_kernel = int(self.conv_cutoff / (self.damping * dt)) + 1
-#         l_noise = self.noise.shape[1]
-#         if l_noise < l_kernel:
-#             ## pad the noise history with white noise
-#             self.noise = th.cat([self.noise, th.randn((self.nb, l_kernel - l_noise), device=self.noise.device)], dim=1)
-#         else:
-#             ## new white noise, move the stack forward
-#             self.noise = th.cat([th.randn((self.nb, 1), device=self.noise.device), self.noise[:, :-1]], dim=1)
-#         conv_kernel = th.exp(-self.damping * (th.arange(l_kernel, dtype=self.noise.dtype, device=self.noise.device) + 0.5) * dt)
-#         coef = th.sum(self.noise[:, :l_kernel] * conv_kernel, dim=1)
-#         coef = th.sqrt(2 * self.damping) * self.amp * coef * np.sqrt(dt)
-#         return self.sum_operators(), coef
-
-
+ 
 class ColorNoisePauliOperatorGroup(LangevinNoisePauliOperatorGroup):  ## TODO: test autocorrelation
     """
     This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a color noise coefficient. 
@@ -358,11 +424,9 @@ class ColorNoisePauliOperatorGroup(LangevinNoisePauliOperatorGroup):  ## TODO: t
         coef = np.sqrt(2) * th.cos(phase) * noise_new
         return self.sum_operators(), coef
 
-
 ###########################################################################
 # Operators groups involving motion of classical particles.
 ###########################################################################
-
 
 class DipolarInteraction(PauliOperatorGroup):
     """

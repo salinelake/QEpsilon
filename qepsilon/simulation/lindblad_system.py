@@ -378,9 +378,13 @@ class LindbladSystem(th.nn.Module):
         """
         if isinstance(operator, OperatorGroup) is False:
             raise ValueError("The operator must be an OperatorGroup object. It should not be a plain array or tensor.")
-        ops, coefs = operator.sample(dt=0)
+        ops, _coefs = operator.sample(dt=0)
         ## sanitary check
-        if coefs.shape != (self.nb,):
+        if _coefs.shape == (1,):
+            coefs = th.ones(self.nb, dtype=_coefs.dtype, device=_coefs.device) * _coefs[0]
+        elif _coefs.shape == (self.nb,):
+            coefs = _coefs
+        else:
             raise ValueError("The coefficients sampled from an operator group should be a 1D tensor of length equal to the batchsize.")
         ## no broadcasting if the operators is already batched
         if ops.shape == (self.nb, self.ns, self.ns):

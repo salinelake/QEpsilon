@@ -38,6 +38,10 @@ class OperatorGroup(th.nn.Module):
         """
         pass
 
+    def clear_buffer(self):
+        self.op_static = None
+        self.coef_static = None
+
     def sample(self, dt: float=None):
         if self.static:
             if self.op_static is None:

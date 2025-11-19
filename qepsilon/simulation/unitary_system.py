@@ -173,7 +173,7 @@ class UnitarySystem(th.nn.Module):
 
     def step_pse(self, dt: float, hamiltonian: th.Tensor, set_buffer=False, set_buffer_evo=False):
         """
-        This function steps the pure state ensemble for a time step dt.
+        This function steps the pure state ensemble for a time step dt with Euler's method.
         """
         identity = th.eye(self.ns, dtype=th.cfloat).to(hamiltonian.device).unsqueeze(0).repeat(self.nb, 1, 1)
         evolution_matrix = identity - 1j * dt * hamiltonian
@@ -211,22 +211,64 @@ class UnitarySystem(th.nn.Module):
             th.cuda.synchronize()
             t1 = timer()
             logging.info(f"The time taken for stepping the Hamiltonian is {t1 - t0}s.")
-        self.pse = self.step_pse(dt, hamiltonian, set_buffer, set_buffer_evo)
+        self.pse = self.step_pse(dt, hamiltonian, set_buffer)
         if profile:
             th.cuda.synchronize()
             t2 = timer()
             logging.info(f"The time taken for stepping the pure state ensemble is {t2 - t1}s.")
         return self.pse
  
+    def step_exact(self, dt: float, set_buffer: bool = False):
+        """
+        This function steps the system for a time step dt using the exact matrix exponential method.
+        """
+        hamiltonian = self.step_hamiltonian(dt, set_buffer)
+        evo_op = th.linalg.matrix_exp(-1j * dt * hamiltonian)
+        self.pse = apply_to_pse(self.pse, evo_op)
+        return self.pse
+
+    def step_leap_frog(self, dt: float, set_buffer: bool = False):
+        """
+        This function steps the system for a time step dt using the leap frog method.
+        This only works for real-valued Hamiltonian.
+        """
+        ham_half = self.step_hamiltonian(dt/2.0, set_buffer).real
+        self.pse += dt * apply_to_pse(self.pse.imag, ham_half)
+        ham_full = self.step_hamiltonian(dt/2.0, set_buffer).real
+        self.pse += - 1j * dt * apply_to_pse(self.pse.real, ham_full)
+        return self.pse
+
+    def step_AB_scheme(self, dt: float, set_buffer: bool = False):
+        """
+        This function steps the system for a time step dt using the AB scheme.
+        A is the diagonal part of the Hamiltonian, and B is the off-diagonal part.
+        The step is given by:
+        pse(t+dt) = (1 - 1j * dt * B) * exp(-dt * A) * pse(t)
+        """
+        hamiltonian = self.step_hamiltonian(dt, set_buffer)
+        ## perform exp(-dt * A) first
+        ham_A = th.diagonal(hamiltonian, dim1=-2, dim2=-1)
+        evo_A = th.exp(-1j * dt * ham_A)   ## shape: (nb, ns)
+        self.pse = self.pse * evo_A
+        ## perform (1 - 1j * dt * B) next
+        mask = 1 - th.eye(self.ns, dtype=hamiltonian.dtype, device=hamiltonian.device).reshape(1, self.ns, self.ns)
+        ham_B = hamiltonian * mask
+        self.pse = self.step_pse(dt, ham_B, set_buffer)
+        return self.pse
+
     def observe(self, operator):
         """
         This function observes the system with an operator.
         """
         if isinstance(operator, OperatorGroup) is False:
             raise ValueError("The operator must be an OperatorGroup object. It should not be a plain array or tensor.")
-        ops, coefs = operator.sample(dt=0)
+        ops, _coefs = operator.sample(dt=0)
         ## sanitary check
-        if coefs.shape != (self.nb,):
+        if _coefs.shape == (1,):
+            coefs = th.ones(self.nb, dtype=_coefs.dtype, device=_coefs.device) * _coefs[0]
+        elif _coefs.shape == (self.nb,):
+            coefs = _coefs
+        else:
             raise ValueError("The coefficients sampled from an operator group should be a 1D tensor of length equal to the batchsize.")
         ## no broadcasting if the operators is already batched
         if ops.shape == (self.nb, self.ns, self.ns):
