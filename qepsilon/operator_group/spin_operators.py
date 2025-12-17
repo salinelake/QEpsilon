@@ -196,15 +196,91 @@ class RydbergCouplingOperatorGroup(PauliOperatorGroup):
                 total_ops += self.pauli.get_composite_ops(self._ops[idx]).reshape(1, self.ns, self.ns) * prefactor.reshape(self.nb, 1, 1)
                 idx += 1
         return total_ops, th.ones(self.nb, dtype=total_ops.dtype, device=total_ops.device)
-###########################################################################
-# Operators groups involving simple stochastic processes. 
-###########################################################################
 
-class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
+class RydbergCouplingThermalOperatorGroup(PauliOperatorGroup):
     """
-    This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a shot-by-shot noise coefficient. 
+    This class deals with Rydberg interaction between all pairs of atoms. Atoms are modeled as classical particles with constant-velocity motion.
+    The interaction is given by:
+    H = \sum_{i,j} C6 / |r_i - r_j|^6
+    where C6 is the Rydberg coupling constant, and r_i is the position of the i-th atom.
     """
-    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, amp: float = 1, static: bool = False, requires_grad: bool = False):
+    def __init__(self, n_qubits: int, id: str, batchsize: int, 
+                atom_centers: th.Tensor, 
+                C6_normalized: float = 1, 
+                position_std: float = 1, 
+                velocity_std: float = 1,
+                static: bool = False, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize, static)
+        ## set variables
+        if requires_grad:
+            raise NotImplementedError("RydbergCoupling with flexible initial position/velocity standard deviation is not implemented yet.")
+        else:
+            self.register_buffer("x_std", th.tensor(position_std, dtype=th.float))
+            self.register_buffer("v_std", th.tensor(velocity_std, dtype=th.float))
+        self.register_buffer("atom_centers", atom_centers.reshape(n_qubits, 1, 3).to(dtype=th.float))
+        self.register_buffer("C6_normalized", th.tensor(C6_normalized, dtype=th.float))
+        self.register_buffer("seed_x", th.randn((n_qubits, batchsize, 3), dtype=th.float))
+        self.register_buffer("seed_v", th.randn((n_qubits, batchsize, 3), dtype=th.float))
+        self.time = 0
+        
+        ## add interaction operators
+        for i in range(n_qubits):
+            for j in range(i+1, n_qubits):
+                op_name = ['I'] * n_qubits
+                op_name[i] = 'N'
+                op_name[j] = 'N'
+                self._ops.append(''.join(op_name))
+
+    def add_operator(self, PauliSequence):
+        raise ValueError("RydbergCouplingOperatorGroup does not support custom operators. The operators are sum_ij (N_iN_j) for each pair of atoms.")
+    
+    def reset(self):
+        self.time = 0
+        self.seed_x = th.randn((self.nq, self.nb, 3), dtype=self.x_std.dtype, device=self.x_std.device)
+        self.seed_v = th.randn((self.nq, self.nb, 3), dtype=self.v_std.dtype, device=self.v_std.device)
+        self.clear_buffer()
+
+    @property
+    def initial_position(self):
+        return self.atom_centers + self.x_std * self.seed_x  # shape: (nq, nb, 3)
+
+    @property
+    def initial_velocity(self):
+        return self.v_std * self.seed_v  # shape: (nq, nb, 3)
+
+    @property
+    def atomic_positions(self):
+        return self.initial_position + self.initial_velocity * self.time  # shape: (nq, nb, 3)
+
+    def _sample(self, dt: float):
+        """
+        This function sum up pair-wise Rydberg interaction operators.
+        Args:
+            dt: float, the time step.
+        Returns:
+            ops: th.Tensor, the operator matrix of shape (self.ns, self.ns).
+            coef: th.Tensor, the coefficient of shape (self.nb,).
+        """
+        self.time += dt
+        positions = self.atomic_positions  # shape: (nq, nb, 3)
+        total_ops = 0
+        idx = 0
+        for i in range(self.nq):
+            for j in range(i+1, self.nq):
+                distance = th.norm(positions[i] - positions[j], dim=-1)  ## shape: (nb,)
+                prefactor = self.C6_normalized / distance**6  ## shape: (nb,)
+                total_ops += self.pauli.get_composite_ops(self._ops[idx]).reshape(1, self.ns, self.ns) * prefactor.reshape(self.nb, 1, 1)
+                idx += 1
+        return total_ops, th.ones(self.nb, dtype=total_ops.dtype, device=total_ops.device)
+
+class RydbergInhomoOperatorGroup(PauliOperatorGroup):
+    """
+    This class deals with spatially inhomogeneous detuning/Rabi-Frequency noise for each qubit. The noise is shot-by-shot, hence fixed in time.
+    H = \sum_{i} n_i N_i
+    or H = \sum_{i} n_i X_i
+    where n_i is a random variable drawn from a normal distribution with mean=shift and standard deviation=amp.
+    """
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, amp: float = 1, shift: float = None, type: str = "detune", static: bool = False, requires_grad: bool = False):
         super().__init__(n_qubits, id, batchsize, static)
         if amp<0:
             raise ValueError("amp must be non-negative")
@@ -213,6 +289,70 @@ class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
             self.register_parameter("logamp", th.nn.Parameter(logamp))
         else:
             self.register_buffer("logamp", logamp)
+        if shift is None:
+            self.register_buffer("shift", th.tensor(0.0, dtype=th.float))
+        else:
+            if requires_grad:
+                self.register_parameter("shift", th.nn.Parameter(th.tensor(shift, dtype=th.float)))
+            else:
+                self.register_buffer("shift", th.tensor(shift, dtype=th.float))
+        self.register_buffer("seed", th.randn((n_qubits, batchsize), dtype=th.float))
+        ## add operators
+        for i in range(n_qubits):
+            op_name = ['I'] * n_qubits
+            if type == "detune":
+                op_name[i] = 'N'
+            elif type == "rabi":
+                op_name[i] = 'X'
+            else:
+                raise ValueError("type must be 'detune' or 'rabi'")
+            self._ops.append(''.join(op_name))
+
+    def add_operator(self, PauliSequence):
+        raise ValueError("RydbergInhomoDetuneOperatorGroup does not support custom operators.")
+    
+    @property
+    def amp(self):
+        return th.exp(self.logamp)
+    
+    def reset(self):
+        self.seed = th.randn((self.nq, self.nb), dtype=self.logamp.dtype, device=self.logamp.device)
+        self.clear_buffer()
+
+    def _sample(self, dt: float):
+        total_ops = 0
+        for i in range(self.nq):
+            noise = self.amp * self.seed[i] + self.shift
+            total_ops += self.pauli.get_composite_ops(self._ops[i]).reshape(1, self.ns, self.ns) * noise.reshape(self.nb, 1, 1)
+        return total_ops, th.ones(self.nb, dtype=total_ops.dtype, device=total_ops.device)
+
+###########################################################################
+# Operators groups involving simple stochastic processes. 
+###########################################################################
+
+class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
+    """
+    This class deals with a group of operators (composite Pauli operators on n-qubit systems) and a shot-by-shot noise coefficient. 
+    """
+    def __init__(self, n_qubits: int, id: str, batchsize: int = 1, amp: float = 1, shift: float = None, static: bool = False, requires_grad: bool = False):
+        super().__init__(n_qubits, id, batchsize, static)
+        if amp<0:
+            raise ValueError("amp must be non-negative")
+        logamp = th.log(th.tensor(amp, dtype=th.float))
+        ## set the amplitude of shot-by-shot noise
+        if requires_grad:
+            self.register_parameter("logamp", th.nn.Parameter(logamp))
+        else:
+            self.register_buffer("logamp", logamp)
+        ## set the shift of shot-by-shot noise
+        if shift is None:
+            self.register_buffer("shift", th.tensor(0.0, dtype=th.float))
+        else:
+            if requires_grad:
+                self.register_parameter("shift", th.nn.Parameter(th.tensor(shift, dtype=th.float)))
+            else:
+                self.register_buffer("shift", th.tensor(shift, dtype=th.float))
+        ## set the seed of shot-by-shot noise
         self.register_buffer("seed", th.randn(self.nb, dtype=logamp.dtype, device=logamp.device))
 
     @property
@@ -233,7 +373,7 @@ class ShotbyShotNoisePauliOperatorGroup(PauliOperatorGroup):
             coef: th.Tensor, the coefficient of shape (self.nb,).
         """
         ops = self.sum_operators() 
-        noise = self.amp * self.seed
+        noise = self.amp * self.seed + self.shift
         return ops, noise
 
 class WhiteNoisePauliOperatorGroup(PauliOperatorGroup):
